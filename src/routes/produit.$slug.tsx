@@ -71,7 +71,7 @@ function ProductPage() {
           <div className="mt-9">
             <p className="eyebrow mb-3 text-foreground/70">{tr("product.size")}</p>
             <div className="flex flex-wrap gap-2">
-              {product.sizes.map((s) => (
+              {product.sizes.map((s: string) => (
                 <button
                   key={s}
                   onClick={() => setSize(s)}

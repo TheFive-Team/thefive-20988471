@@ -29,7 +29,7 @@
   --color-ink: var(--ink);
   --font-serif: "Cormorant Garamond", "Times New Roman", serif;
   --font-sans: "Inter", system-ui, sans-serif;
-  --font-arabic: "Amiri", "Noto Naskh Arabic", serif;
+  --font-arabic: "Noto Kufi Arabic", "Amiri", "Noto Naskh Arabic", serif;
   --radius-sm: 2px;
   --radius-md: 3px;
   --radius-lg: 4px;
@@ -81,11 +81,43 @@
   [dir="rtl"] body,
   [lang="ar"] body {
     font-family: var(--font-arabic);
+    font-size: 1.0625rem;
+    line-height: 1.85;
+    font-weight: 400;
   }
-  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3,
-  [lang="ar"] h1, [lang="ar"] h2, [lang="ar"] h3 {
+  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6,
+  [lang="ar"] h1, [lang="ar"] h2, [lang="ar"] h3, [lang="ar"] h4, [lang="ar"] h5, [lang="ar"] h6 {
+    font-family: var(--font-arabic);
+    font-weight: 700;
+    line-height: 1.5;
+    letter-spacing: 0;
+  }
+  [dir="rtl"] .eyebrow,
+  [lang="ar"] .eyebrow {
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+  }
+  [dir="rtl"] button,
+  [dir="rtl"] a,
+  [dir="rtl"] input,
+  [dir="rtl"] textarea,
+  [dir="rtl"] select,
+  [lang="ar"] button,
+  [lang="ar"] a,
+  [lang="ar"] input,
+  [lang="ar"] textarea,
+  [lang="ar"] select {
     font-family: var(--font-arabic);
   }
+  [dir="rtl"] .text-xs,
+  [lang="ar"] .text-xs { font-size: 0.875rem; }
+  [dir="rtl"] .text-sm,
+  [lang="ar"] .text-sm { font-size: 1rem; }
+  [dir="rtl"] .text-\[0\.7rem\],
+  [lang="ar"] .text-\[0\.7rem\] { font-size: 0.9rem; }
+  [dir="rtl"] .text-\[0\.6rem\],
+  [lang="ar"] .text-\[0\.6rem\] { font-size: 0.8rem; }
 }
 
 @utility eyebrow {

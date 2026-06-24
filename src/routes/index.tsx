@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useI18n } from "@/lib/i18n";
-import { products } from "@/lib/products";
+import { useShopifyProducts } from "@/hooks/useShopifyProducts";
 import { ProductCard } from "@/components/product-card";
 import hero from "@/assets/hero.jpg";
 import edit1 from "@/assets/editorial-1.jpg";
@@ -20,6 +20,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { tr, lang } = useI18n();
+  const { data: products = [] } = useShopifyProducts();
   const featured = products.slice(0, 4);
 
   return (
@@ -68,9 +69,13 @@ function Index() {
           <div className="hairline mx-auto mt-5 w-24" />
           <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-muted-foreground">{tr("feat.sub")}</p>
         </div>
-        <div className="grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-4">
-          {featured.map((p) => <ProductCard key={p.slug} product={p} />)}
-        </div>
+        {featured.length === 0 ? (
+          <p className="text-center text-muted-foreground">No products found.</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-4">
+            {featured.map((p) => <ProductCard key={p.node.id} product={p} />)}
+          </div>
+        )}
         <div className="mt-14 text-center">
           <Link to="/boutique" search={{ cat: "all" }} className="inline-block border-b border-foreground pb-1 text-[0.7rem] uppercase tracking-[0.3em] hover:border-accent hover:text-accent">
             {tr("feat.view")}

@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { z } from "zod";
 import { useMemo } from "react";
 import { useI18n } from "@/lib/i18n";
-import { products } from "@/lib/products";
+import { useShopifyProducts } from "@/hooks/useShopifyProducts";
 import { ProductCard } from "@/components/product-card";
 
 const searchSchema = z.object({
@@ -22,18 +22,24 @@ export const Route = createFileRoute("/boutique")({
   component: ShopPage,
 });
 
+function matchCategory(tags: string[], productType: string, cat: string): boolean {
+  const all = [...tags.map((t) => t.toLowerCase()), productType.toLowerCase()];
+  if (cat === "boys") return all.some((t) => ["boys", "garçons", "garcons", "unisex", "unisexe"].includes(t));
+  if (cat === "girls") return all.some((t) => ["girls", "filles", "unisex", "unisexe"].includes(t));
+  if (cat === "outer") return all.some((t) => ["outer", "outerwear", "manteau", "manteaux", "veste", "vestes", "coat"].includes(t));
+  if (cat === "knit") return all.some((t) => ["knit", "knitwear", "maille", "mailles", "tricot"].includes(t));
+  return true;
+}
+
 function ShopPage() {
   const { tr } = useI18n();
   const { cat } = Route.useSearch();
+  const { data: products = [], isLoading } = useShopifyProducts();
 
   const filtered = useMemo(() => {
     if (cat === "all") return products;
-    if (cat === "boys") return products.filter((p) => p.category === "boys" || p.category === "unisex");
-    if (cat === "girls") return products.filter((p) => p.category === "girls" || p.category === "unisex");
-    if (cat === "outer") return products.filter((p) => p.type === "outer");
-    if (cat === "knit") return products.filter((p) => p.type === "knit");
-    return products;
-  }, [cat]);
+    return products.filter((p) => matchCategory(p.node.tags, p.node.productType, cat));
+  }, [cat, products]);
 
   const tabs: { key: typeof cat; label: string }[] = [
     { key: "all", label: tr("shop.all") },
@@ -64,12 +70,16 @@ function ShopPage() {
         ))}
       </div>
 
-      <div className="mt-14 grid grid-cols-2 gap-6 sm:gap-10 lg:grid-cols-3">
-        {filtered.map((p) => <ProductCard key={p.slug} product={p} />)}
-      </div>
+      {isLoading ? (
+        <p className="mt-20 text-center text-muted-foreground">Chargement…</p>
+      ) : (
+        <div className="mt-14 grid grid-cols-2 gap-6 sm:gap-10 lg:grid-cols-3">
+          {filtered.map((p) => <ProductCard key={p.node.id} product={p} />)}
+        </div>
+      )}
 
-      {filtered.length === 0 && (
-        <p className="mt-20 text-center text-muted-foreground">Aucun article dans cette catégorie pour le moment.</p>
+      {!isLoading && filtered.length === 0 && (
+        <p className="mt-20 text-center text-muted-foreground">No products found.</p>
       )}
     </div>
   );

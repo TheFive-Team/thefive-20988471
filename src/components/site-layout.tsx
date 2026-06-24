@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
-import { useCart } from "@/lib/cart";
+import { useCartCount } from "@/stores/cartStore";
 import logoAsset from "@/assets/five-a-logo.png.asset.json";
 
 export function SiteHeader() {
   const { tr, lang, setLang } = useI18n();
-  const { count } = useCart();
+  const count = useCartCount();
   const [open, setOpen] = useState(false);
 
   const navLinks = (

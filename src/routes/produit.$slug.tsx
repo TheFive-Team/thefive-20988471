@@ -1,50 +1,75 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useMemo } from "react";
 import { useI18n } from "@/lib/i18n";
-import { products, formatDZD } from "@/lib/products";
-import { useCart } from "@/lib/cart";
+import { useShopifyProduct } from "@/hooks/useShopifyProducts";
+import { useCartStore } from "@/stores/cartStore";
+import { formatMoney } from "@/lib/shopify";
 
 export const Route = createFileRoute("/produit/$slug")({
-  loader: ({ params }) => {
-    const product = products.find((p) => p.slug === params.slug);
-    if (!product) throw notFound();
-    return { product };
-  },
-  head: ({ loaderData }) => ({
+  head: ({ params }) => ({
     meta: [
-      { title: `${loaderData?.product.name.fr ?? "Produit"} — The Five A` },
-      { name: "description", content: loaderData?.product.description.fr ?? "" },
-      { property: "og:title", content: loaderData?.product.name.fr ?? "" },
-      { property: "og:description", content: loaderData?.product.description.fr ?? "" },
-      { property: "og:image", content: loaderData?.product.image ?? "" },
+      { title: `${params.slug} — The Five A` },
+      { property: "og:title", content: `${params.slug} — The Five A` },
     ],
   }),
   component: ProductPage,
-  notFoundComponent: () => (
-    <div className="px-6 py-32 text-center">
-      <h1 className="font-serif text-3xl">Article introuvable</h1>
-      <Link to="/boutique" search={{ cat: "all" }} className="mt-6 inline-block underline">Retour à la boutique</Link>
-    </div>
-  ),
 });
 
 function ProductPage() {
-  const { product } = Route.useLoaderData();
-  const { tr, lang } = useI18n();
-  const { add } = useCart();
-  const navigate = useNavigate();
-  const [size, setSize] = useState(product.sizes[1] ?? product.sizes[0]);
+  const { slug } = Route.useParams();
+  const { tr } = useI18n();
+  const { data: product, isLoading } = useShopifyProduct(slug);
+  const addItem = useCartStore((s) => s.addItem);
+  const isCartLoading = useCartStore((s) => s.isLoading);
+  const [variantId, setVariantId] = useState<string | null>(null);
   const [added, setAdded] = useState(false);
 
-  const handleAdd = () => {
-    add(product.slug, size, 1);
+  const variants = product?.node.variants.edges ?? [];
+  const selectedVariant = useMemo(
+    () => variants.find((v) => v.node.id === variantId)?.node ?? variants[0]?.node,
+    [variantId, variants],
+  );
+  const image = product?.node.images.edges[0]?.node;
+
+  if (isLoading) {
+    return <div className="px-6 py-32 text-center text-muted-foreground">Chargement…</div>;
+  }
+  if (!product) {
+    return (
+      <div className="px-6 py-32 text-center">
+        <h1 className="font-serif text-3xl">Article introuvable</h1>
+        <Link to="/boutique" search={{ cat: "all" }} className="mt-6 inline-block underline">
+          Retour à la boutique
+        </Link>
+      </div>
+    );
+  }
+
+  const p = product.node;
+  const handleAdd = async () => {
+    if (!selectedVariant) return;
+    await addItem({
+      variantId: selectedVariant.id,
+      productHandle: p.handle,
+      productTitle: p.title,
+      variantTitle: selectedVariant.title,
+      image: image?.url ?? null,
+      price: selectedVariant.price,
+      quantity: 1,
+      selectedOptions: selectedVariant.selectedOptions,
+    });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
-  };
-
-  const buyNow = () => {
-    add(product.slug, size, 1);
-    navigate({ to: "/panier" });
+    // Meta Pixel AddToCart
+    if (typeof window !== "undefined" && (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq) {
+      (window as unknown as { fbq: (...args: unknown[]) => void }).fbq("track", "AddToCart", {
+        content_ids: [p.handle],
+        content_name: p.title,
+        content_type: "product",
+        value: parseFloat(selectedVariant.price.amount),
+        currency: selectedVariant.price.currencyCode,
+      });
+    }
   };
 
   return (
@@ -54,43 +79,44 @@ function ProductPage() {
       </Link>
       <div className="mt-8 grid gap-12 md:grid-cols-2 md:gap-16">
         <div className="bg-secondary">
-          <img src={product.image} alt={product.name[lang]} width={800} height={1000} className="h-full w-full object-cover" />
+          {image && <img src={image.url} alt={image.altText ?? p.title} width={800} height={1000} className="h-full w-full object-cover" />}
         </div>
         <div className="md:py-6">
-          <p className="eyebrow text-accent">
-            {product.category === "boys" ? tr("nav.boys") : product.category === "girls" ? tr("nav.girls") : "Unisexe"}
+          {p.productType && <p className="eyebrow text-accent">{p.productType}</p>}
+          <h1 className="mt-3 font-serif text-3xl leading-tight sm:text-5xl">{p.title}</h1>
+          <p className="mt-4 text-xl tracking-wide text-foreground/85">
+            {selectedVariant ? formatMoney(selectedVariant.price) : formatMoney(p.priceRange.minVariantPrice)}
           </p>
-          <h1 className="mt-3 font-serif text-3xl leading-tight sm:text-5xl">{product.name[lang]}</h1>
-          <p className="mt-4 text-xl tracking-wide text-foreground/85">{formatDZD(product.price)}</p>
           <div className="hairline my-7 w-20" />
-          <p className="text-sm leading-relaxed text-foreground/75 sm:text-base">{product.description[lang]}</p>
-          <p className="mt-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            {lang === "ar" ? "القماش: " : "Matière : "}{product.fabric[lang]}
-          </p>
+          {p.description && <p className="text-sm leading-relaxed text-foreground/75 sm:text-base whitespace-pre-line">{p.description}</p>}
 
-          <div className="mt-9">
-            <p className="eyebrow mb-3 text-foreground/70">{tr("product.size")}</p>
-            <div className="flex flex-wrap gap-2">
-              {product.sizes.map((s: string) => (
-                <button
-                  key={s}
-                  onClick={() => setSize(s)}
-                  className={`min-w-16 border px-4 py-2.5 text-xs uppercase tracking-[0.2em] transition-colors ${
-                    size === s
-                      ? "border-foreground bg-foreground text-background"
-                      : "border-border text-foreground hover:border-foreground"
-                  }`}
-                >{s}</button>
-              ))}
+          {variants.length > 1 && (
+            <div className="mt-9">
+              <p className="eyebrow mb-3 text-foreground/70">{tr("product.size")}</p>
+              <div className="flex flex-wrap gap-2">
+                {variants.map((v) => (
+                  <button
+                    key={v.node.id}
+                    onClick={() => setVariantId(v.node.id)}
+                    disabled={!v.node.availableForSale}
+                    className={`min-w-16 border px-4 py-2.5 text-xs uppercase tracking-[0.2em] transition-colors disabled:opacity-40 ${
+                      selectedVariant?.id === v.node.id
+                        ? "border-foreground bg-foreground text-background"
+                        : "border-border text-foreground hover:border-foreground"
+                    }`}
+                  >{v.node.title}</button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <button onClick={handleAdd} className="flex-1 border border-foreground bg-background px-6 py-4 text-xs uppercase tracking-[0.28em] text-foreground transition-colors hover:bg-foreground hover:text-background">
-              {added ? "✓ Ajouté" : tr("product.add")}
-            </button>
-            <button onClick={buyNow} className="flex-1 bg-foreground px-6 py-4 text-xs uppercase tracking-[0.28em] text-background transition-colors hover:bg-accent">
-              {tr("cart.checkout")}
+            <button
+              onClick={handleAdd}
+              disabled={!selectedVariant || isCartLoading || !selectedVariant.availableForSale}
+              className="flex-1 border border-foreground bg-background px-6 py-4 text-xs uppercase tracking-[0.28em] text-foreground transition-colors hover:bg-foreground hover:text-background disabled:opacity-50"
+            >
+              {added ? "✓ Ajouté" : selectedVariant?.availableForSale === false ? "Indisponible" : tr("product.add")}
             </button>
           </div>
 

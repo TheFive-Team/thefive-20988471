@@ -26,18 +26,18 @@ function Index() {
     <div>
       {/* HERO */}
       <section className="relative">
-        <div className="relative h-[78vh] min-h-[560px] w-full overflow-hidden">
+        <div className="relative h-[68vh] min-h-[480px] w-full overflow-hidden sm:h-[78vh] sm:min-h-[560px]">
           <img src={hero} alt="The Five A — collection enfants" width={1600} height={1100} className="h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-foreground/10 via-foreground/20 to-foreground/55" />
-          <div className="absolute inset-0 flex flex-col items-center justify-end px-6 pb-16 text-center text-background sm:pb-24">
-            <p className="eyebrow text-background/85">{tr("hero.eyebrow")}</p>
-            <h1 className="mt-5 max-w-3xl whitespace-pre-line font-serif text-4xl leading-[1.05] sm:text-6xl md:text-7xl">
+          <div className="absolute inset-0 bg-gradient-to-b from-foreground/10 via-foreground/20 to-foreground/60" />
+          <div className="absolute inset-0 flex flex-col items-center justify-end px-5 pb-12 text-center text-background sm:px-6 sm:pb-24">
+            <p className="eyebrow text-background/85 text-[0.6rem] sm:text-[0.7rem]">{tr("hero.eyebrow")}</p>
+            <h1 className="mt-4 max-w-3xl whitespace-pre-line font-serif text-3xl leading-[1.1] sm:mt-5 sm:text-6xl md:text-7xl">
               {tr("hero.title")}
             </h1>
-            <p className="mt-6 max-w-xl text-sm leading-relaxed text-background/85 sm:text-base">
+            <p className="mt-4 max-w-xl text-xs leading-relaxed text-background/85 sm:mt-6 sm:text-base">
               {tr("hero.sub")}
             </p>
-            <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-9">
               <Link to="/boutique" search={{ cat: "all" }} className="bg-background px-7 py-3.5 text-[0.7rem] uppercase tracking-[0.28em] text-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
                 {tr("hero.cta")}
               </Link>

@@ -12,8 +12,11 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider } from "@/lib/i18n";
-import { CartProvider } from "@/lib/cart";
 import { SiteHeader, SiteFooter } from "@/components/site-layout";
+import { useCartSync } from "@/hooks/useCartSync";
+
+// Meta Pixel — set your Pixel ID here once Meta gives it to you
+const META_PIXEL_ID = "";
 
 function NotFoundComponent() {
   return (

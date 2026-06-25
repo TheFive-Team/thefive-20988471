@@ -1,8 +1,8 @@
 // Shopify Storefront API client
 export const SHOPIFY_API_VERSION = "2025-07";
-export const SHOPIFY_STORE_PERMANENT_DOMAIN = "i2ehph-w9.myshopify.com";
+export const SHOPIFY_STORE_PERMANENT_DOMAIN = "q1hpq2-aq.myshopify.com";
 export const SHOPIFY_STOREFRONT_URL = `https://${SHOPIFY_STORE_PERMANENT_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
-export const SHOPIFY_STOREFRONT_TOKEN = "4917b52ba0941e13d34b31faaaba459d";
+export const SHOPIFY_STOREFRONT_TOKEN = "32f051bf5abbb576ede1c13d67e5a142";
 
 export interface ShopifyMoney {
   amount: string;

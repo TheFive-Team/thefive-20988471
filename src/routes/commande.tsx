@@ -125,7 +125,7 @@ function LeadFormPage() {
           </div>
         </fieldset>
 
-        <textarea rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder={tr("checkout.notes")} className={inputCls} />
+        
 
         <div className="border border-border bg-secondary p-5 text-sm">
           <div className="flex justify-between"><span>{tr("cart.subtotal")}</span><span>{formatMoney({ amount: String(subtotal), currencyCode: currency })}</span></div>

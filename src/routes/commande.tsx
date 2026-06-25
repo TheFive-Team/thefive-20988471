@@ -104,7 +104,12 @@ function LeadFormPage() {
               <option key={w.code} value={w.code}>{w.code} — {lang === "ar" ? w.nameAr : w.name}</option>
             ))}
           </select>
-          <input required value={form.commune} onChange={(e) => setForm({ ...form, commune: e.target.value })} placeholder={tr("checkout.commune")} className={inputCls} />
+          <select required disabled={!form.wilaya} value={form.commune} onChange={(e) => setForm({ ...form, commune: e.target.value })} className={inputCls}>
+            <option value="">{tr("checkout.commune")}</option>
+            {(communesByWilaya[Number(form.wilaya)] ?? []).map((c) => (
+              <option key={c.fr} value={lang === "ar" ? c.ar : c.fr}>{lang === "ar" ? c.ar : c.fr}</option>
+            ))}
+          </select>
         </div>
 
         <fieldset className="border border-border p-5">

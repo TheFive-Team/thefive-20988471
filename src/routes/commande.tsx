@@ -30,7 +30,6 @@ function LeadFormPage() {
     wilaya: "",
     commune: "",
     method: "home" as "home" | "stop",
-    notes: "",
   });
 
   const subtotal = items.reduce((a, b) => a + parseFloat(b.price.amount) * b.quantity, 0);

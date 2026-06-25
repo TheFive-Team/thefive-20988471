@@ -4,6 +4,7 @@ import { useI18n } from "@/lib/i18n";
 import { useCartStore } from "@/stores/cartStore";
 import { formatMoney } from "@/lib/shopify";
 import { wilayas } from "@/lib/wilayas";
+import { communesByWilaya } from "@/lib/communes";
 
 export const Route = createFileRoute("/commande")({
   head: () => ({
@@ -29,7 +30,6 @@ function LeadFormPage() {
     wilaya: "",
     commune: "",
     method: "home" as "home" | "stop",
-    notes: "",
   });
 
   const subtotal = items.reduce((a, b) => a + parseFloat(b.price.amount) * b.quantity, 0);
@@ -84,6 +84,16 @@ function LeadFormPage() {
   }
 
   return (
+    <div>
+      <div className="overflow-hidden border-b border-border bg-foreground py-2 text-background">
+        <div className="marquee-track whitespace-nowrap text-[0.65rem] uppercase tracking-[0.28em]">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <span key={i} className="mx-8 inline-block">
+              ✦ {tr("ship.f2")} &nbsp; · &nbsp; {tr("ship.f1")} &nbsp; · &nbsp; {tr("ship.f3")} &nbsp; · &nbsp; {tr("checkout.cod")}
+            </span>
+          ))}
+        </div>
+      </div>
     <div className="mx-auto max-w-3xl px-6 py-16 sm:px-10 sm:py-20">
       <div className="text-center">
         <p className="eyebrow text-accent">{lang === "ar" ? "خطوة 2 من 2" : "Étape 2 / 2"}</p>
@@ -98,13 +108,18 @@ function LeadFormPage() {
         <input required value={form.fullname} onChange={(e) => setForm({ ...form, fullname: e.target.value })} placeholder={tr("checkout.fullname")} className={inputCls} />
         <input required type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder={tr("checkout.phone")} className={inputCls} />
         <div className="grid gap-5 sm:grid-cols-2">
-          <select required value={form.wilaya} onChange={(e) => setForm({ ...form, wilaya: e.target.value })} className={inputCls}>
+          <select required value={form.wilaya} onChange={(e) => setForm({ ...form, wilaya: e.target.value, commune: "" })} className={inputCls}>
             <option value="">{tr("checkout.wilaya")}</option>
             {wilayas.map((w) => (
               <option key={w.code} value={w.code}>{w.code} — {lang === "ar" ? w.nameAr : w.name}</option>
             ))}
           </select>
-          <input required value={form.commune} onChange={(e) => setForm({ ...form, commune: e.target.value })} placeholder={tr("checkout.commune")} className={inputCls} />
+          <select required disabled={!form.wilaya} value={form.commune} onChange={(e) => setForm({ ...form, commune: e.target.value })} className={inputCls}>
+            <option value="">{tr("checkout.commune")}</option>
+            {(communesByWilaya[Number(form.wilaya)] ?? []).map((c) => (
+              <option key={c.fr} value={lang === "ar" ? c.ar : c.fr}>{lang === "ar" ? c.ar : c.fr}</option>
+            ))}
+          </select>
         </div>
 
         <fieldset className="border border-border p-5">
@@ -120,7 +135,7 @@ function LeadFormPage() {
           </div>
         </fieldset>
 
-        <textarea rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder={tr("checkout.notes")} className={inputCls} />
+        
 
         <div className="border border-border bg-secondary p-5 text-sm">
           <div className="flex justify-between"><span>{tr("cart.subtotal")}</span><span>{formatMoney({ amount: String(subtotal), currencyCode: currency })}</span></div>
@@ -133,6 +148,7 @@ function LeadFormPage() {
           {submitting ? "..." : tr("checkout.confirm")}
         </button>
       </form>
+    </div>
     </div>
   );
 }

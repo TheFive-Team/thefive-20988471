@@ -4,6 +4,7 @@ import { useI18n } from "@/lib/i18n";
 import { useCartStore } from "@/stores/cartStore";
 import { formatMoney } from "@/lib/shopify";
 import { wilayas } from "@/lib/wilayas";
+import { communesByWilaya } from "@/lib/communes";
 
 export const Route = createFileRoute("/commande")({
   head: () => ({

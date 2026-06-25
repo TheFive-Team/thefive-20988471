@@ -149,6 +149,7 @@ function LeadFormPage() {
         </button>
       </form>
     </div>
+    </div>
   );
 }
 

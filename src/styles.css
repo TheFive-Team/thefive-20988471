@@ -131,3 +131,14 @@
   height: 1px;
   background: linear-gradient(to right, transparent, var(--gold), transparent);
 }
+
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  display: inline-block;
+  animation: marquee-scroll 22s linear infinite;
+  min-width: 200%;
+}

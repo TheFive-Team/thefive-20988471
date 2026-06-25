@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useI18n } from "@/lib/i18n";
 import { useCartStore } from "@/stores/cartStore";
 import { formatMoney } from "@/lib/shopify";
@@ -15,26 +15,28 @@ export const Route = createFileRoute("/panier")({
 
 function CartPage() {
   const { tr, lang } = useI18n();
+  const navigate = useNavigate();
   const items = useCartStore((s) => s.items);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
-  const checkoutUrl = useCartStore((s) => s.checkoutUrl);
   const isLoading = useCartStore((s) => s.isLoading);
 
   const subtotal = items.reduce((a, b) => a + parseFloat(b.price.amount) * b.quantity, 0);
   const currency = items[0]?.price.currencyCode ?? "DZD";
 
   const handleCheckout = () => {
-    if (!checkoutUrl) return;
-    if (typeof window !== "undefined" && (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq) {
-      (window as unknown as { fbq: (...args: unknown[]) => void }).fbq("track", "InitiateCheckout", {
+    if (items.length === 0) return;
+    if (typeof window !== "undefined") {
+      const w = window as unknown as { fbq?: (...args: unknown[]) => void };
+      w.fbq?.("track", "InitiateCheckout", {
         value: subtotal,
         currency,
         num_items: items.reduce((a, b) => a + b.quantity, 0),
       });
     }
-    window.open(checkoutUrl, "_blank");
+    navigate({ to: "/commande" });
   };
+
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10 sm:py-20">
@@ -101,7 +103,7 @@ function CartPage() {
             </dl>
             <button
               onClick={handleCheckout}
-              disabled={!checkoutUrl || isLoading}
+              disabled={isLoading}
               className="mt-6 block w-full bg-foreground py-4 text-center text-xs uppercase tracking-[0.28em] text-background hover:bg-accent disabled:opacity-50"
             >
               {tr("cart.checkout")}

@@ -49,10 +49,10 @@ function ContactPage() {
               <input required placeholder={tr("checkout.fullname")} className={inputCls} />
               <input required type="tel" placeholder={tr("checkout.phone")} className={inputCls} />
             </div>
-            <input type="email" placeholder={tr("checkout.email")} className={inputCls} />
             <input required placeholder={lang === "ar" ? "الموضوع" : "Sujet"} className={inputCls} />
             <textarea required rows={6} placeholder={lang === "ar" ? "رسالتك…" : "Votre message…"} className={inputCls} />
             <button className="bg-foreground px-8 py-4 text-xs uppercase tracking-[0.28em] text-background hover:bg-accent">
+
               {lang === "ar" ? "إرسال" : "Envoyer"}
             </button>
           </form>
@@ -61,7 +61,6 @@ function ContactPage() {
         <aside className="space-y-7 border-t border-border pt-8 md:border-l md:border-t-0 md:ps-10 md:pt-0">
           <Info label={lang === "ar" ? "الدار" : "Adresse"} v="Alger Centre, Algérie" />
           <Info label={lang === "ar" ? "الهاتف" : "Téléphone"} v="+213 555 00 00 00" />
-          <Info label="Email" v="bonjour@thefivea.dz" />
           <Info label={lang === "ar" ? "ساعات العمل" : "Horaires"} v={lang === "ar" ? "السبت — الخميس · 9h — 18h" : "Sam — Jeu · 9h — 18h"} />
         </aside>
       </div>

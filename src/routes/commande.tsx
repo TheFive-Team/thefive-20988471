@@ -98,7 +98,7 @@ function LeadFormPage() {
         <input required value={form.fullname} onChange={(e) => setForm({ ...form, fullname: e.target.value })} placeholder={tr("checkout.fullname")} className={inputCls} />
         <input required type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder={tr("checkout.phone")} className={inputCls} />
         <div className="grid gap-5 sm:grid-cols-2">
-          <select required value={form.wilaya} onChange={(e) => setForm({ ...form, wilaya: e.target.value })} className={inputCls}>
+          <select required value={form.wilaya} onChange={(e) => setForm({ ...form, wilaya: e.target.value, commune: "" })} className={inputCls}>
             <option value="">{tr("checkout.wilaya")}</option>
             {wilayas.map((w) => (
               <option key={w.code} value={w.code}>{w.code} — {lang === "ar" ? w.nameAr : w.name}</option>

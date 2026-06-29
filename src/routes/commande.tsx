@@ -43,11 +43,13 @@ function LeadFormPage() {
     setSubmitting(true);
     try {
       const ref = "FA-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-      // Meta Pixel — Lead event
+      // Meta Pixel — Lead + Purchase events (numeric variant IDs for ad matching)
       if (typeof window !== "undefined") {
         const w = window as unknown as { fbq?: (...args: unknown[]) => void };
-        w.fbq?.("track", "Lead", { value: total, currency, content_ids: items.map((i) => i.variantId) });
-        w.fbq?.("track", "Purchase", { value: total, currency });
+        const contentIds = items.map((i) => i.variantId.split("/").pop() ?? i.variantId);
+        const contents = items.map((i) => ({ id: i.variantId.split("/").pop() ?? i.variantId, quantity: i.quantity }));
+        w.fbq?.("track", "Lead", { value: total, currency, content_ids: contentIds, contents, content_type: "product" });
+        w.fbq?.("track", "Purchase", { value: total, currency, content_ids: contentIds, contents, content_type: "product", num_items: items.reduce((s, i) => s + i.quantity, 0) });
       }
       console.log("[Lead]", { ...form, items, ref, total });
       setDone(ref);
@@ -85,15 +87,6 @@ function LeadFormPage() {
 
   return (
     <div>
-      <div className="overflow-hidden border-b border-border bg-foreground py-2 text-background">
-        <div className="marquee-track whitespace-nowrap text-[0.65rem] uppercase tracking-[0.28em]">
-          {Array.from({ length: 2 }).map((_, i) => (
-            <span key={i} className="mx-8 inline-block">
-              ✦ {tr("ship.f2")} &nbsp; · &nbsp; {tr("ship.f1")} &nbsp; · &nbsp; {tr("ship.f3")} &nbsp; · &nbsp; {tr("checkout.cod")}
-            </span>
-          ))}
-        </div>
-      </div>
     <div className="mx-auto max-w-3xl px-6 py-16 sm:px-10 sm:py-20">
       <div className="text-center">
         <p className="eyebrow text-accent">{lang === "ar" ? "خطوة 2 من 2" : "Étape 2 / 2"}</p>

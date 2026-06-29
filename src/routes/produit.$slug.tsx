@@ -1,9 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useShopifyProduct } from "@/hooks/useShopifyProducts";
 import { useCartStore } from "@/stores/cartStore";
 import { formatMoney } from "@/lib/shopify";
+
+const numericId = (gid: string) => gid.split("/").pop() ?? gid;
+const fbq = (...args: unknown[]) => {
+  if (typeof window === "undefined") return;
+  const w = window as unknown as { fbq?: (...a: unknown[]) => void };
+  w.fbq?.(...args);
+};
 
 export const Route = createFileRoute("/produit/$slug")({
   head: ({ params }) => ({
@@ -29,7 +36,21 @@ function ProductPage() {
     () => variants.find((v) => v.node.id === variantId)?.node ?? variants[0]?.node,
     [variantId, variants],
   );
-  const image = product?.node.images.edges[0]?.node;
+  const images = product?.node.images.edges.map((e) => e.node) ?? [];
+  const [activeImg, setActiveImg] = useState(0);
+  const image = images[activeImg] ?? images[0];
+
+  // Meta Pixel — ViewContent
+  useEffect(() => {
+    if (!product || !selectedVariant) return;
+    fbq("track", "ViewContent", {
+      content_ids: [numericId(selectedVariant.id)],
+      content_name: product.node.title,
+      content_type: "product",
+      value: parseFloat(selectedVariant.price.amount),
+      currency: selectedVariant.price.currencyCode,
+    });
+  }, [product, selectedVariant]);
 
   if (isLoading) {
     return <div className="px-6 py-32 text-center text-muted-foreground">Chargement…</div>;
@@ -60,16 +81,13 @@ function ProductPage() {
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
-    // Meta Pixel AddToCart
-    if (typeof window !== "undefined" && (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq) {
-      (window as unknown as { fbq: (...args: unknown[]) => void }).fbq("track", "AddToCart", {
-        content_ids: [p.handle],
-        content_name: p.title,
-        content_type: "product",
-        value: parseFloat(selectedVariant.price.amount),
-        currency: selectedVariant.price.currencyCode,
-      });
-    }
+    fbq("track", "AddToCart", {
+      content_ids: [numericId(selectedVariant.id)],
+      content_name: p.title,
+      content_type: "product",
+      value: parseFloat(selectedVariant.price.amount),
+      currency: selectedVariant.price.currencyCode,
+    });
   };
 
   return (
@@ -78,8 +96,23 @@ function ProductPage() {
         ← {tr("nav.shop")}
       </Link>
       <div className="mt-8 grid gap-12 md:grid-cols-2 md:gap-16">
-        <div className="bg-secondary">
-          {image && <img src={image.url} alt={image.altText ?? p.title} width={800} height={1000} className="h-full w-full object-cover" />}
+        <div>
+          <div className="bg-secondary">
+            {image && <img src={image.url} alt={image.altText ?? p.title} width={800} height={1000} className="h-full w-full object-cover" />}
+          </div>
+          {images.length > 1 && (
+            <div className="mt-3 grid grid-cols-5 gap-2">
+              {images.map((img, i) => (
+                <button
+                  key={img.url}
+                  onClick={() => setActiveImg(i)}
+                  className={`aspect-square overflow-hidden bg-secondary border ${i === activeImg ? "border-foreground" : "border-transparent hover:border-border"}`}
+                >
+                  <img src={img.url} alt={img.altText ?? `${p.title} ${i + 1}`} className="h-full w-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div className="md:py-6">
           {p.productType && <p className="eyebrow text-accent">{p.productType}</p>}

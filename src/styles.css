@@ -137,8 +137,11 @@
   100% { transform: translateX(-50%); }
 }
 
+.marquee-viewport { overflow: hidden; }
 .marquee-track {
-  display: inline-block;
-  animation: marquee-scroll 22s linear infinite;
-  min-width: 200%;
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 28s linear infinite;
 }
+.marquee-track > * { flex: 0 0 auto; }
+

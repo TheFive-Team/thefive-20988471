@@ -28,9 +28,14 @@ function CartPage() {
     if (items.length === 0) return;
     if (typeof window !== "undefined") {
       const w = window as unknown as { fbq?: (...args: unknown[]) => void };
+      const contentIds = items.map((i) => i.variantId.split("/").pop() ?? i.variantId);
+      const contents = items.map((i) => ({ id: i.variantId.split("/").pop() ?? i.variantId, quantity: i.quantity }));
       w.fbq?.("track", "InitiateCheckout", {
         value: subtotal,
         currency,
+        content_ids: contentIds,
+        contents,
+        content_type: "product",
         num_items: items.reduce((a, b) => a + b.quantity, 0),
       });
     }

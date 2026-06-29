@@ -160,6 +160,15 @@ function ProductPage() {
           </div>
         </div>
       </div>
+
+      {p.descriptionHtml && (
+        <section className="mt-16 sm:mt-24">
+          <div
+            className="shopify-rte mx-auto max-w-4xl text-foreground/85 [&_img]:mx-auto [&_img]:my-6 [&_img]:h-auto [&_img]:max-w-full [&_h1]:font-serif [&_h2]:font-serif [&_h3]:font-serif [&_h1]:text-3xl [&_h2]:text-2xl [&_h3]:text-xl [&_h1]:mt-10 [&_h2]:mt-10 [&_h3]:mt-8 [&_h1]:mb-4 [&_h2]:mb-4 [&_h3]:mb-3 [&_p]:my-4 [&_p]:leading-relaxed [&_ul]:my-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_a]:underline [&_iframe]:mx-auto [&_iframe]:my-6 [&_iframe]:max-w-full"
+            dangerouslySetInnerHTML={{ __html: p.descriptionHtml }}
+          />
+        </section>
+      )}
     </div>
   );
 }

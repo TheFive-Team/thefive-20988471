@@ -96,8 +96,23 @@ function ProductPage() {
         ← {tr("nav.shop")}
       </Link>
       <div className="mt-8 grid gap-12 md:grid-cols-2 md:gap-16">
-        <div className="bg-secondary">
-          {image && <img src={image.url} alt={image.altText ?? p.title} width={800} height={1000} className="h-full w-full object-cover" />}
+        <div>
+          <div className="bg-secondary">
+            {image && <img src={image.url} alt={image.altText ?? p.title} width={800} height={1000} className="h-full w-full object-cover" />}
+          </div>
+          {images.length > 1 && (
+            <div className="mt-3 grid grid-cols-5 gap-2">
+              {images.map((img, i) => (
+                <button
+                  key={img.url}
+                  onClick={() => setActiveImg(i)}
+                  className={`aspect-square overflow-hidden bg-secondary border ${i === activeImg ? "border-foreground" : "border-transparent hover:border-border"}`}
+                >
+                  <img src={img.url} alt={img.altText ?? `${p.title} ${i + 1}`} className="h-full w-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div className="md:py-6">
           {p.productType && <p className="eyebrow text-accent">{p.productType}</p>}

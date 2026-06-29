@@ -1,9 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useShopifyProduct } from "@/hooks/useShopifyProducts";
 import { useCartStore } from "@/stores/cartStore";
 import { formatMoney } from "@/lib/shopify";
+
+const numericId = (gid: string) => gid.split("/").pop() ?? gid;
+const fbq = (...args: unknown[]) => {
+  if (typeof window === "undefined") return;
+  const w = window as unknown as { fbq?: (...a: unknown[]) => void };
+  w.fbq?.(...args);
+};
 
 export const Route = createFileRoute("/produit/$slug")({
   head: ({ params }) => ({

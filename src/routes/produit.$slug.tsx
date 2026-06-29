@@ -36,7 +36,21 @@ function ProductPage() {
     () => variants.find((v) => v.node.id === variantId)?.node ?? variants[0]?.node,
     [variantId, variants],
   );
-  const image = product?.node.images.edges[0]?.node;
+  const images = product?.node.images.edges.map((e) => e.node) ?? [];
+  const [activeImg, setActiveImg] = useState(0);
+  const image = images[activeImg] ?? images[0];
+
+  // Meta Pixel — ViewContent
+  useEffect(() => {
+    if (!product || !selectedVariant) return;
+    fbq("track", "ViewContent", {
+      content_ids: [numericId(selectedVariant.id)],
+      content_name: product.node.title,
+      content_type: "product",
+      value: parseFloat(selectedVariant.price.amount),
+      currency: selectedVariant.price.currencyCode,
+    });
+  }, [product, selectedVariant]);
 
   if (isLoading) {
     return <div className="px-6 py-32 text-center text-muted-foreground">Chargement…</div>;

@@ -22,6 +22,7 @@ export interface ShopifyProduct {
     id: string;
     title: string;
     description: string;
+    descriptionHtml: string;
     handle: string;
     tags: string[];
     productType: string;
@@ -34,9 +35,9 @@ export interface ShopifyProduct {
 }
 
 const STOREFRONT_PRODUCT_FIELDS = `
-  id title description handle tags productType vendor
+  id title description descriptionHtml handle tags productType vendor
   priceRange { minVariantPrice { amount currencyCode } }
-  images(first: 6) { edges { node { url altText } } }
+  images(first: 30) { edges { node { url altText } } }
   variants(first: 25) {
     edges { node {
       id title availableForSale

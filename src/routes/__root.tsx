@@ -11,9 +11,25 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { I18nProvider } from "@/lib/i18n";
+import { I18nProvider, useI18n } from "@/lib/i18n";
 import { SiteHeader, SiteFooter } from "@/components/site-layout";
 import { useCartSync } from "@/hooks/useCartSync";
+
+function PromoBar() {
+  const { tr } = useI18n();
+  const item = (
+    <span className="mx-8 inline-block whitespace-nowrap">
+      ✦ {tr("ship.f2")} &nbsp;·&nbsp; {tr("ship.f1")} &nbsp;·&nbsp; {tr("ship.f3")} &nbsp;·&nbsp;
+    </span>
+  );
+  return (
+    <div className="marquee-viewport border-b border-border bg-foreground py-2 text-background">
+      <div className="marquee-track text-[0.65rem] uppercase tracking-[0.28em]">
+        {Array.from({ length: 6 }).map((_, i) => <div key={i}>{item}</div>)}
+      </div>
+    </div>
+  );
+}
 
 // Meta Pixel — set your Pixel ID here once Meta gives it to you
 const META_PIXEL_ID = "";

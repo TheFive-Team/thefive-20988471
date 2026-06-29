@@ -81,16 +81,13 @@ function ProductPage() {
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
-    // Meta Pixel AddToCart
-    if (typeof window !== "undefined" && (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq) {
-      (window as unknown as { fbq: (...args: unknown[]) => void }).fbq("track", "AddToCart", {
-        content_ids: [p.handle],
-        content_name: p.title,
-        content_type: "product",
-        value: parseFloat(selectedVariant.price.amount),
-        currency: selectedVariant.price.currencyCode,
-      });
-    }
+    fbq("track", "AddToCart", {
+      content_ids: [numericId(selectedVariant.id)],
+      content_name: p.title,
+      content_type: "product",
+      value: parseFloat(selectedVariant.price.amount),
+      currency: selectedVariant.price.currencyCode,
+    });
   };
 
   return (

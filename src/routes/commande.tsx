@@ -85,15 +85,6 @@ function LeadFormPage() {
 
   return (
     <div>
-      <div className="overflow-hidden border-b border-border bg-foreground py-2 text-background">
-        <div className="marquee-track whitespace-nowrap text-[0.65rem] uppercase tracking-[0.28em]">
-          {Array.from({ length: 2 }).map((_, i) => (
-            <span key={i} className="mx-8 inline-block">
-              ✦ {tr("ship.f2")} &nbsp; · &nbsp; {tr("ship.f1")} &nbsp; · &nbsp; {tr("ship.f3")} &nbsp; · &nbsp; {tr("checkout.cod")}
-            </span>
-          ))}
-        </div>
-      </div>
     <div className="mx-auto max-w-3xl px-6 py-16 sm:px-10 sm:py-20">
       <div className="text-center">
         <p className="eyebrow text-accent">{lang === "ar" ? "خطوة 2 من 2" : "Étape 2 / 2"}</p>

@@ -32,7 +32,7 @@ function PromoBar() {
 }
 
 // Meta Pixel — set your Pixel ID here once Meta gives it to you
-const META_PIXEL_ID = "";
+const META_PIXEL_ID = (import.meta.env.VITE_META_PIXEL_ID as string | undefined) ?? "";
 
 function NotFoundComponent() {
   return (

@@ -121,7 +121,7 @@ function ProductPage() {
             {selectedVariant ? formatMoney(selectedVariant.price) : formatMoney(p.priceRange.minVariantPrice)}
           </p>
           <div className="hairline my-7 w-20" />
-          {p.description && <p className="text-sm leading-relaxed text-foreground/75 sm:text-base whitespace-pre-line">{p.description}</p>}
+
 
           {variants.length > 1 && (
             <div className="mt-9">

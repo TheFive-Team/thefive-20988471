@@ -43,11 +43,13 @@ function LeadFormPage() {
     setSubmitting(true);
     try {
       const ref = "FA-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-      // Meta Pixel — Lead event
+      // Meta Pixel — Lead + Purchase events (numeric variant IDs for ad matching)
       if (typeof window !== "undefined") {
         const w = window as unknown as { fbq?: (...args: unknown[]) => void };
-        w.fbq?.("track", "Lead", { value: total, currency, content_ids: items.map((i) => i.variantId) });
-        w.fbq?.("track", "Purchase", { value: total, currency });
+        const contentIds = items.map((i) => i.variantId.split("/").pop() ?? i.variantId);
+        const contents = items.map((i) => ({ id: i.variantId.split("/").pop() ?? i.variantId, quantity: i.quantity }));
+        w.fbq?.("track", "Lead", { value: total, currency, content_ids: contentIds, contents, content_type: "product" });
+        w.fbq?.("track", "Purchase", { value: total, currency, content_ids: contentIds, contents, content_type: "product", num_items: items.reduce((s, i) => s + i.quantity, 0) });
       }
       console.log("[Lead]", { ...form, items, ref, total });
       setDone(ref);

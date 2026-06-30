@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { useI18n } from "@/lib/i18n";
-import premiumLogo from "@/assets/logo-premium.png";
 
 export function SiteHeader() {
   const { tr, lang, setLang } = useI18n();
@@ -9,14 +8,10 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md">
       <div className="mx-auto flex justify-center items-center px-4 py-3 sm:px-8 sm:py-4">
         {/* Center: logo */}
-        <Link to="/" className="flex items-center justify-center">
-          <img
-            src={premiumLogo}
-            alt="The Five A — Algeria"
-            width={320}
-            height={320}
-            className="h-12 w-auto sm:h-16 md:h-20"
-          />
+        <Link to="/" className="flex items-center justify-center py-2">
+          <span className="font-serif text-3xl sm:text-4xl md:text-5xl font-medium tracking-[0.2em] text-zinc-900 uppercase">
+            The Five A
+          </span>
         </Link>
       </div>
 
@@ -38,8 +33,10 @@ export function SiteFooter() {
     <footer className="mt-20 border-t border-border bg-foreground text-background sm:mt-24">
       <div className="mx-auto grid max-w-7xl gap-10 px-6 py-12 sm:grid-cols-2 sm:gap-12 sm:px-10 sm:py-16 lg:grid-cols-4">
         <div>
-          <img src={premiumLogo} alt="The Five A" width={240} height={240} className="h-14 w-auto brightness-0 invert" loading="lazy" />
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-background/70">
+          <span className="font-serif text-3xl sm:text-4xl font-medium tracking-[0.2em] text-white uppercase">
+            The Five A
+          </span>
+          <p className="mt-6 max-w-xs text-sm leading-relaxed text-background/70">
             Vêtements raffinés pour enfants. Confectionnés avec soin, livrés partout en Algérie.
           </p>
         </div>

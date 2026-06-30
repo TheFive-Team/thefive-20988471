@@ -58,7 +58,7 @@ function Index() {
           <span>Laine · Cachemire · Coton</span>
           <span>Petites séries</span>
           <span>Livraison 48 wilayas</span>
-          <span>Paiement à la livraison</span>
+          <span>Réduction exclusive de 10% pour une durée limitée</span>
         </div>
       </section>
 

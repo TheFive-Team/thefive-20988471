@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useI18n } from "@/lib/i18n";
-import logoAsset from "@/assets/five-a-logo.png.asset.json";
+import premiumLogo from "@/assets/logo-premium.png";
 
 export function SiteHeader() {
   const { tr, lang, setLang } = useI18n();
@@ -11,7 +11,7 @@ export function SiteHeader() {
         {/* Center: logo */}
         <Link to="/" className="flex items-center justify-center">
           <img
-            src={logoAsset.url}
+            src={premiumLogo}
             alt="The Five A — Algeria"
             width={320}
             height={320}
@@ -38,7 +38,7 @@ export function SiteFooter() {
     <footer className="mt-20 border-t border-border bg-foreground text-background sm:mt-24">
       <div className="mx-auto grid max-w-7xl gap-10 px-6 py-12 sm:grid-cols-2 sm:gap-12 sm:px-10 sm:py-16 lg:grid-cols-4">
         <div>
-          <img src={logoAsset.url} alt="The Five A" width={240} height={240} className="h-14 w-auto brightness-0 invert" loading="lazy" />
+          <img src={premiumLogo} alt="The Five A" width={240} height={240} className="h-14 w-auto brightness-0 invert" loading="lazy" />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-background/70">
             Vêtements raffinés pour enfants. Confectionnés avec soin, livrés partout en Algérie.
           </p>

@@ -4,6 +4,9 @@ import { useI18n } from "@/lib/i18n";
 import { useShopifyProduct } from "@/hooks/useShopifyProducts";
 import { useCartStore } from "@/stores/cartStore";
 import { formatMoney } from "@/lib/shopify";
+import { MobileImageGallery } from "@/components/MobileImageGallery";
+import { Reviews } from "@/components/Reviews";
+import { CodForm } from "@/components/CodForm";
 
 const numericId = (gid: string) => gid.split("/").pop() ?? gid;
 const fbq = (...args: unknown[]) => {
@@ -90,13 +93,21 @@ function ProductPage() {
     });
   };
 
+  const scrollToCheckout = () => {
+    document.getElementById("checkout-form")?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16">
       <Link to="/boutique" search={{ cat: "all" }} className="text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground hover:text-accent">
         ← {tr("nav.shop")}
       </Link>
       <div className="mt-8 grid gap-12 md:grid-cols-2 md:gap-16">
-        <div>
+        <div className="block md:hidden -mx-6 sm:-mx-10">
+          {/* Hardcoded gallery for this specific product as requested */}
+          <MobileImageGallery />
+        </div>
+        <div className="hidden md:block">
           <div className="bg-secondary">
             {image && <img src={image.url} alt={image.altText ?? p.title} width={800} height={1000} className="h-full w-full object-cover" />}
           </div>
@@ -145,11 +156,11 @@ function ProductPage() {
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <button
-              onClick={handleAdd}
-              disabled={!selectedVariant || isCartLoading || !selectedVariant.availableForSale}
-              className="flex-1 border border-foreground bg-background px-6 py-4 text-xs uppercase tracking-[0.28em] text-foreground transition-colors hover:bg-foreground hover:text-background disabled:opacity-50"
+              onClick={scrollToCheckout}
+              disabled={!selectedVariant || !selectedVariant.availableForSale}
+              className="flex-1 bg-zinc-900 px-6 py-5 text-sm font-bold tracking-widest text-white transition-colors hover:bg-zinc-800 shadow-xl rounded-xl"
             >
-              {added ? "✓ Ajouté" : selectedVariant?.availableForSale === false ? "Indisponible" : tr("product.add")}
+              اطلب الآن
             </button>
           </div>
 
@@ -169,6 +180,19 @@ function ProductPage() {
           />
         </section>
       )}
+
+      {/* Reviews Section */}
+      <div className="-mx-6 sm:mx-0">
+        <Reviews />
+      </div>
+
+      {/* COD Form Checkout Section */}
+      <section className="py-16 mt-8 border-t border-border bg-zinc-50 -mx-6 px-6 sm:mx-0 sm:px-0">
+        <div className="max-w-xl mx-auto">
+          <CodForm />
+        </div>
+      </section>
+
     </div>
   );
 }

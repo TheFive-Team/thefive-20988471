@@ -98,10 +98,34 @@ function ProductPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16">
-      <Link to="/boutique" search={{ cat: "all" }} className="text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground hover:text-accent">
+    <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16 overflow-hidden">
+      <style>{`
+        @keyframes scroll-right {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0%); }
+        }
+        .animate-scroll-right {
+          animation: scroll-right 20s linear infinite;
+        }
+      `}</style>
+
+      <Link to="/boutique" search={{ cat: "all" }} className="text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground hover:text-accent mb-6 inline-block">
         ← {tr("nav.shop")}
       </Link>
+
+      {/* Animated Marquee Band */}
+      <div className="-mx-6 sm:-mx-10 mb-8 bg-zinc-900 text-white py-3 border-y border-zinc-800" dir="ltr">
+        <div className="flex animate-scroll-right w-max">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="flex items-center gap-6 px-3 whitespace-nowrap text-xs md:text-sm font-bold tracking-wide">
+              <span>🚚 توصيل سريع لـ 58 ولاية و الدفع عند الاستلام💵</span>
+              <span>📦 فتح الطرد قبل الدفع📦</span>
+              <span>🔄 إرجاع واستبدال متاح🔄</span>
+              <span>✅ جودة مضمونة وخدمة موثوقة✅</span>
+            </div>
+          ))}
+        </div>
+      </div>
       <div className="mt-8 grid gap-12 md:grid-cols-2 md:gap-16">
         <div className="block md:hidden -mx-6 sm:-mx-10">
           {/* Hardcoded gallery for this specific product as requested */}

@@ -154,11 +154,11 @@ function ProductPage() {
             </div>
           )}
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-8">
             <button
               onClick={scrollToCheckout}
               disabled={!selectedVariant || !selectedVariant.availableForSale}
-              className="flex-1 bg-zinc-900 px-6 py-5 text-sm font-bold tracking-widest text-white transition-colors hover:bg-zinc-800 shadow-xl rounded-xl"
+              className="w-full bg-zinc-900 text-white px-8 py-5 text-sm font-bold tracking-widest transition-all hover:bg-zinc-800 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               اطلب الآن
             </button>

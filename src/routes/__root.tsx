@@ -16,16 +16,26 @@ import { SiteHeader, SiteFooter } from "@/components/site-layout";
 import { useCartSync } from "@/hooks/useCartSync";
 
 function PromoBar() {
-  const { tr } = useI18n();
   const item = (
-    <span className="mx-8 inline-block whitespace-nowrap">
-      ✦ {tr("ship.f2")} &nbsp;·&nbsp; {tr("ship.f1")} &nbsp;·&nbsp; {tr("ship.f3")} &nbsp;·&nbsp;
+    <span className="mx-6 inline-block whitespace-nowrap font-bold text-[0.8rem] tracking-wide">
+      🚚 توصيل سريع لـ 58 ولاية و الدفع عند الاستلام💵 &nbsp;&nbsp;&nbsp; 📦 فتح الطرد قبل الدفع📦 &nbsp;&nbsp;&nbsp; 🔄 إرجاع واستبدال متاح🔄 &nbsp;&nbsp;&nbsp; ✅ جودة مضمونة وخدمة موثوقة✅
     </span>
   );
   return (
-    <div className="marquee-viewport border-b border-border bg-foreground py-2 text-background">
-      <div className="marquee-track text-[0.65rem] uppercase tracking-[0.28em]">
-        {Array.from({ length: 6 }).map((_, i) => <div key={i}>{item}</div>)}
+    <div className="overflow-hidden border-b border-border bg-foreground py-2 text-background" dir="ltr">
+      <style>{`
+        @keyframes scroll-right {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0%); }
+        }
+        .animate-scroll-right {
+          animation: scroll-right 30s linear infinite;
+        }
+      `}</style>
+      <div className="flex animate-scroll-right w-max">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i}>{item}</div>
+        ))}
       </div>
     </div>
   );

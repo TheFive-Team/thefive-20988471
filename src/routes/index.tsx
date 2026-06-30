@@ -1,10 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useI18n } from "@/lib/i18n";
-import { useShopifyProducts } from "@/hooks/useShopifyProducts";
-import { ProductCard } from "@/components/product-card";
-import hero from "@/assets/hero.jpg";
-import edit1 from "@/assets/editorial-1.jpg";
-import edit2 from "@/assets/editorial-2.jpg";
+import * as React from 'react';
+import { createFileRoute } from '@tanstack/react-router';
+import { ProductHero } from '../components/ProductHero';
+import { TrustBadges } from '../components/TrustBadges';
+import { Features } from '../components/Features';
+import { Reviews } from '../components/Reviews';
+import { CodForm } from '../components/CodForm';
+import { StickyCheckoutBar } from '../components/StickyCheckoutBar';
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -15,7 +16,7 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: "L'élégance se transmet, jamais ne s'achète." },
     ],
   }),
-  component: Index,
+  component: LandingPage,
 });
 
 function Index() {

@@ -130,11 +130,17 @@ function LeadFormPage() {
 
         
 
-        <div className="border border-border bg-secondary p-5 text-sm">
-          <div className="flex justify-between"><span>{tr("cart.subtotal")}</span><span>{formatMoney({ amount: String(subtotal), currencyCode: currency })}</span></div>
+        <div className="marquee-viewport border border-border bg-secondary p-5 text-sm overflow-hidden">
+          <div className="marquee-track">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <span key={i} className="mx-6 inline-block whitespace-nowrap text-[0.7rem] uppercase tracking-[0.2em] text-muted-foreground">
+                ◆ {tr("checkout.cod")} &nbsp;·&nbsp;
+              </span>
+            ))}
+          </div>
+          <div className="mt-2 flex justify-between"><span>{tr("cart.subtotal")}</span><span>{formatMoney({ amount: String(subtotal), currencyCode: currency })}</span></div>
           <div className="mt-2 flex justify-between"><span>{tr("cart.shipping")}</span><span>{shipping ? formatMoney({ amount: String(shipping), currencyCode: currency }) : "—"}</span></div>
           <div className="mt-3 flex justify-between border-t border-border pt-3 font-serif text-lg"><span>{tr("cart.total")}</span><span>{formatMoney({ amount: String(total), currencyCode: currency })}</span></div>
-          <p className="mt-3 text-[0.7rem] uppercase tracking-[0.2em] text-muted-foreground">◆ {tr("checkout.cod")}</p>
         </div>
 
         <button disabled={submitting} className="block w-full bg-foreground py-4 text-xs uppercase tracking-[0.28em] text-background hover:bg-accent disabled:opacity-50">

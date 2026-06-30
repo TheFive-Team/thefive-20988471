@@ -104,8 +104,8 @@ function ProductPage() {
       </Link>
       <div className="mt-8 grid gap-12 md:grid-cols-2 md:gap-16">
         <div className="block md:hidden -mx-6 sm:-mx-10">
-          {/* Hardcoded gallery for this specific product as requested */}
-          <MobileImageGallery />
+          {/* Dynamic gallery from Shopify */}
+          <MobileImageGallery images={images} />
         </div>
         <div className="hidden md:block">
           <div className="bg-secondary">

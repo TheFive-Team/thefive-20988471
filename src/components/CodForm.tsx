@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CheckCircle2, Truck, ShieldCheck, Clock } from "lucide-react";
+import { submitOrderFn } from "@/server/submitOrder";
 import { wilayas } from "@/lib/wilayas";
 import { communesByWilaya } from "@/lib/communes";
 
@@ -14,14 +15,29 @@ export function CodForm({ productPriceAmount }: { productPriceAmount?: string })
     address: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call for premium feel
-    setTimeout(() => {
+    
+    try {
+      const response = await submitOrderFn({
+        data: {
+          ...form,
+          productPriceAmount
+        }
+      });
+      
+      if (response.success) {
+        setSubmitted(true);
+      } else {
+        alert("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("حدث خطأ في الاتصال، يرجى المحاولة مرة أخرى");
+    } finally {
       setIsSubmitting(false);
-      setSubmitted(true);
-    }, 1200);
+    }
   };
 
   if (submitted) {

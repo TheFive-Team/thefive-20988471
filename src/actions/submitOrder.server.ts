@@ -11,6 +11,8 @@ export const submitOrderFn = createServerFn({ method: "POST" })
       address: z.string().optional(),
       variantId: z.string().optional(),
       productPriceAmount: z.string().optional(),
+      productName: z.string().optional(),
+      variantTitle: z.string().optional(),
     })
   )
   .handler(async ({ data }) => {
@@ -40,7 +42,9 @@ export const submitOrderFn = createServerFn({ method: "POST" })
               wilaya: data.wilaya,
               commune: data.commune,
               address: data.address || "",
-              productPriceAmount: totalAmount
+              productPriceAmount: totalAmount,
+              productName: data.productName || "",
+              variantTitle: data.variantTitle || ""
             }),
           });
           

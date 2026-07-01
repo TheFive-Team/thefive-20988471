@@ -4,7 +4,7 @@ import { submitOrderFn } from "@/actions/submitOrder.server";
 import { wilayas } from "@/lib/wilayas";
 import { communesByWilaya } from "@/lib/communes";
 
-export function CodForm({ productPriceAmount }: { productPriceAmount?: string }) {
+export function CodForm({ productPriceAmount, productName, variantTitle }: { productPriceAmount?: string, productName?: string, variantTitle?: string }) {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
@@ -23,7 +23,9 @@ export function CodForm({ productPriceAmount }: { productPriceAmount?: string })
       const response = await submitOrderFn({
         data: {
           ...form,
-          productPriceAmount
+          productPriceAmount,
+          productName,
+          variantTitle
         }
       });
       

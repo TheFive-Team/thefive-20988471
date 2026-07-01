@@ -173,6 +173,20 @@ function ProductPage() {
         </section>
       )}
 
+      {/* Mobile Stacked Big Images (moved to bottom) */}
+      {images.length > 1 && (
+        <section className="block md:hidden w-full flex flex-col -mx-6 sm:-mx-10 mt-10">
+          {images.slice(1).map((img, idx) => (
+            <img 
+              key={idx} 
+              src={img.url} 
+              alt={img.altText || `${p.title} detail view ${idx + 1}`} 
+              className="w-full h-auto object-cover" 
+            />
+          ))}
+        </section>
+      )}
+
       <StickyCheckoutBar price={selectedVariant?.price ?? p.priceRange.minVariantPrice} />
     </div>
   );

@@ -62,21 +62,6 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
         )}
       </section>
 
-      {/* 2. DETAILS SECTION (Vertically Stacked Images) */}
-      {/* Renders all images stacked for that GemPages look, starting from the second image to avoid immediate duplication of the cover */}
-      {images.length > 1 && (
-        <section className="w-full flex flex-col">
-          {images.slice(1).map((img, idx) => (
-            <img 
-              key={idx} 
-              src={img.url} 
-              alt={img.altText || `Detail view ${idx + 1}`} 
-              className="w-full h-auto object-cover" 
-            />
-          ))}
-        </section>
-      )}
-
     </div>
   );
 }

@@ -45,9 +45,13 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
     setIsSubmitting(true);
     
     try {
+      const selectedWilaya = wilayas.find(w => w.code === Number(form.wilaya));
+      const wilayaName = selectedWilaya ? `${selectedWilaya.code} - ${selectedWilaya.nameAr}` : form.wilaya;
+
       const response = await submitOrderFn({
         data: {
           ...form,
+          wilaya: wilayaName,
           productPriceAmount,
           productName,
           variantTitle

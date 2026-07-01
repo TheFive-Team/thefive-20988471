@@ -98,11 +98,8 @@ function ProductPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16">
-      <Link to="/boutique" search={{ cat: "all" }} className="text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground hover:text-accent">
-        ← {tr("nav.shop")}
-      </Link>
-      <div className="mt-8 grid gap-12 md:grid-cols-2 md:gap-16">
+    <div className="mx-auto max-w-7xl px-6 py-6 sm:px-10 sm:py-16">
+      <div className="grid gap-12 md:grid-cols-2 md:gap-16">
         <div className="block md:hidden -mx-6 sm:-mx-10">
           {/* Dynamic gallery from Shopify */}
           <MobileImageGallery images={images} />

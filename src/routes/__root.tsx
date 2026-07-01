@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useLocation,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -135,6 +136,9 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useCartSync();
+  const location = useLocation();
+  const isProductPage = location.pathname.startsWith("/produit");
+
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
@@ -156,7 +160,7 @@ function RootComponent() {
           <main className="flex-1">
             <Outlet />
           </main>
-          <SiteFooter />
+          {!isProductPage && <SiteFooter />}
         </div>
       </I18nProvider>
     </QueryClientProvider>

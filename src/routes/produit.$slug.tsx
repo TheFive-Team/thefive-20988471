@@ -5,8 +5,8 @@ import { useShopifyProduct } from "@/hooks/useShopifyProducts";
 import { useCartStore } from "@/stores/cartStore";
 import { formatMoney } from "@/lib/shopify";
 import { MobileImageGallery } from "@/components/MobileImageGallery";
-import { Reviews } from "@/components/Reviews";
 import { CodForm } from "@/components/CodForm";
+import { StickyCheckoutBar } from "@/components/StickyCheckoutBar";
 
 const numericId = (gid: string) => gid.split("/").pop() ?? gid;
 const fbq = (...args: unknown[]) => {
@@ -154,14 +154,9 @@ function ProductPage() {
             </div>
           )}
 
-          <div className="mt-8">
-            <button
-              onClick={scrollToCheckout}
-              disabled={!selectedVariant || !selectedVariant.availableForSale}
-              className="w-full bg-zinc-900 text-white px-8 py-5 text-sm font-bold tracking-widest transition-all hover:bg-zinc-800 disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              اطلب الآن
-            </button>
+          {/* COD Form Checkout Section Moved Here (Right after variants) */}
+          <div id="checkout-form" className="mt-12 bg-zinc-50 border border-zinc-200 p-6 -mx-6 sm:mx-0 sm:rounded-lg">
+            <CodForm />
           </div>
 
           <div className="mt-8 space-y-2 border-t border-border pt-6 text-xs text-muted-foreground">
@@ -181,18 +176,7 @@ function ProductPage() {
         </section>
       )}
 
-      {/* Reviews Section */}
-      <div className="-mx-6 sm:mx-0">
-        <Reviews />
-      </div>
-
-      {/* COD Form Checkout Section */}
-      <section className="py-16 mt-8 border-t border-border bg-zinc-50 -mx-6 px-6 sm:mx-0 sm:px-0">
-        <div className="max-w-xl mx-auto">
-          <CodForm />
-        </div>
-      </section>
-
+      <StickyCheckoutBar price={selectedVariant?.price ?? p.priceRange.minVariantPrice} />
     </div>
   );
 }

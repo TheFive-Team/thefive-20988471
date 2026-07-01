@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, Truck, ShieldCheck, Clock } from "lucide-react";
+import { CheckCircle2, Truck, ShieldCheck, Clock, RefreshCw } from "lucide-react";
 import { submitOrderFn } from "@/actions/submitOrder.server";
 import { wilayas } from "@/lib/wilayas";
 import { communesByWilaya } from "@/lib/communes";
@@ -236,20 +236,22 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
         </div>
         
         {/* Trust Badges */}
-        <div className="flex items-center justify-center gap-6 pt-6 pb-6 text-secondary bg-background rounded-2xl border border-border/50 shadow-sm mt-8">
-          <div className="flex flex-col items-center gap-2">
-            <Truck className="w-5 h-5 text-primary" strokeWidth={1.5} />
-            <span className="text-[10px] font-bold uppercase tracking-wider">توصيل سريع</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-6 gap-x-2 py-6 text-secondary bg-background rounded-2xl border border-border/50 shadow-sm mt-8 px-4">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <Truck className="w-6 h-6 text-primary" strokeWidth={1.5} />
+            <span className="text-xs font-bold tracking-wider">توصيل سريع</span>
           </div>
-          <div className="w-px h-8 bg-border/50"></div>
-          <div className="flex flex-col items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-primary" strokeWidth={1.5} />
-            <span className="text-[10px] font-bold uppercase tracking-wider">دفع آمن</span>
+          <div className="flex flex-col items-center gap-2 text-center">
+            <ShieldCheck className="w-6 h-6 text-primary" strokeWidth={1.5} />
+            <span className="text-xs font-bold tracking-wider">دفع آمن</span>
           </div>
-          <div className="w-px h-8 bg-border/50"></div>
-          <div className="flex flex-col items-center gap-2">
-            <Clock className="w-5 h-5 text-primary" strokeWidth={1.5} />
-            <span className="text-[10px] font-bold uppercase tracking-wider">خدمة 24/7</span>
+          <div className="flex flex-col items-center gap-2 text-center">
+            <RefreshCw className="w-6 h-6 text-primary" strokeWidth={1.5} />
+            <span className="text-xs font-bold tracking-wider">استبدال واسترجاع</span>
+          </div>
+          <div className="flex flex-col items-center gap-2 text-center">
+            <Clock className="w-6 h-6 text-primary" strokeWidth={1.5} />
+            <span className="text-xs font-bold tracking-wider">خدمة 24/7</span>
           </div>
         </div>
       </form>

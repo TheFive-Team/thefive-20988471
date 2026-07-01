@@ -26,7 +26,7 @@ export const submitOrderFn = createServerFn({ method: "POST" })
       console.log(`Processing Order ${orderId}`);
 
       // 3. Send to Google Sheets (via Apps Script Webhook)
-      const googleWebhookUrl = "https://script.google.com/macros/s/AKfycbz3wOIGXg0Ve21fh3XCOxnmWae5gsn7s-GPBCY0qNQWf19VnlgrIhbYjjwkr-rPtPTA/exec";
+      const googleWebhookUrl = "https://script.google.com/macros/s/AKfycbxV4NA6LOSGc1CkZ60jl6v4ZmruXYzkf8WHr-0S9oqPlayI-Z2Wv9mCmMCzF0DN6q8/exec";
       
       if (googleWebhookUrl) {
         try {

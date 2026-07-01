@@ -45,7 +45,7 @@ export function SiteFooter() {
           <p className="eyebrow text-background/60">{tr("footer.care")}</p>
           <ul className="mt-4 space-y-2 text-sm text-background/85">
             <li><Link to="/contact" className="hover:text-accent">{tr("nav.contact")}</Link></li>
-            <li><Link to="/maison" className="hover:text-accent">{tr("nav.about")}</Link></li>
+
             <li className="text-background/70">Livraison · 58 wilayas</li>
             <li className="text-background/70">Paiement à la livraison</li>
           </ul>

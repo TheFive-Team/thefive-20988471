@@ -160,11 +160,7 @@ function ProductPage() {
             />
           </div>
 
-          <div className="mt-10 space-y-3 border-t border-primary/20 pt-8 text-sm text-secondary">
-            <p className="flex items-center gap-3"><span className="text-primary">◆</span> {tr("product.cod")}</p>
-            <p className="flex items-center gap-3"><span className="text-primary">◆</span> {tr("ship.f1")}</p>
-            <p className="flex items-center gap-3"><span className="text-primary">◆</span> {tr("ship.f3")}</p>
-          </div>
+
         </div>
       </div>
 

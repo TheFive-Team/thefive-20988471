@@ -13,7 +13,7 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
     phone: "",
     wilaya: "",
     commune: "",
-    address: ""
+    shippingMethod: "home" as "home" | "stopdesk"
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,8 +50,11 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
 
       const response = await submitOrderFn({
         data: {
-          ...form,
+          fullname: form.fullname,
+          phone: form.phone,
           wilaya: wilayaName,
+          commune: form.commune,
+          address: form.shippingMethod === 'home' ? 'توصيل للمنزل' : 'الاستلام من المكتب',
           productPriceAmount,
           productName,
           variantTitle
@@ -171,17 +174,19 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
           </div>
         </div>
 
-        {/* Input: Address */}
+        {/* Shipping Method Selection */}
         <div>
-          <label htmlFor="address" className={labelClasses}>العنوان الكامل (اختياري)</label>
-          <input
-            type="text"
-            id="address"
-            value={form.address}
-            onChange={(e) => setForm({ ...form, address: e.target.value })}
-            className={inputClasses}
-            placeholder="الحي، الشارع، أو رقم المنزل"
-          />
+          <label className={labelClasses}>طريقة التوصيل</label>
+          <div className="grid grid-cols-2 gap-4 mt-2">
+            <label className={`flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${form.shippingMethod === 'home' ? 'border-primary bg-primary/5 text-primary shadow-sm' : 'border-border text-foreground/70 hover:border-accent'}`}>
+              <input type="radio" name="shippingMethod" value="home" checked={form.shippingMethod === 'home'} onChange={(e) => setForm({...form, shippingMethod: 'home'})} className="sr-only" />
+              <span className="text-sm font-bold">توصيل للمنزل</span>
+            </label>
+            <label className={`flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${form.shippingMethod === 'stopdesk' ? 'border-primary bg-primary/5 text-primary shadow-sm' : 'border-border text-foreground/70 hover:border-accent'}`}>
+              <input type="radio" name="shippingMethod" value="stopdesk" checked={form.shippingMethod === 'stopdesk'} onChange={(e) => setForm({...form, shippingMethod: 'stopdesk'})} className="sr-only" />
+              <span className="text-sm font-bold">الاستلام من المكتب</span>
+            </label>
+          </div>
         </div>
 
         {/* Price Breakdown */}
@@ -195,7 +200,7 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
               <span>سعر التوصيل</span>
               <span className="font-serif dir-ltr">
                 {form.wilaya ? (
-                  `+ ${wilayas.find(w => w.code === Number(form.wilaya))?.home.toLocaleString()} د.ج`
+                  `+ ${(form.shippingMethod === 'home' ? wilayas.find(w => w.code === Number(form.wilaya))?.home : wilayas.find(w => w.code === Number(form.wilaya))?.stop)?.toLocaleString()} د.ج`
                 ) : (
                   "اختر الولاية"
                 )}
@@ -206,7 +211,7 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
               <span>المجموع الكلي</span>
               <span className="font-serif dir-ltr text-lg text-primary">
                 {form.wilaya ? (
-                  `${(Number(productPriceAmount) + (wilayas.find(w => w.code === Number(form.wilaya))?.home || 0)).toLocaleString()} د.ج`
+                  `${(Number(productPriceAmount) + ((form.shippingMethod === 'home' ? wilayas.find(w => w.code === Number(form.wilaya))?.home : wilayas.find(w => w.code === Number(form.wilaya))?.stop) || 0)).toLocaleString()} د.ج`
                 ) : (
                   `${Number(productPriceAmount).toLocaleString()} د.ج`
                 )}

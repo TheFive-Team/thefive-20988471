@@ -179,7 +179,7 @@ function ProductPage() {
 
       {/* Mobile Stacked Big Images (moved to bottom) */}
       {images.length > 1 && (
-        <section className="block md:hidden w-full flex flex-col items-center justify-center -mx-6 sm:-mx-10 mt-16 space-y-4 px-6">
+        <section className="block md:hidden w-full flex flex-col items-center justify-center mt-16 space-y-4">
           {images.slice(1).map((img, idx) => (
             <img 
               key={idx} 

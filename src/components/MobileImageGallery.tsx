@@ -30,7 +30,7 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
   if (!images || images.length === 0) return null;
 
   return (
-    <div className="w-full max-w-md mx-auto bg-white flex flex-col gap-8 pb-12">
+    <div className="w-full max-w-md mx-auto bg-transparent flex flex-col gap-8 pb-12">
       
       {/* 1. MAIN GALLERY (Top Carousel + Thumbnails) */}
       <section className="w-full">

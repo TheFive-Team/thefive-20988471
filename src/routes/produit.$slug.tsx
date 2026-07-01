@@ -99,7 +99,7 @@ function ProductPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10 sm:py-24">
-      <div className="grid gap-8 md:grid-cols-2 md:gap-10 lg:gap-12">
+      <div className="grid gap-0 md:grid-cols-2 md:gap-10 lg:gap-12">
         <div className="block md:hidden -mx-6 sm:-mx-10">
           {/* Dynamic gallery from Shopify */}
           <MobileImageGallery images={images} />
@@ -122,7 +122,7 @@ function ProductPage() {
             </div>
           )}
         </div>
-        <div className="md:py-6">
+        <div>
           {p.productType && <p className="eyebrow text-accent">{p.productType}</p>}
           <h1 className="mt-2 font-serif font-bold text-secondary text-3xl leading-tight sm:text-5xl">{p.title}</h1>
           <p className="mt-1 text-2xl sm:text-3xl font-medium tracking-wide text-primary">

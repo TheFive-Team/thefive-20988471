@@ -124,15 +124,15 @@ function ProductPage() {
         </div>
         <div className="md:py-6">
           {p.productType && <p className="eyebrow text-accent">{p.productType}</p>}
-          <h1 className="mt-3 font-serif font-bold text-secondary text-3xl leading-tight sm:text-6xl">{p.title}</h1>
-          <p className="mt-2 text-2xl sm:text-3xl font-medium tracking-wide text-primary">
+          <h1 className="mt-2 font-serif font-bold text-secondary text-3xl leading-tight sm:text-5xl">{p.title}</h1>
+          <p className="mt-1 text-2xl sm:text-3xl font-medium tracking-wide text-primary">
             {selectedVariant ? formatMoney(selectedVariant.price) : formatMoney(p.priceRange.minVariantPrice)}
           </p>
-          <div className="hairline my-8 w-24" />
+          <div className="hairline my-6 w-16" />
 
 
           {variants.length > 1 && (
-            <div className="mt-9">
+            <div className="mt-6">
               <p className="eyebrow mb-3 text-foreground/70">{tr("product.size")}</p>
               <div className="flex flex-wrap gap-2">
                 {variants.map((v) => (

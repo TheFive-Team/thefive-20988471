@@ -7,6 +7,7 @@ import { communesByWilaya } from "@/lib/communes";
 export function CodForm({ productPriceAmount, productName, variantTitle }: { productPriceAmount?: string, productName?: string, variantTitle?: string }) {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [form, setForm] = useState({
     fullname: "",
     phone: "",
@@ -17,6 +18,30 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
+
+    // 1. Name Validation (Letters and spaces only, at least 3 chars)
+    const nameRegex = /^[a-zA-Z\u0600-\u06FF\s]{3,}$/;
+    if (!nameRegex.test(form.fullname.trim())) {
+      setFormError("يرجى إدخال اسم حقيقي (يحتوي على أحرف فقط ولا يقل عن 3 أحرف).");
+      return;
+    }
+
+    // 2. Phone Validation (Algerian mobile format: 05/06/07 followed by 8 digits)
+    const phoneRegex = /^(05|06|07)[0-9]{8}$/;
+    const phoneClean = form.phone.replace(/\s+/g, '');
+    if (!phoneRegex.test(phoneClean)) {
+      setFormError("يرجى إدخال رقم هاتف صحيح يتكون من 10 أرقام (مثال: 0555123456).");
+      return;
+    }
+
+    // 3. Spam Prevention (Rate Limiting)
+    const lastOrder = localStorage.getItem("thefive_last_order");
+    if (lastOrder && Date.now() - parseInt(lastOrder) < 60000) {
+      setFormError("لقد قمت بتقديم طلب للتو. يرجى الانتظار دقيقة قبل المحاولة مرة أخرى.");
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -30,13 +55,14 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
       });
       
       if (response.success) {
+        localStorage.setItem("thefive_last_order", Date.now().toString());
         setSubmitted(true);
       } else {
-        alert("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى");
+        setFormError("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى");
       }
     } catch (err) {
       console.error(err);
-      alert("حدث خطأ في الاتصال، يرجى المحاولة مرة أخرى");
+      setFormError("حدث خطأ في الاتصال، يرجى المحاولة مرة أخرى");
     } finally {
       setIsSubmitting(false);
     }
@@ -65,6 +91,12 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
         <p className="text-xs text-zinc-500 tracking-wide">الرجاء إدخال معلوماتك الشخصية لتوصيل طلبك</p>
       </div>
       
+      {formError && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm font-bold text-center">
+          {formError}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-5">
         
         {/* Input: Name */}

@@ -25,15 +25,15 @@ function PromoBar() {
   return (
     <div className="overflow-hidden border-b border-border bg-foreground py-2 text-background" dir="ltr">
       <style>{`
-        @keyframes scroll-right {
-          0% { transform: translateX(-50%); }
-          100% { transform: translateX(0%); }
+        @keyframes scroll-left {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
         }
-        .animate-scroll-right {
-          animation: scroll-right 30s linear infinite;
+        .animate-scroll-left {
+          animation: scroll-left 30s linear infinite;
         }
       `}</style>
-      <div className="flex animate-scroll-right w-max">
+      <div className="flex animate-scroll-left w-max">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i}>{item}</div>
         ))}

@@ -98,23 +98,23 @@ function ProductPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-6 sm:px-10 sm:py-16">
+    <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10 sm:py-24">
       <div className="grid gap-12 md:grid-cols-2 md:gap-16">
         <div className="block md:hidden -mx-6 sm:-mx-10">
           {/* Dynamic gallery from Shopify */}
           <MobileImageGallery images={images} />
         </div>
         <div className="hidden md:block">
-          <div className="bg-secondary">
+          <div className="bg-secondary rounded-2xl overflow-hidden shadow-xl shadow-secondary/5">
             {image && <img src={image.url} alt={image.altText ?? p.title} width={800} height={1000} className="h-full w-full object-cover" />}
           </div>
           {images.length > 1 && (
-            <div className="mt-3 grid grid-cols-5 gap-2">
+            <div className="mt-4 grid grid-cols-5 gap-3">
               {images.map((img, i) => (
                 <button
                   key={img.url}
                   onClick={() => setActiveImg(i)}
-                  className={`aspect-square overflow-hidden bg-secondary border ${i === activeImg ? "border-foreground" : "border-transparent hover:border-border"}`}
+                  className={`aspect-square rounded-xl overflow-hidden shadow-sm bg-secondary border ${i === activeImg ? "border-primary" : "border-transparent hover:border-accent"}`}
                 >
                   <img src={img.url} alt={img.altText ?? `${p.title} ${i + 1}`} className="h-full w-full object-cover" />
                 </button>
@@ -124,11 +124,11 @@ function ProductPage() {
         </div>
         <div className="md:py-6">
           {p.productType && <p className="eyebrow text-accent">{p.productType}</p>}
-          <h1 className="mt-3 font-serif text-3xl leading-tight sm:text-5xl">{p.title}</h1>
-          <p className="mt-4 text-xl tracking-wide text-foreground/85">
+          <h1 className="mt-3 font-serif font-bold text-secondary text-3xl leading-tight sm:text-6xl">{p.title}</h1>
+          <p className="mt-5 text-2xl sm:text-3xl font-medium tracking-wide text-primary">
             {selectedVariant ? formatMoney(selectedVariant.price) : formatMoney(p.priceRange.minVariantPrice)}
           </p>
-          <div className="hairline my-7 w-20" />
+          <div className="hairline my-8 w-24" />
 
 
           {variants.length > 1 && (
@@ -140,10 +140,10 @@ function ProductPage() {
                     key={v.node.id}
                     onClick={() => setVariantId(v.node.id)}
                     disabled={!v.node.availableForSale}
-                    className={`min-w-16 border px-4 py-2.5 text-xs uppercase tracking-[0.2em] transition-colors disabled:opacity-40 ${
+                    className={`rounded-lg min-w-16 border px-4 py-2.5 text-xs uppercase tracking-[0.2em] transition-colors disabled:opacity-40 ${
                       selectedVariant?.id === v.node.id
-                        ? "border-foreground bg-foreground text-background"
-                        : "border-border text-foreground hover:border-foreground"
+                        ? "border-primary bg-background shadow-sm text-foreground"
+                        : "border-border text-muted-foreground hover:border-accent hover:bg-accent/20"
                     }`}
                   >{v.node.title}</button>
                 ))}
@@ -152,7 +152,7 @@ function ProductPage() {
           )}
 
           {/* COD Form Checkout Section Moved Here (Right after variants) */}
-          <div id="checkout-form" className="mt-12 bg-zinc-50 border border-zinc-200 p-6 -mx-6 sm:mx-0 sm:rounded-lg">
+          <div id="checkout-form" className="mt-12 bg-transparent -mx-6 sm:mx-0">
             <CodForm 
               productPriceAmount={selectedVariant?.price?.amount ?? p.priceRange.minVariantPrice.amount} 
               productName={p.title}
@@ -160,10 +160,10 @@ function ProductPage() {
             />
           </div>
 
-          <div className="mt-8 space-y-2 border-t border-border pt-6 text-xs text-muted-foreground">
-            <p className="flex items-center gap-2"><span className="text-accent">◆</span> {tr("product.cod")}</p>
-            <p className="flex items-center gap-2"><span className="text-accent">◆</span> {tr("ship.f1")}</p>
-            <p className="flex items-center gap-2"><span className="text-accent">◆</span> {tr("ship.f3")}</p>
+          <div className="mt-10 space-y-3 border-t border-primary/20 pt-8 text-sm text-secondary">
+            <p className="flex items-center gap-3"><span className="text-primary">◆</span> {tr("product.cod")}</p>
+            <p className="flex items-center gap-3"><span className="text-primary">◆</span> {tr("ship.f1")}</p>
+            <p className="flex items-center gap-3"><span className="text-primary">◆</span> {tr("ship.f3")}</p>
           </div>
         </div>
       </div>

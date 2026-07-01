@@ -84,15 +84,15 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
     );
   }
 
-  const inputClasses = "w-full px-4 py-3.5 bg-white border border-zinc-300 rounded-md text-zinc-900 text-sm focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 transition-all outline-none";
-  const labelClasses = "block text-xs font-bold text-zinc-700 mb-2 tracking-wide";
+  const inputClasses = "w-full px-4 py-3.5 bg-background border border-border rounded-lg text-foreground text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none shadow-sm";
+  const labelClasses = "block text-xs font-bold text-secondary mb-2 tracking-wide";
 
   return (
     <div className="bg-transparent" id="checkout-form" dir="rtl">
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-zinc-900 mb-2">معلومات التوصيل</h2>
-        <p className="text-xs text-zinc-500 tracking-wide">الرجاء إدخال معلوماتك الشخصية لتوصيل طلبك</p>
+        <h2 className="text-2xl font-bold text-secondary mb-2">معلومات التوصيل</h2>
+        <p className="text-xs text-foreground/70 tracking-wide">الرجاء إدخال معلوماتك الشخصية لتوصيل طلبك</p>
       </div>
       
       {formError && (
@@ -186,12 +186,12 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
 
         {/* Price Breakdown */}
         {productPriceAmount && (
-          <div className="bg-zinc-50 border border-zinc-200 rounded-md p-4 mt-2 space-y-2">
-            <div className="flex justify-between items-center text-sm text-zinc-600">
+          <div className="bg-background border border-border/50 rounded-xl p-5 mt-4 space-y-3 shadow-sm">
+            <div className="flex justify-between items-center text-sm text-foreground/80">
               <span>سعر المنتج</span>
               <span className="font-serif dir-ltr">{Number(productPriceAmount).toLocaleString()} د.ج</span>
             </div>
-            <div className="flex justify-between items-center text-sm text-zinc-600">
+            <div className="flex justify-between items-center text-sm text-foreground/80">
               <span>سعر التوصيل</span>
               <span className="font-serif dir-ltr">
                 {form.wilaya ? (
@@ -201,10 +201,10 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
                 )}
               </span>
             </div>
-            <div className="h-px bg-zinc-200 my-2"></div>
-            <div className="flex justify-between items-center text-base font-bold text-zinc-900">
+            <div className="h-px bg-border/50 my-3"></div>
+            <div className="flex justify-between items-center text-base font-bold text-secondary">
               <span>المجموع الكلي</span>
-              <span className="font-serif dir-ltr text-lg text-accent">
+              <span className="font-serif dir-ltr text-lg text-primary">
                 {form.wilaya ? (
                   `${(Number(productPriceAmount) + (wilayas.find(w => w.code === Number(form.wilaya))?.home || 0)).toLocaleString()} د.ج`
                 ) : (
@@ -216,11 +216,11 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
         )}
 
         {/* Submit Button */}
-        <div className="pt-2">
+        <div className="pt-4">
           <button 
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-zinc-900 hover:bg-zinc-800 text-white py-4 px-6 rounded-md shadow-lg transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full bg-primary hover:bg-secondary text-[#1D1D1D] hover:text-background py-4 px-6 rounded-2xl shadow-lg shadow-primary/20 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
@@ -231,20 +231,20 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
         </div>
         
         {/* Trust Badges */}
-        <div className="flex items-center justify-center gap-4 pt-4 pb-2 text-zinc-500">
-          <div className="flex flex-col items-center gap-1.5">
-            <Truck className="w-4 h-4" strokeWidth={1.5} />
-            <span className="text-[9px] font-bold uppercase tracking-wider">توصيل سريع</span>
+        <div className="flex items-center justify-center gap-6 pt-6 pb-6 text-secondary bg-background rounded-2xl border border-border/50 shadow-sm mt-8">
+          <div className="flex flex-col items-center gap-2">
+            <Truck className="w-5 h-5 text-primary" strokeWidth={1.5} />
+            <span className="text-[10px] font-bold uppercase tracking-wider">توصيل سريع</span>
           </div>
-          <div className="w-px h-6 bg-zinc-300"></div>
-          <div className="flex flex-col items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4" strokeWidth={1.5} />
-            <span className="text-[9px] font-bold uppercase tracking-wider">دفع آمن</span>
+          <div className="w-px h-8 bg-border/50"></div>
+          <div className="flex flex-col items-center gap-2">
+            <ShieldCheck className="w-5 h-5 text-primary" strokeWidth={1.5} />
+            <span className="text-[10px] font-bold uppercase tracking-wider">دفع آمن</span>
           </div>
-          <div className="w-px h-6 bg-zinc-300"></div>
-          <div className="flex flex-col items-center gap-1.5">
-            <Clock className="w-4 h-4" strokeWidth={1.5} />
-            <span className="text-[9px] font-bold uppercase tracking-wider">خدمة 24/7</span>
+          <div className="w-px h-8 bg-border/50"></div>
+          <div className="flex flex-col items-center gap-2">
+            <Clock className="w-5 h-5 text-primary" strokeWidth={1.5} />
+            <span className="text-[10px] font-bold uppercase tracking-wider">خدمة 24/7</span>
           </div>
         </div>
       </form>

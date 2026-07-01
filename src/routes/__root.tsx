@@ -23,7 +23,7 @@ function PromoBar() {
     </span>
   );
   return (
-    <div className="overflow-hidden border-b border-border bg-foreground py-2 text-background" dir="ltr">
+    <div className="overflow-hidden border-b border-border bg-secondary py-1.5 text-secondary-foreground" dir="ltr">
       <style>{`
         @keyframes scroll-left {
           0% { transform: translateX(0%); }

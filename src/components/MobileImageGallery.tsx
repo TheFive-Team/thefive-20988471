@@ -30,7 +30,7 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
   if (!images || images.length === 0) return null;
 
   return (
-    <div className="w-full max-w-md mx-auto bg-transparent flex flex-col gap-8 pb-12">
+    <div className="w-full max-w-md mx-auto bg-transparent flex flex-col pb-2">
       
       {/* 1. MAIN GALLERY (Top Carousel + Thumbnails) */}
       <section className="w-full">
@@ -51,7 +51,7 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
               {images.map((img, idx) => (
                 <div 
                   key={idx} 
-                  className={`flex-[0_0_22%] min-w-0 cursor-pointer rounded-md overflow-hidden border-2 transition-all ${idx === selectedIndex ? 'border-zinc-900 opacity-100' : 'border-transparent opacity-60'}`}
+                  className={`flex-[0_0_22%] min-w-0 cursor-pointer rounded-xl overflow-hidden border-2 transition-all ${idx === selectedIndex ? 'border-primary opacity-100 shadow-sm' : 'border-transparent hover:border-accent opacity-60'}`}
                   onClick={() => onThumbClick(idx)}
                 >
                   <img src={img.url} alt={`Thumbnail ${idx + 1}`} className="w-full h-auto object-cover aspect-square" />

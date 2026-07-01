@@ -124,7 +124,7 @@ function ProductPage() {
         </div>
         <div>
           {p.productType && <p className="eyebrow text-accent">{p.productType}</p>}
-          <h1 className="mt-2 font-serif font-bold text-secondary text-3xl leading-tight sm:text-5xl">{p.title}</h1>
+          <h1 className="font-serif font-bold text-secondary text-3xl leading-tight sm:text-5xl">{p.title}</h1>
           <p className="mt-1 text-2xl sm:text-3xl font-medium tracking-wide text-primary">
             {selectedVariant ? formatMoney(selectedVariant.price) : formatMoney(p.priceRange.minVariantPrice)}
           </p>

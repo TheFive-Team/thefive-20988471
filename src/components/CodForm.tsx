@@ -194,11 +194,11 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
           <div className="bg-background border border-border/50 rounded-xl p-5 mt-4 space-y-3 shadow-sm">
             <div className="flex justify-between items-center text-base text-foreground/80">
               <span>سعر المنتج</span>
-              <span className="font-serif dir-ltr text-lg">{Number(productPriceAmount).toLocaleString()} د.ج</span>
+              <span className="font-sans font-semibold tracking-tight dir-ltr text-lg">{Number(productPriceAmount).toLocaleString()} د.ج</span>
             </div>
             <div className="flex justify-between items-center text-base text-foreground/80">
               <span>سعر التوصيل</span>
-              <span className="font-serif dir-ltr text-lg">
+              <span className="font-sans font-semibold tracking-tight dir-ltr text-lg">
                 {form.wilaya ? (
                   `+ ${(form.shippingMethod === 'home' ? wilayas.find(w => w.code === Number(form.wilaya))?.home : wilayas.find(w => w.code === Number(form.wilaya))?.stop)?.toLocaleString()} د.ج`
                 ) : (
@@ -209,7 +209,7 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
             <div className="h-px bg-border/50 my-3"></div>
             <div className="flex justify-between items-center text-lg font-bold text-secondary">
               <span>المجموع الكلي</span>
-              <span className="font-serif dir-ltr text-2xl text-primary">
+              <span className="font-sans font-bold tracking-tight dir-ltr text-2xl text-primary">
                 {form.wilaya ? (
                   `${(Number(productPriceAmount) + ((form.shippingMethod === 'home' ? wilayas.find(w => w.code === Number(form.wilaya))?.home : wilayas.find(w => w.code === Number(form.wilaya))?.stop) || 0)).toLocaleString()} د.ج`
                 ) : (

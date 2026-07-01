@@ -37,7 +37,7 @@ export function StickyCheckoutBar({ price }: { price?: ShopifyMoney }) {
         )}
         <button 
           onClick={scrollToCheckout}
-          className="flex-1 bg-primary text-[#1D1D1D] font-bold py-4 px-6 text-sm tracking-widest hover:bg-secondary hover:text-background transition-all duration-300 uppercase rounded-2xl shadow-lg shadow-primary/20"
+          className="flex-1 font-arabic bg-primary text-[#1D1D1D] font-bold py-4 px-6 text-base tracking-widest hover:bg-secondary hover:text-background transition-all duration-300 uppercase rounded-2xl shadow-lg shadow-primary/20"
         >
           اطلب الآن - الدفع عند الاستلام
         </button>

@@ -87,15 +87,15 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
     );
   }
 
-  const inputClasses = "w-full px-4 py-3.5 bg-background border border-border rounded-lg text-foreground text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none shadow-sm";
-  const labelClasses = "block text-xs font-bold text-secondary mb-2 tracking-wide";
+  const inputClasses = "w-full px-4 py-3.5 bg-background border border-border rounded-lg text-foreground text-base focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none shadow-sm";
+  const labelClasses = "block text-sm font-bold text-secondary mb-2 tracking-wide";
 
   return (
-    <div className="bg-transparent" id="checkout-form" dir="rtl">
+    <div className="bg-transparent font-arabic" id="checkout-form" dir="rtl">
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-secondary mb-2">معلومات التوصيل</h2>
-        <p className="text-xs text-foreground/70 tracking-wide">الرجاء إدخال معلوماتك الشخصية لتوصيل طلبك</p>
+        <h2 className="text-3xl font-bold text-secondary mb-3">معلومات التوصيل</h2>
+        <p className="text-sm text-foreground/70 tracking-wide">الرجاء إدخال معلوماتك الشخصية لتوصيل طلبك</p>
       </div>
       
       {formError && (
@@ -180,11 +180,11 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
           <div className="grid grid-cols-2 gap-4 mt-2">
             <label className={`flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${form.shippingMethod === 'home' ? 'border-primary bg-primary/5 text-primary shadow-sm' : 'border-border text-foreground/70 hover:border-accent'}`}>
               <input type="radio" name="shippingMethod" value="home" checked={form.shippingMethod === 'home'} onChange={(e) => setForm({...form, shippingMethod: 'home'})} className="sr-only" />
-              <span className="text-sm font-bold">توصيل للمنزل</span>
+              <span className="text-base font-bold mt-1">توصيل للمنزل</span>
             </label>
             <label className={`flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${form.shippingMethod === 'stopdesk' ? 'border-primary bg-primary/5 text-primary shadow-sm' : 'border-border text-foreground/70 hover:border-accent'}`}>
               <input type="radio" name="shippingMethod" value="stopdesk" checked={form.shippingMethod === 'stopdesk'} onChange={(e) => setForm({...form, shippingMethod: 'stopdesk'})} className="sr-only" />
-              <span className="text-sm font-bold">الاستلام من المكتب</span>
+              <span className="text-base font-bold mt-1">الاستلام من المكتب</span>
             </label>
           </div>
         </div>
@@ -230,7 +230,7 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
             {isSubmitting ? (
               <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
             ) : (
-              <span className="text-sm font-bold tracking-wider uppercase">أطلب الآن - الدفع عند الاستلام</span>
+              <span className="text-base font-bold tracking-wider uppercase">أطلب الآن - الدفع عند الاستلام</span>
             )}
           </button>
         </div>

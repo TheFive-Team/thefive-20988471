@@ -18,8 +18,8 @@ import { useCartSync } from "@/hooks/useCartSync";
 
 function PromoBar() {
   const item = (
-    <span className="mx-6 inline-block whitespace-nowrap font-bold text-[0.8rem] tracking-wide">
-      🚚 توصيل سريع لـ 58 ولاية و الدفع عند الاستلام💵 &nbsp;&nbsp;&nbsp; 📦 فتح الطرد قبل الدفع📦 &nbsp;&nbsp;&nbsp; 🔄 إرجاع واستبدال متاح🔄 &nbsp;&nbsp;&nbsp; ✅ جودة مضمونة وخدمة موثوقة✅
+    <span className="mx-8 inline-block whitespace-nowrap text-[0.65rem] font-medium uppercase tracking-[0.3em] text-background/90">
+      LIVRAISON 58 WILAYAS &nbsp;&nbsp;·&nbsp;&nbsp; PAIEMENT À LA RÉCEPTION &nbsp;&nbsp;·&nbsp;&nbsp; VÉRIFICATION AVANT PAIEMENT &nbsp;&nbsp;·&nbsp;&nbsp; ÉCHANGES SOUS 48H
     </span>
   );
   return (
@@ -160,7 +160,7 @@ function RootComponent() {
           <main className="flex-1">
             <Outlet />
           </main>
-          {!isProductPage && <SiteFooter />}
+          <SiteFooter />
         </div>
       </I18nProvider>
     </QueryClientProvider>

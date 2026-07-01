@@ -53,9 +53,9 @@ export function SiteFooter() {
         <div>
           <p className="eyebrow text-background/60">Contact</p>
           <ul className="mt-4 space-y-2 text-sm text-background/85">
-            <li>Alger, Algérie</li>
-            <li>+213 555 00 00 00</li>
-            <li>bonjour@thefivea.dz</li>
+            <li>Oran, Algérie</li>
+            <li>+213 553 95 06 08</li>
+            <li>smileshop570@gmail.com</li>
           </ul>
         </div>
       </div>

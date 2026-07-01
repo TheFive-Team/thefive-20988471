@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { CheckCircle2, Truck, ShieldCheck, Clock } from "lucide-react";
-import { submitOrderFn } from "@/actions/submitOrder";
+import { submitOrderFn } from "@/actions/submitOrder.server";
 import { wilayas } from "@/lib/wilayas";
 import { communesByWilaya } from "@/lib/communes";
 

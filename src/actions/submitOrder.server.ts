@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-export const submitOrderFn = createServerFn("POST")
+export const submitOrderFn = createServerFn({ method: "POST" })
   .validator(
     z.object({
       fullname: z.string(),

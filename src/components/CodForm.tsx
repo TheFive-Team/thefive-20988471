@@ -3,7 +3,7 @@ import { CheckCircle2, Truck, ShieldCheck, Clock } from "lucide-react";
 import { wilayas } from "@/lib/wilayas";
 import { communesByWilaya } from "@/lib/communes";
 
-export function CodForm() {
+export function CodForm({ productPriceAmount }: { productPriceAmount?: string }) {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
@@ -130,8 +130,39 @@ export function CodForm() {
           />
         </div>
 
+        {/* Price Breakdown */}
+        {productPriceAmount && (
+          <div className="bg-zinc-50 border border-zinc-200 rounded-md p-4 mt-2 space-y-2">
+            <div className="flex justify-between items-center text-sm text-zinc-600">
+              <span>سعر المنتج</span>
+              <span className="font-serif dir-ltr">{Number(productPriceAmount).toLocaleString()} د.ج</span>
+            </div>
+            <div className="flex justify-between items-center text-sm text-zinc-600">
+              <span>سعر التوصيل</span>
+              <span className="font-serif dir-ltr">
+                {form.wilaya ? (
+                  `+ ${wilayas.find(w => w.code === Number(form.wilaya))?.home.toLocaleString()} د.ج`
+                ) : (
+                  "اختر الولاية"
+                )}
+              </span>
+            </div>
+            <div className="h-px bg-zinc-200 my-2"></div>
+            <div className="flex justify-between items-center text-base font-bold text-zinc-900">
+              <span>المجموع الكلي</span>
+              <span className="font-serif dir-ltr text-lg text-accent">
+                {form.wilaya ? (
+                  `${(Number(productPriceAmount) + (wilayas.find(w => w.code === Number(form.wilaya))?.home || 0)).toLocaleString()} د.ج`
+                ) : (
+                  `${Number(productPriceAmount).toLocaleString()} د.ج`
+                )}
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Submit Button */}
-        <div className="pt-4">
+        <div className="pt-2">
           <button 
             type="submit"
             disabled={isSubmitting}

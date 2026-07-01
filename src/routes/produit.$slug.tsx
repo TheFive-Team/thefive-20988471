@@ -153,7 +153,7 @@ function ProductPage() {
 
           {/* COD Form Checkout Section Moved Here (Right after variants) */}
           <div id="checkout-form" className="mt-12 bg-zinc-50 border border-zinc-200 p-6 -mx-6 sm:mx-0 sm:rounded-lg">
-            <CodForm />
+            <CodForm productPriceAmount={selectedVariant?.price?.amount ?? p.priceRange.minVariantPrice.amount} />
           </div>
 
           <div className="mt-8 space-y-2 border-t border-border pt-6 text-xs text-muted-foreground">

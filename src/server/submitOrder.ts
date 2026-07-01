@@ -17,39 +17,49 @@ export const submitOrderFn = createServerFn("POST")
     console.log("Received new order:", data);
 
     try {
-      // 1. TODO: Fetch actual product price from Shopify/Database using variantId
-      // to avoid trusting the client's productPriceAmount.
-      
-      // 2. TODO: Send to ZR Express API
-      // We need the exact API endpoint. Example:
-      // const zrResponse = await fetch("https://api.zrexpress.app/v1/orders", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     "Authorization": `Bearer ${process.env.ZR_EXPRESS_SECRET_KEY}`,
-      //     "Tenant-Id": process.env.ZR_EXPRESS_TENANT_ID || ""
-      //   },
-      //   body: JSON.stringify({
-      //     recipientName: data.fullname,
-      //     recipientPhone: data.phone,
-      //     wilaya: data.wilaya,
-      //     commune: data.commune,
-      //     address: data.address,
-      //     codAmount: data.productPriceAmount // + shipping
-      //   })
-      // });
-      
-      // 3. TODO: Send to Google Sheets
-      // Requires Google Service Account JWT auth and Google Sheets API.
-      // We will implement this once credentials are provided.
+      // Create a unique order ID
+      const orderId = `ORD-${Date.now()}`;
+      const totalAmount = Number(data.productPriceAmount) + (data.wilaya ? 600 : 0); // Simplified shipping calculation fallback
 
-      // Simulate network delay for now
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log(`Processing Order ${orderId}`);
+
+      // 3. Send to Google Sheets (via Apps Script Webhook)
+      const googleWebhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
+      
+      if (googleWebhookUrl) {
+        try {
+          const sheetResponse = await fetch(googleWebhookUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              orderId,
+              fullname: data.fullname,
+              phone: data.phone,
+              wilaya: data.wilaya,
+              commune: data.commune,
+              address: data.address || "",
+              productPriceAmount: totalAmount
+            }),
+          });
+          
+          if (!sheetResponse.ok) {
+            console.warn("Failed to send order to Google Sheets:", await sheetResponse.text());
+          } else {
+            console.log("Successfully sent order to Google Sheets");
+          }
+        } catch (sheetError) {
+          console.error("Error communicating with Google Sheets Webhook:", sheetError);
+        }
+      } else {
+        console.warn("GOOGLE_SHEETS_WEBHOOK_URL is not set. Skipping Google Sheets integration.");
+      }
 
       return {
         success: true,
         message: "Order received successfully",
-        orderId: `ORD-${Date.now()}`
+        orderId: orderId
       };
     } catch (error) {
       console.error("Error processing order:", error);

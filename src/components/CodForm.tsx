@@ -8,12 +8,13 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [shippingError, setShippingError] = useState(false);
   const [form, setForm] = useState({
     fullname: "",
     phone: "",
     wilaya: "",
     commune: "",
-    shippingMethod: "home" as "home" | "stopdesk"
+    shippingMethod: "" as "" | "home" | "stopdesk"
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,6 +48,14 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
       if (onSizeError) onSizeError();
       setFormError("يرجى اختيار المقاس لتأكيد الطلب");
       document.getElementById("size-selector")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    // 5. Require Shipping Method
+    if (!form.shippingMethod) {
+      setShippingError(true);
+      setFormError("يرجى اختيار طريقة التوصيل لتأكيد الطلب");
+      document.getElementById("shipping-method")?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
@@ -183,16 +192,18 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
         </div>
 
         {/* Shipping Method Selection */}
-        <div>
-          <label className={labelClasses}>طريقة التوصيل</label>
+        <div id="shipping-method">
+          <label className={`block text-sm font-bold mb-2 tracking-wide flex items-center gap-2 transition-colors ${shippingError ? 'text-red-600' : 'text-secondary'}`}>
+            طريقة التوصيل {shippingError && <span className="text-red-500 normal-case font-bold text-sm animate-pulse">* يرجى الاختيار / Required</span>}
+          </label>
           <div className="grid grid-cols-2 gap-4 mt-2">
-            <label className={`flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${form.shippingMethod === 'home' ? 'border-primary bg-primary/5 text-primary shadow-sm' : 'border-border text-foreground/70 hover:border-accent'}`}>
-              <input type="radio" name="shippingMethod" value="home" checked={form.shippingMethod === 'home'} onChange={(e) => setForm({...form, shippingMethod: 'home'})} className="sr-only" />
-              <span className="text-base font-bold mt-1">توصيل للمنزل</span>
+            <label className={`flex items-center justify-center gap-2 p-3 border-2 rounded-xl cursor-pointer transition-all font-bold ${form.shippingMethod === 'home' ? 'border-primary bg-primary/5 text-primary shadow-md scale-105' : 'border-foreground/30 text-foreground/80 hover:border-foreground/50 hover:bg-accent/20'}`}>
+              <input type="radio" name="shippingMethod" value="home" checked={form.shippingMethod === 'home'} onChange={(e) => { setForm({...form, shippingMethod: 'home'}); setShippingError(false); }} className="sr-only" />
+              <span className="text-base mt-1">توصيل للمنزل</span>
             </label>
-            <label className={`flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${form.shippingMethod === 'stopdesk' ? 'border-primary bg-primary/5 text-primary shadow-sm' : 'border-border text-foreground/70 hover:border-accent'}`}>
-              <input type="radio" name="shippingMethod" value="stopdesk" checked={form.shippingMethod === 'stopdesk'} onChange={(e) => setForm({...form, shippingMethod: 'stopdesk'})} className="sr-only" />
-              <span className="text-base font-bold mt-1">الاستلام من المكتب</span>
+            <label className={`flex items-center justify-center gap-2 p-3 border-2 rounded-xl cursor-pointer transition-all font-bold ${form.shippingMethod === 'stopdesk' ? 'border-primary bg-primary/5 text-primary shadow-md scale-105' : 'border-foreground/30 text-foreground/80 hover:border-foreground/50 hover:bg-accent/20'}`}>
+              <input type="radio" name="shippingMethod" value="stopdesk" checked={form.shippingMethod === 'stopdesk'} onChange={(e) => { setForm({...form, shippingMethod: 'stopdesk'}); setShippingError(false); }} className="sr-only" />
+              <span className="text-base mt-1">الاستلام من المكتب</span>
             </label>
           </div>
         </div>
@@ -208,7 +219,11 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
               <span>سعر التوصيل</span>
               <span className="font-sans font-semibold tracking-tight dir-ltr text-lg">
                 {form.wilaya ? (
-                  `+ ${(form.shippingMethod === 'home' ? wilayas.find(w => w.code === Number(form.wilaya))?.home : wilayas.find(w => w.code === Number(form.wilaya))?.stop)?.toLocaleString()} د.ج`
+                  form.shippingMethod ? (
+                    `+ ${(form.shippingMethod === 'home' ? wilayas.find(w => w.code === Number(form.wilaya))?.home : wilayas.find(w => w.code === Number(form.wilaya))?.stop)?.toLocaleString()} د.ج`
+                  ) : (
+                    "اختر طريقة التوصيل"
+                  )
                 ) : (
                   "اختر الولاية"
                 )}
@@ -218,7 +233,7 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
             <div className="flex justify-between items-center text-lg font-bold text-secondary">
               <span>المجموع الكلي</span>
               <span className="font-sans font-bold tracking-tight dir-ltr text-2xl text-primary">
-                {form.wilaya ? (
+                {form.wilaya && form.shippingMethod ? (
                   `${(Number(productPriceAmount) + ((form.shippingMethod === 'home' ? wilayas.find(w => w.code === Number(form.wilaya))?.home : wilayas.find(w => w.code === Number(form.wilaya))?.stop) || 0)).toLocaleString()} د.ج`
                 ) : (
                   `${Number(productPriceAmount).toLocaleString()} د.ج`

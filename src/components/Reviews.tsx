@@ -9,14 +9,14 @@ import {
 
 export function Reviews() {
   const reviewImages = [
-    "/Instagram-post-9.webp",
-    "/Instagram-post-10.webp",
-    "/Instagram-post-11.webp",
-    "/Instagram-post-12.webp",
-    "/Instagram-post-13.webp",
-    "/Instagram-post-14.webp",
-    "/Instagram-post-16.webp",
-    "/Instagram-post-18.webp",
+    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-9.webp",
+    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-10.webp",
+    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-11.webp",
+    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-12.webp",
+    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-13.webp",
+    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-14.webp",
+    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-16.webp",
+    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-18.webp",
   ];
 
   return (

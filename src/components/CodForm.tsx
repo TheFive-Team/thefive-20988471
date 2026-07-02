@@ -102,12 +102,22 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
 
   if (submitted) {
     return (
-      <div id="thank-you-message" className="bg-transparent p-6 py-20 flex flex-col items-center text-center animate-in zoom-in-95 fade-in duration-700">
-        <CheckCircle2 className="w-20 h-20 text-green-500 mb-6" strokeWidth={1.5} />
-        <h3 className="text-3xl sm:text-4xl font-bold text-secondary mb-4 tracking-wide" dir="rtl">تم تأكيد طلبك بنجاح!</h3>
-        <p className="text-foreground/70 mb-8 max-w-sm leading-relaxed text-lg" dir="rtl">
-          شكراً لثقتك بنا. سيقوم أحد ممثلي خدمة العملاء بالاتصال بك قريباً لتأكيد موعد التوصيل.
-        </p>
+      <div id="thank-you-message" className="py-12 sm:py-20 flex flex-col items-center text-center animate-in zoom-in-95 fade-in duration-700 w-full">
+        <div className="relative mb-8">
+          <div className="absolute inset-0 bg-green-500/20 rounded-full blur-xl animate-pulse"></div>
+          <div className="relative bg-gradient-to-tr from-green-500 to-emerald-400 w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/30 text-white">
+            <CheckCircle2 className="w-12 h-12 sm:w-16 sm:h-16" strokeWidth={2.5} />
+          </div>
+        </div>
+        <div className="bg-background border border-border/60 shadow-2xl shadow-foreground/5 rounded-3xl p-8 sm:p-10 max-w-xl w-full relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-green-400 via-emerald-500 to-green-400"></div>
+          <h3 className="text-3xl sm:text-4xl font-bold text-foreground mb-5 tracking-tight leading-tight" dir="rtl">
+            تم تأكيد طلبك بنجاح!
+          </h3>
+          <p className="text-foreground/80 leading-relaxed text-lg sm:text-xl font-medium" dir="rtl">
+            شكراً لثقتك بنا. سيتواصل معك فريقنا قريباً لتأكيد الطلب وتحديد موعد التوصيل.
+          </p>
+        </div>
       </div>
     );
   }

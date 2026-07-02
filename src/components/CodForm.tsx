@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckCircle2, Truck, ShieldCheck, Clock, RefreshCw } from "lucide-react";
 import { submitOrderFn } from "@/actions/submitOrder.server";
 import { wilayas } from "@/lib/wilayas";
@@ -92,12 +92,20 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
     }
   };
 
+  useEffect(() => {
+    if (submitted) {
+      setTimeout(() => {
+        document.getElementById("thank-you-message")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  }, [submitted]);
+
   if (submitted) {
     return (
-      <div className="bg-transparent p-6 flex flex-col items-center text-center animate-in fade-in duration-700">
-        <CheckCircle2 className="w-16 h-16 text-zinc-900 mb-6" strokeWidth={1} />
-        <h3 className="text-3xl font-serif text-zinc-900 mb-3 tracking-wide" dir="rtl">تم تأكيد طلبك بنجاح</h3>
-        <p className="text-zinc-600 mb-8 max-w-sm leading-relaxed" dir="rtl">
+      <div id="thank-you-message" className="bg-transparent p-6 py-20 flex flex-col items-center text-center animate-in zoom-in-95 fade-in duration-700">
+        <CheckCircle2 className="w-20 h-20 text-green-500 mb-6" strokeWidth={1.5} />
+        <h3 className="text-3xl sm:text-4xl font-bold text-secondary mb-4 tracking-wide" dir="rtl">تم تأكيد طلبك بنجاح!</h3>
+        <p className="text-foreground/70 mb-8 max-w-sm leading-relaxed text-lg" dir="rtl">
           شكراً لثقتك بنا. سيقوم أحد ممثلي خدمة العملاء بالاتصال بك قريباً لتأكيد موعد التوصيل.
         </p>
       </div>

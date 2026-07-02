@@ -5,7 +5,7 @@ import { commitFile } from "@/lib/github";
 import { 
   ShoppingBag, Hourglass, Truck, CheckCircle, Wallet, Calendar, 
   MapPin, Phone, User, Hash, Clock, Box, FileText, Settings, 
-  LogOut, AlertCircle, RefreshCw, Trash2, Plus
+  LogOut, AlertCircle, RefreshCw, Trash2, Plus, X
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -397,13 +397,14 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 // --- PRODUCTS MANAGER COMPONENT ---
+type ProductImageObj = { id: string, url?: string, base64?: string };
+
 function ProductsManager({ products, token, onRefresh, loading }: { products: ShopifyProduct[], token: string, onRefresh: () => void, loading: boolean }) {
   const [mode, setMode] = useState<"list" | "edit" | "create">("list");
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<any>({});
   const [isSaving, setIsSaving] = useState(false);
-  const [newImageBase64, setNewImageBase64] = useState<string | null>(null);
-  const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
+  const [productImages, setProductImages] = useState<ProductImageObj[]>([]);
 
   const startEdit = (product: ShopifyProduct) => {
     setMode("edit");
@@ -419,8 +420,12 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       price: product.node.priceRange.minVariantPrice.amount,
       sizes: sizes
     });
-    setCurrentImageUrl(product.node.images.edges[0]?.node.url || null);
-    setNewImageBase64(null);
+    
+    const existingImages = product.node.images.edges.map((e, idx) => ({
+      id: `img-${Date.now()}-${idx}`,
+      url: e.node.url
+    }));
+    setProductImages(existingImages);
   };
 
   const startCreate = () => {
@@ -433,23 +438,35 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       price: "",
       sizes: ""
     });
-    setCurrentImageUrl(null);
-    setNewImageBase64(null);
+    setProductImages([]);
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    Array.from(files).forEach((file, idx) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = (reader.result as string).split(',')[1];
-        setNewImageBase64(base64String);
+        setProductImages(prev => [...prev, {
+          id: `new-${Date.now()}-${idx}`,
+          base64: base64String,
+          url: reader.result as string // For immediate preview
+        }]);
       };
       reader.readAsDataURL(file);
-    }
+    });
+    
+    // Clear input so same file can be selected again if needed
+    e.target.value = "";
   };
 
-  const generateShopifyNode = (form: any, imageUrl: string | null, id: string) => {
+  const removeImage = (id: string) => {
+    setProductImages(prev => prev.filter(img => img.id !== id));
+  };
+
+  const generateShopifyNode = (form: any, imageEdges: any[], id: string) => {
     const sizeValues = form.sizes ? form.sizes.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
     const options = sizeValues.length > 0 ? [{ name: "size", values: sizeValues }] : [];
     
@@ -483,7 +500,7 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       productType: "",
       vendor: "My Store",
       priceRange: { minVariantPrice: { amount: form.price, currencyCode: "DZD" } },
-      images: { edges: imageUrl ? [{ node: { url: imageUrl, altText: null } }] : [] },
+      images: { edges: imageEdges },
       variants: { edges: variantsEdges },
       options: options
     };
@@ -497,25 +514,31 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
     }
     setIsSaving(true);
     try {
-      let finalImageUrl = currentImageUrl;
-
-      if (newImageBase64) {
-        const fileName = `product-${Date.now()}.png`;
-        const imagePath = `public/images/${fileName}`;
-        await commitFile(imagePath, newImageBase64, `Upload image for ${editForm.title}`, token, true);
-        finalImageUrl = `/images/${fileName}`;
+      const finalImageEdges: any[] = [];
+      
+      // Upload new images and preserve existing ones
+      for (let i = 0; i < productImages.length; i++) {
+        const img = productImages[i];
+        if (img.base64) {
+          const fileName = `product-${Date.now()}-${i}.png`;
+          const imagePath = `public/images/${fileName}`;
+          await commitFile(imagePath, img.base64, `Upload image for ${editForm.title}`, token, true);
+          finalImageEdges.push({ node: { url: `/images/${fileName}`, altText: null } });
+        } else if (img.url) {
+          finalImageEdges.push({ node: { url: img.url, altText: null } });
+        }
       }
 
       let updatedProducts = [...products];
 
       if (mode === "create") {
         const newId = `gid://shopify/Product/${Date.now()}`;
-        const newNode = generateShopifyNode(editForm, finalImageUrl, newId);
+        const newNode = generateShopifyNode(editForm, finalImageEdges, newId);
         updatedProducts.push({ node: newNode as any });
       } else if (mode === "edit" && editingProductId) {
         updatedProducts = products.map(p => {
           if (p.node.id === editingProductId) {
-            return { node: generateShopifyNode(editForm, finalImageUrl, editingProductId) as any };
+            return { node: generateShopifyNode(editForm, finalImageEdges, editingProductId) as any };
           }
           return p;
         });
@@ -589,16 +612,24 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
               <p className="text-xs text-slate-500">افصل بين القياسات بفاصلة (مثال: S, M, L) / Separate sizes with commas</p>
             </div>
             <div className="space-y-3">
-              <label className="font-bold text-slate-700 text-sm">الصورة الرئيسية (Main Photo)</label>
-              <div className="flex items-center gap-4 p-2 border border-slate-200 rounded-xl bg-slate-50">
-                <div className="w-16 h-16 bg-white rounded-lg overflow-hidden border shadow-sm">
-                   {newImageBase64 ? (
-                      <img src={`data:image/png;base64,${newImageBase64}`} className="w-full h-full object-cover" />
-                   ) : currentImageUrl ? (
-                      <img src={currentImageUrl} className="w-full h-full object-cover" />
-                   ) : null}
+              <label className="font-bold text-slate-700 text-sm">معرض الصور (Gallery)</label>
+              <div className="border border-slate-200 rounded-xl bg-slate-50 p-4">
+                <div className="flex flex-wrap gap-4 mb-4">
+                  {productImages.map(img => (
+                    <div key={img.id} className="relative w-24 h-24 bg-white rounded-lg border shadow-sm group">
+                      <img src={img.url} className="w-full h-full object-cover rounded-lg" alt="product" />
+                      <button 
+                        onClick={() => removeImage(img.id)}
+                        className="absolute -top-2 -right-2 bg-red-100 text-red-600 rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-200"
+                      >
+                        <X size={14} strokeWidth={3} />
+                      </button>
+                    </div>
+                  ))}
                 </div>
-                <input type="file" accept="image/*" onChange={handleImageUpload} className="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-white file:text-slate-700 file:shadow-sm file:cursor-pointer hover:file:bg-slate-100" />
+                <div className="flex items-center">
+                  <input type="file" multiple accept="image/*" onChange={handleImageUpload} className="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-white file:text-slate-700 file:shadow-sm file:cursor-pointer hover:file:bg-slate-100" />
+                </div>
               </div>
             </div>
           </div>

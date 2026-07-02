@@ -50,6 +50,36 @@ export const submitOrderFn = createServerFn({ method: "POST" })
 
       console.log(`Successfully saved order ${orderId} to Supabase`);
 
+      // Backup: Send to Google Sheets (via Apps Script Webhook)
+      const googleWebhookUrl = "https://script.google.com/macros/s/AKfycbzgry3EWQHvZLjudmmR_J7hkqO5fBLi4F3HqO3Iy1hGx28Gz3HchBKyI0xbVNCVtGeg/exec";
+      try {
+        const sheetResponse = await fetch(googleWebhookUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderId,
+            fullname: data.fullname,
+            phone: data.phone,
+            wilaya: data.wilaya,
+            commune: data.commune,
+            address: data.address || "",
+            productPriceAmount: totalAmount,
+            productName: data.productName || "",
+            variantTitle: data.variantTitle || ""
+          }),
+        });
+        
+        if (!sheetResponse.ok) {
+          console.warn("Failed to send order to Google Sheets:", await sheetResponse.text());
+        } else {
+          console.log("Successfully backed up order to Google Sheets");
+        }
+      } catch (sheetError) {
+        console.error("Error communicating with Google Sheets Webhook:", sheetError);
+      }
+
       return {
         success: true,
         message: "Order received successfully",

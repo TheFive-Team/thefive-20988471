@@ -362,6 +362,32 @@ function OrdersDashboard() {
         </button>
       </div>
 
+      {/* Compact Status Summary Bar */}
+      <div className="flex flex-wrap gap-3">
+        {STATUS_OPTIONS.map(statusObj => {
+          const count = orders.filter(o => {
+            // Need to match exactly what getStatusConfig returns so legacy maps to new properly
+            const config = getStatusConfig(o.status);
+            return config.value === statusObj.value;
+          }).length;
+          
+          const Icon = statusObj.icon;
+          
+          return (
+            <div key={statusObj.value} className={`flex-1 min-w-[140px] bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between shadow-sm hover:border-slate-300 transition-all cursor-default group relative overflow-hidden`}>
+              <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity ${statusObj.bg}`}></div>
+              <div className="flex items-center gap-2 relative z-10">
+                <div className={`p-1.5 rounded-lg ${statusObj.bg} ${statusObj.color}`}>
+                  <Icon size={14} strokeWidth={2.5} />
+                </div>
+                <span className="text-xs font-bold text-slate-600 group-hover:text-slate-800 transition-colors">{statusObj.label}</span>
+              </div>
+              <span className="text-base font-black text-slate-800 relative z-10">{count}</span>
+            </div>
+          );
+        })}
+      </div>
+
       {/* Main Table */}
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden relative">
         <div className="overflow-x-auto w-full" style={{ maxHeight: "calc(100vh - 300px)" }}>

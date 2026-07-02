@@ -2,7 +2,7 @@
   {
     "node": {
       "id": "gid://shopify/Product/8000957644848",
-      "title": "vetement lux venom",
+      "title": "vetement lux ",
       "description": "",
       "descriptionHtml": "",
       "handle": "vetement-lux-venom",
@@ -47,7 +47,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17830216208700",
+              "id": "gid://shopify/ProductVariant/17830227978230",
               "title": "6",
               "availableForSale": true,
               "price": {
@@ -64,7 +64,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17830216208701",
+              "id": "gid://shopify/ProductVariant/17830227978231",
               "title": "8",
               "availableForSale": true,
               "price": {
@@ -81,7 +81,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17830216208702",
+              "id": "gid://shopify/ProductVariant/17830227978232",
               "title": "10",
               "availableForSale": true,
               "price": {
@@ -98,7 +98,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17830216208703",
+              "id": "gid://shopify/ProductVariant/17830227978233",
               "title": "12",
               "availableForSale": true,
               "price": {

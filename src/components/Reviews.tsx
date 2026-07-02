@@ -21,8 +21,8 @@ export function Reviews() {
 
   return (
     <section className="py-16 md:py-24 bg-zinc-50">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-10">
+      <div className="max-w-6xl mx-auto px-0 md:px-4">
+        <div className="text-center mb-8 px-4">
           <h2 className="text-3xl font-bold text-zinc-900 mb-2">تقييمات عملائنا</h2>
           <div className="flex justify-center items-center gap-2 text-amber-500 mb-2">
             {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-5 h-5 fill-current" />)}
@@ -30,7 +30,7 @@ export function Reviews() {
           <p className="text-zinc-500">آراء عملائنا بعد تجربة المنتج</p>
         </div>
 
-        <div className="px-12 md:px-16 relative">
+        <div className="relative w-full">
           <Carousel
             opts={{
               align: "center",
@@ -38,19 +38,17 @@ export function Reviews() {
             }}
             className="w-full"
           >
-            <CarouselContent>
+            <CarouselContent className="-ml-2 md:-ml-4">
               {reviewImages.map((imgUrl, i) => (
-                <CarouselItem key={i} className="basis-full md:basis-1/2 lg:basis-[45%]">
-                  <div className="p-2 md:p-4">
-                    <div className="w-full rounded-2xl overflow-hidden shadow-lg border border-zinc-200">
-                      <img src={imgUrl} alt={`Review ${i + 1}`} className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500" />
-                    </div>
+                <CarouselItem key={i} className="pl-2 md:pl-4 basis-[90%] sm:basis-[80%] md:basis-1/2 lg:basis-[40%]">
+                  <div className="w-full rounded-2xl overflow-hidden shadow-lg border border-zinc-200">
+                    <img src={imgUrl} alt={`Review ${i + 1}`} className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500" />
                   </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="w-10 h-10 md:w-12 md:h-12 border-2 border-zinc-200 shadow-md text-zinc-700 bg-white hover:bg-zinc-100" />
-            <CarouselNext className="w-10 h-10 md:w-12 md:h-12 border-2 border-zinc-200 shadow-md text-zinc-700 bg-white hover:bg-zinc-100" />
+            <CarouselPrevious className="absolute left-2 md:-left-6 lg:-left-12 z-10 w-10 h-10 md:w-12 md:h-12 border border-zinc-200 shadow-xl text-zinc-700 bg-white/90 backdrop-blur hover:bg-white" />
+            <CarouselNext className="absolute right-2 md:-right-6 lg:-right-12 z-10 w-10 h-10 md:w-12 md:h-12 border border-zinc-200 shadow-xl text-zinc-700 bg-white/90 backdrop-blur hover:bg-white" />
           </Carousel>
         </div>
       </div>

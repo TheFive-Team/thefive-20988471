@@ -176,8 +176,8 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17830250579240",
-              "title": "21 21 21 12",
+              "id": "gid://shopify/ProductVariant/17830277487680",
+              "title": "21",
               "availableForSale": true,
               "price": {
                 "amount": "5050",
@@ -186,7 +186,58 @@
               "selectedOptions": [
                 {
                   "name": "size",
-                  "value": "21 21 21 12"
+                  "value": "21"
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "id": "gid://shopify/ProductVariant/17830277487681",
+              "title": "21",
+              "availableForSale": true,
+              "price": {
+                "amount": "5050",
+                "currencyCode": "DZD"
+              },
+              "selectedOptions": [
+                {
+                  "name": "size",
+                  "value": "21"
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "id": "gid://shopify/ProductVariant/17830277487682",
+              "title": "21",
+              "availableForSale": true,
+              "price": {
+                "amount": "5050",
+                "currencyCode": "DZD"
+              },
+              "selectedOptions": [
+                {
+                  "name": "size",
+                  "value": "21"
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "id": "gid://shopify/ProductVariant/17830277487683",
+              "title": "12",
+              "availableForSale": true,
+              "price": {
+                "amount": "5050",
+                "currencyCode": "DZD"
+              },
+              "selectedOptions": [
+                {
+                  "name": "size",
+                  "value": "12"
                 }
               ]
             }
@@ -197,7 +248,10 @@
         {
           "name": "size",
           "values": [
-            "21 21 21 12"
+            "21",
+            "21",
+            "21",
+            "12"
           ]
         }
       ]

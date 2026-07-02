@@ -31,6 +31,7 @@ export interface SupabaseOrder {
   delivery_type: string;
   delivery_fee: number;
   status: string;
+  notes?: string;
 }
 
 function AdminDashboard() {

@@ -5,7 +5,7 @@ import { commitFile } from "@/lib/github";
 import { 
   ShoppingBag, Hourglass, Truck, CheckCircle, Wallet, Calendar, 
   MapPin, Phone, User, Hash, Clock, Box, FileText, Settings, 
-  LogOut, AlertCircle, RefreshCw, Trash2, Plus, X, Download
+  LogOut, AlertCircle, RefreshCw, Trash2, Plus, X, Download, Search, Filter, Copy, MessageCircle, Edit
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -149,11 +149,44 @@ function AdminDashboard() {
   );
 }
 
+// --- STATUS CONFIGURATION ---
+const STATUS_OPTIONS = [
+  { value: "جديد", label: "جديد", color: "text-[#2563EB]", bg: "bg-[#2563EB]/10", icon: Plus },
+  { value: "مؤكد", label: "مؤكد", color: "text-[#7C3AED]", bg: "bg-[#7C3AED]/10", icon: CheckCircle },
+  { value: "قيد التوصيل", label: "قيد التوصيل", color: "text-[#EA580C]", bg: "bg-[#EA580C]/10", icon: Truck },
+  { value: "تم التسليم", label: "تم التسليم", color: "text-[#16A34A]", bg: "bg-[#16A34A]/10", icon: CheckCircle },
+  { value: "ملغى", label: "ملغى", color: "text-[#DC2626]", bg: "bg-[#DC2626]/10", icon: X },
+  { value: "رجوع", label: "رجوع / استبدال", color: "text-[#6B7280]", bg: "bg-[#6B7280]/10", icon: AlertCircle },
+];
+
+function getStatusConfig(status: string) {
+  if (status === "pending") return STATUS_OPTIONS[0];
+  if (status === "delivery") return STATUS_OPTIONS[2];
+  if (status === "delivered") return STATUS_OPTIONS[3];
+  if (status === "cancelled") return STATUS_OPTIONS[4];
+  return STATUS_OPTIONS.find(s => s.value === status) || STATUS_OPTIONS[0];
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const config = getStatusConfig(status);
+  const Icon = config.icon;
+  return (
+    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap min-w-[100px] justify-center shadow-sm transition-colors ${config.bg} ${config.color}`}>
+      <Icon size={14} strokeWidth={2.5}/> {config.label}
+    </div>
+  );
+}
+
 // --- ORDERS DASHBOARD COMPONENT ---
 function OrdersDashboard() {
-  const currentDate = new Date().toLocaleDateString("en-GB"); // DD/MM/YYYY
+  const currentDate = new Date().toLocaleDateString("en-GB"); 
   const [orders, setOrders] = useState<SupabaseOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Filters
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [wilayaFilter, setWilayaFilter] = useState("all");
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -169,18 +202,49 @@ function OrdersDashboard() {
   }, []);
 
   const updateStatus = async (id: string, newStatus: string) => {
-    const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', id);
-    if (!error) {
-      fetchOrders();
-    }
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
+    await supabase.from('orders').update({ status: newStatus }).eq('id', id);
   };
 
+  const updateNotes = async (id: string, notes: string) => {
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, notes } : o));
+    await supabase.from('orders').update({ notes }).eq('id', id);
+  };
+
+  const deleteOrder = async (id: string) => {
+    if (!confirm("هل أنت متأكد من حذف هذا الطلب نهائياً؟")) return;
+    setOrders(prev => prev.filter(o => o.id !== id));
+    await supabase.from('orders').delete().eq('id', id);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  const filteredOrders = orders.filter(o => {
+    const matchesSearch = 
+      o.fullname.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      o.phone.includes(searchQuery) || 
+      o.order_id.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    let normalizedStatus = o.status;
+    if (o.status === "pending") normalizedStatus = "جديد";
+    if (o.status === "delivery") normalizedStatus = "قيد التوصيل";
+    if (o.status === "delivered") normalizedStatus = "تم التسليم";
+    if (o.status === "cancelled") normalizedStatus = "ملغى";
+
+    const matchesStatus = statusFilter === "all" || normalizedStatus === statusFilter;
+    const matchesWilaya = wilayaFilter === "all" || o.wilaya === wilayaFilter;
+    
+    return matchesSearch && matchesStatus && matchesWilaya;
+  });
+
+  const uniqueWilayas = Array.from(new Set(orders.map(o => o.wilaya))).filter(Boolean);
+
   const exportToCSV = () => {
-    if (orders.length === 0) return;
-    
-    const headers = ["Order ID", "Date", "Time", "Customer Name", "Phone", "Wilaya", "Commune", "Address", "Product", "Variant", "Total Amount (DZD)", "Delivery Type", "Status"];
-    
-    const rows = orders.map(order => {
+    if (filteredOrders.length === 0) return;
+    const headers = ["Order ID", "Date", "Time", "Customer Name", "Phone", "Wilaya", "Commune", "Address", "Product", "Variant", "Total Amount (DZD)", "Delivery Type", "Status", "Notes"];
+    const rows = filteredOrders.map(order => {
       const dateObj = new Date(order.created_at);
       return [
         order.order_id,
@@ -195,15 +259,11 @@ function OrdersDashboard() {
         order.variant_title,
         order.total_amount,
         order.delivery_type,
-        order.status
+        getStatusConfig(order.status).label,
+        order.notes || ""
       ];
     });
-
-    const csvContent = [
-      headers.join(","),
-      ...rows.map(row => row.map(cell => `"${String(cell || '').replace(/"/g, '""')}"`).join(","))
-    ].join("\n");
-
+    const csvContent = [headers.join(","), ...rows.map(row => row.map(cell => `"${String(cell || '').replace(/"/g, '""')}"`).join(","))].join("\n");
     const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" }); 
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -214,233 +274,238 @@ function OrdersDashboard() {
     document.body.removeChild(link);
   };
 
-  const pendingCount = orders.filter(o => o.status === 'pending').length;
-  const deliveryCount = orders.filter(o => o.status === 'delivery').length;
-  const deliveredCount = orders.filter(o => o.status === 'delivered').length;
   const totalSales = orders.reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
   
   return (
-    <div className="space-y-6 max-w-[1400px] mx-auto animate-in fade-in duration-500">
+    <div className="space-y-6 max-w-[1600px] mx-auto animate-in fade-in duration-500 font-sans pb-12" style={{ fontFamily: "'Cairo', sans-serif" }}>
       
       {/* Top Metrics Row */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {/* Logo / Title */}
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-4 flex flex-col justify-center items-center shadow-sm">
-          <h2 className="text-xl font-serif font-bold text-[#1e293b] tracking-wider mb-2 uppercase">The Five A</h2>
-          <div className="flex items-center gap-2 text-[#D29E5B]">
-            <div className="h-[1px] w-8 bg-[#D29E5B]/40"></div>
-            <span className="font-bold text-sm">سجل الطلبات</span>
-            <div className="h-[1px] w-8 bg-[#D29E5B]/40"></div>
-          </div>
-        </div>
-        
-        {/* Total Orders */}
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-4 flex items-center gap-4 shadow-sm">
-          <div className="p-3 bg-slate-50 rounded-lg text-slate-700">
-            <ShoppingBag size={28} strokeWidth={1.5}/>
-          </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-[#0E1A2F] rounded-xl p-6 flex items-center justify-between shadow-sm text-white border border-[#0E1A2F]">
           <div>
-            <p className="text-xs font-bold text-slate-500 mb-1">إجمالي الطلبات</p>
-            <p className="text-2xl font-black text-slate-900">{orders.length} <span className="text-sm font-normal text-slate-400">طلب</span></p>
+            <p className="text-sm font-bold text-slate-300 mb-2">إجمالي الطلبات</p>
+            <p className="text-4xl font-black">{orders.length}</p>
           </div>
+          <ShoppingBag size={48} className="text-[#C9A46A] opacity-90" strokeWidth={1.5}/>
         </div>
 
-        {/* Pending */}
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-4 flex items-center gap-4 shadow-sm">
-          <div className="p-3 bg-amber-50 rounded-lg text-[#D29E5B]">
-            <Hourglass size={28} strokeWidth={1.5}/>
-          </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-6 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow">
           <div>
-            <p className="text-xs font-bold text-slate-500 mb-1">قيد المراجعة</p>
-            <p className="text-2xl font-black text-slate-900">{pendingCount} <span className="text-sm font-normal text-slate-400">طلب</span></p>
+            <p className="text-sm font-bold text-slate-500 mb-2">طلبات جديدة</p>
+            <p className="text-4xl font-black text-slate-900">{orders.filter(o => o.status === 'pending' || o.status === 'جديد').length}</p>
           </div>
+          <div className="p-4 bg-blue-50 rounded-2xl text-blue-600"><Plus size={28} strokeWidth={2}/></div>
         </div>
 
-        {/* Delivery */}
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-4 flex items-center gap-4 shadow-sm">
-          <div className="p-3 bg-blue-50 rounded-lg text-blue-600">
-            <Truck size={28} strokeWidth={1.5}/>
-          </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-6 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow">
           <div>
-            <p className="text-xs font-bold text-slate-500 mb-1">قيد التوصيل</p>
-            <p className="text-2xl font-black text-slate-900">{deliveryCount} <span className="text-sm font-normal text-slate-400">طلب</span></p>
+            <p className="text-sm font-bold text-slate-500 mb-2">قيد التوصيل</p>
+            <p className="text-4xl font-black text-slate-900">{orders.filter(o => o.status === 'delivery' || o.status === 'قيد التوصيل').length}</p>
           </div>
+          <div className="p-4 bg-orange-50 rounded-2xl text-orange-600"><Truck size={28} strokeWidth={2}/></div>
         </div>
 
-        {/* Delivered */}
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-4 flex items-center gap-4 shadow-sm">
-          <div className="p-3 bg-emerald-50 rounded-lg text-emerald-600">
-            <CheckCircle size={28} strokeWidth={1.5}/>
-          </div>
+        <div className="bg-[#C9A46A] rounded-xl p-6 flex items-center justify-between shadow-sm text-white border border-[#C9A46A]">
           <div>
-            <p className="text-xs font-bold text-slate-500 mb-1">تم التسليم</p>
-            <p className="text-2xl font-black text-slate-900">{deliveredCount} <span className="text-sm font-normal text-slate-400">طلب</span></p>
+            <p className="text-sm font-bold text-white/90 mb-2">المبيعات الإجمالية</p>
+            <p className="text-2xl font-black" dir="ltr">{totalSales.toLocaleString()} <span className="text-sm font-normal">DZD</span></p>
           </div>
-        </div>
-
-        {/* Total Sales & Date */}
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-4 flex flex-col justify-between shadow-sm">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-xs font-bold text-slate-500 mb-1">إجمالي المبيعات</p>
-              <p className="text-xl font-black text-slate-900" dir="ltr">{totalSales.toLocaleString()} <span className="text-xs font-normal text-slate-400">DZD</span></p>
-            </div>
-            <div className="p-2 bg-amber-50 rounded-lg text-[#D29E5B]">
-              <Wallet size={20} strokeWidth={1.5}/>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100 text-slate-500 text-xs justify-between">
-            <span className="font-bold">تاريخ اليوم</span>
-            <div className="flex items-center gap-1 text-[#D29E5B]">
-              <Calendar size={14} />
-              <span className="font-bold" dir="ltr">{currentDate}</span>
-            </div>
-          </div>
+          <Wallet size={48} className="text-white opacity-90" strokeWidth={1.5}/>
         </div>
       </div>
 
-      {/* Main Table Actions */}
-      <div className="flex justify-end px-2">
-         <button onClick={exportToCSV} className="flex items-center gap-2 px-5 py-2.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg font-bold hover:bg-emerald-100 transition-colors shadow-sm">
-           <Download size={18} strokeWidth={2.5} />
-           تصدير إلى Excel/CSV
-         </button>
+      {/* Control Bar */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-col lg:flex-row gap-4 justify-between items-center">
+        <div className="flex flex-1 flex-col sm:flex-row gap-4 w-full">
+          {/* Search */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input 
+              type="text" 
+              placeholder="البحث بالاسم، الهاتف، أو رقم الطلب..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-[#F7F5F0] border-transparent rounded-xl py-3 pr-11 pl-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] transition-all placeholder:text-slate-400 text-slate-800"
+            />
+          </div>
+          
+          {/* Status Filter */}
+          <div className="relative">
+            <Filter className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <select 
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="bg-[#F7F5F0] border-transparent rounded-xl py-3 pr-11 pl-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] appearance-none min-w-[160px] cursor-pointer text-slate-800 transition-all"
+            >
+              <option value="all">كل الحالات</option>
+              {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+          </div>
+
+          {/* Wilaya Filter */}
+          <div className="relative">
+            <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <select 
+              value={wilayaFilter}
+              onChange={(e) => setWilayaFilter(e.target.value)}
+              className="bg-[#F7F5F0] border-transparent rounded-xl py-3 pr-11 pl-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] appearance-none min-w-[160px] cursor-pointer text-slate-800 transition-all"
+            >
+              <option value="all">كل الولايات</option>
+              {uniqueWilayas.map(w => <option key={w} value={w}>{w}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <button onClick={exportToCSV} className="flex items-center justify-center gap-2 px-6 py-3 bg-[#0E1A2F] text-white rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-md whitespace-nowrap text-sm w-full lg:w-auto">
+          <Download size={18} strokeWidth={2.5} />
+          تصدير إلى Excel
+        </button>
       </div>
 
       {/* Main Table */}
-      <div className="bg-white border border-[#E5E7EB] rounded-xl overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden relative">
+        <div className="overflow-x-auto w-full" style={{ maxHeight: "calc(100vh - 300px)" }}>
           <table className="w-full text-sm text-center border-collapse whitespace-nowrap">
-            <thead>
-              <tr className="bg-[#1e293b] text-white">
-                <th className="p-4 font-bold border-r border-slate-600"><div className="flex items-center justify-center gap-2"><Hourglass size={16}/> الحالة</div></th>
-                <th className="p-4 font-bold border-r border-slate-600"><div className="flex items-center justify-center gap-2"><Wallet size={16}/> إجمالي السعر</div></th>
-                <th className="p-4 font-bold border-r border-slate-600"><div className="flex items-center justify-center gap-2"><Box size={16}/> رسوم المنتج</div></th>
-                <th className="p-4 font-bold border-r border-slate-600"><div className="flex items-center justify-center gap-2"><Truck size={16}/> رسوم التوصيل</div></th>
-                <th className="p-4 font-bold border-r border-slate-600"><div className="flex items-center justify-center gap-2"><MapPin size={16}/> نوع التوصيل</div></th>
-                <th className="p-4 font-bold border-r border-slate-600"><div className="flex items-center justify-center gap-2"><MapPin size={16}/> الولاية</div></th>
-                <th className="p-4 font-bold border-r border-slate-600"><div className="flex items-center justify-center gap-2"><Box size={16}/> المنتج</div></th>
-                <th className="p-4 font-bold border-r border-slate-600"><div className="flex items-center justify-center gap-2"><Phone size={16}/> رقم الهاتف</div></th>
-                <th className="p-4 font-bold border-r border-slate-600"><div className="flex items-center justify-center gap-2"><User size={16}/> الاسم</div></th>
-                <th className="p-4 font-bold border-r border-slate-600"><div className="flex items-center justify-center gap-2"><Hash size={16}/> رقم الطلب</div></th>
-                <th className="p-4 font-bold"><div className="flex items-center justify-center gap-2"><Clock size={16}/> الوقت</div></th>
+            <thead className="sticky top-0 z-20 bg-[#F7F5F0] shadow-sm">
+              <tr className="text-[#0E1A2F]">
+                {/* Right-to-Left Column Order */}
+                <th className="p-4 font-bold border-b border-slate-200 bg-[#F7F5F0] sticky right-0 z-30 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] min-w-[150px]">الحالة</th>
+                <th className="p-4 font-bold border-b border-slate-200">إجراءات</th>
+                <th className="p-4 font-bold border-b border-slate-200 min-w-[200px]">ملاحظات</th>
+                <th className="p-4 font-bold border-b border-slate-200 text-[#C9A46A]">المجموع</th>
+                <th className="p-4 font-bold border-b border-slate-200">سعر المنتج</th>
+                <th className="p-4 font-bold border-b border-slate-200">التوصيل</th>
+                <th className="p-4 font-bold border-b border-slate-200">النوع</th>
+                <th className="p-4 font-bold border-b border-slate-200">البلدية</th>
+                <th className="p-4 font-bold border-b border-slate-200">الولاية</th>
+                <th className="p-4 font-bold border-b border-slate-200">المقاس</th>
+                <th className="p-4 font-bold border-b border-slate-200">المنتج</th>
+                <th className="p-4 font-bold border-b border-slate-200">الهاتف</th>
+                <th className="p-4 font-bold border-b border-slate-200 min-w-[150px]">الاسم</th>
+                <th className="p-4 font-bold border-b border-slate-200 text-slate-500">رقم الطلب</th>
+                <th className="p-4 font-bold border-b border-slate-200">الوقت</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={11} className="p-8 text-slate-400">جاري تحميل الطلبات...</td></tr>
-              ) : orders.length === 0 ? (
-                <tr><td colSpan={11} className="p-8 text-slate-400">لا توجد طلبات بعد</td></tr>
-              ) : orders.map((order, i) => {
+                <tr><td colSpan={15} className="p-16 text-slate-400 font-bold text-lg">جاري تحميل الطلبات...</td></tr>
+              ) : filteredOrders.length === 0 ? (
+                <tr><td colSpan={15} className="p-16 text-slate-400 font-bold text-lg">لا توجد طلبات مطابقة</td></tr>
+              ) : filteredOrders.map((order, i) => {
                 const dateObj = new Date(order.created_at);
-                const time = dateObj.toLocaleTimeString("en-GB");
-                const date = dateObj.toLocaleDateString("en-GB");
+                const time = dateObj.toLocaleTimeString("en-GB", { hour: '2-digit', minute: '2-digit' });
+                const date = dateObj.toLocaleDateString("en-GB", { day: '2-digit', month: 'short' });
                 const productFee = order.total_amount - (order.delivery_fee || 0);
 
                 return (
-                <tr key={order.id} className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'}`}>
-                  <td className="p-3 border-r border-slate-100">
-                    <select 
-                      className="bg-transparent text-xs font-bold border-none outline-none cursor-pointer w-full text-center"
-                      value={order.status}
-                      onChange={(e) => updateStatus(order.id, e.target.value)}
-                    >
-                      <option value="pending">قيد المراجعة</option>
-                      <option value="delivery">قيد التوصيل</option>
-                      <option value="delivered">تم التسليم</option>
-                      <option value="cancelled">ملغاة</option>
-                    </select>
-                    <div className="mt-1 flex justify-center"><StatusBadge status={order.status} /></div>
+                <tr key={order.id} className={`h-[68px] border-b border-slate-100 hover:bg-slate-50/80 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'}`}>
+                  
+                  {/* Status - Sticky Right */}
+                  <td className={`p-3 border-l border-slate-100 bg-inherit sticky right-0 z-10 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] ${i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA] group-hover:bg-slate-50/80'}`}>
+                    <div className="relative group cursor-pointer w-full h-full flex items-center justify-center">
+                      <select 
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        value={getStatusConfig(order.status).value}
+                        onChange={(e) => updateStatus(order.id, e.target.value)}
+                      >
+                        {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                      </select>
+                      <StatusBadge status={order.status} />
+                    </div>
                   </td>
-                  <td className="p-3 border-r border-slate-100 font-bold text-slate-800" dir="ltr">{Number(order.total_amount || 0).toLocaleString()} DZD</td>
-                  <td className="p-3 border-r border-slate-100 text-slate-600" dir="ltr">{productFee.toLocaleString()} DZD</td>
-                  <td className="p-3 border-r border-slate-100 text-slate-600" dir="ltr">{Number(order.delivery_fee || 0).toLocaleString()} DZD</td>
-                  <td className="p-3 border-r border-slate-100 text-slate-600">
+
+                  {/* Actions */}
+                  <td className="p-3 border-l border-slate-100">
                     <div className="flex items-center justify-center gap-2">
-                      {order.delivery_type === "توصيل للمنزل" ? <MapPin size={14} className="text-[#D29E5B]"/> : <Box size={14} className="text-slate-400"/>}
+                      <a href={`https://wa.me/213${order.phone.replace(/^0+/, '')}`} target="_blank" rel="noreferrer" className="w-9 h-9 rounded-xl bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 hover:scale-110 transition-all shadow-sm border border-green-100" title="مراسلة عبر واتساب">
+                        <MessageCircle size={18} strokeWidth={2.5} />
+                      </a>
+                      <a href={`tel:${order.phone}`} className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 hover:scale-110 transition-all shadow-sm border border-blue-100" title="اتصال بالعميل">
+                        <Phone size={18} strokeWidth={2.5} />
+                      </a>
+                      <button onClick={() => copyToClipboard(order.phone)} className="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center hover:bg-slate-200 hover:scale-110 transition-all shadow-sm border border-slate-200" title="نسخ الرقم">
+                        <Copy size={18} strokeWidth={2.5} />
+                      </button>
+                      <div className="w-[1px] h-6 bg-slate-200 mx-1"></div>
+                      <button onClick={() => deleteOrder(order.id)} className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 hover:scale-110 transition-all shadow-sm border border-red-100" title="حذف نهائي">
+                        <Trash2 size={18} strokeWidth={2.5} />
+                      </button>
+                    </div>
+                  </td>
+
+                  {/* Notes */}
+                  <td className="p-3 border-l border-slate-100">
+                    <textarea 
+                      className="w-full h-10 resize-none bg-[#F7F5F0] border border-transparent hover:border-slate-200 focus:border-[#C9A46A] focus:bg-white rounded-lg p-2 text-xs font-bold text-slate-700 outline-none transition-all placeholder:text-slate-400 placeholder:font-normal"
+                      placeholder="أضف ملاحظة..."
+                      defaultValue={order.notes || ""}
+                      onBlur={(e) => updateNotes(order.id, e.target.value)}
+                    />
+                  </td>
+
+                  {/* Total */}
+                  <td className="p-3 border-l border-slate-100 font-black text-[#0E1A2F] bg-[#C9A46A]/5" dir="ltr">
+                    {Number(order.total_amount || 0).toLocaleString()} <span className="text-[10px] text-[#C9A46A] font-bold">DZD</span>
+                  </td>
+
+                  {/* Product Fee */}
+                  <td className="p-3 border-l border-slate-100 font-bold text-slate-600" dir="ltr">
+                    {productFee.toLocaleString()}
+                  </td>
+
+                  {/* Delivery Fee */}
+                  <td className="p-3 border-l border-slate-100 font-bold text-slate-600" dir="ltr">
+                    {Number(order.delivery_fee || 0).toLocaleString()}
+                  </td>
+
+                  {/* Delivery Type */}
+                  <td className="p-3 border-l border-slate-100 text-slate-700 text-xs font-bold">
+                    <div className="flex items-center justify-center gap-1.5 px-2 py-1 bg-white border border-slate-200 rounded-md whitespace-nowrap shadow-sm">
+                      {order.delivery_type === "توصيل للمنزل" ? <MapPin size={12} className="text-[#C9A46A]"/> : <Box size={12} className="text-slate-400"/>}
                       {order.delivery_type}
                     </div>
                   </td>
-                  <td className="p-3 border-r border-slate-100 text-slate-800 font-bold">{order.wilaya}</td>
-                  <td className="p-3 border-r border-slate-100 text-slate-900 font-bold">{order.product_name}</td>
-                  <td className="p-3 border-r border-slate-100 font-bold text-slate-900" dir="ltr">{order.phone}</td>
-                  <td className="p-3 border-r border-slate-100 text-slate-900 font-bold">{order.fullname}</td>
-                  <td className="p-3 border-r border-slate-100 text-slate-600 font-mono text-xs font-semibold">{order.order_id}</td>
-                  <td className="p-3 text-slate-600 text-xs font-semibold" dir="ltr">{date}, {time}</td>
+
+                  {/* Commune */}
+                  <td className="p-3 border-l border-slate-100 text-slate-700 font-bold">{order.commune}</td>
+                  
+                  {/* Wilaya */}
+                  <td className="p-3 border-l border-slate-100 text-slate-900 font-black">{order.wilaya}</td>
+
+                  {/* Variant */}
+                  <td className="p-3 border-l border-slate-100 text-slate-700 font-bold">
+                    {order.variant_title && <span className="px-2.5 py-1 bg-white border border-slate-200 shadow-sm rounded-md text-xs">{order.variant_title}</span>}
+                  </td>
+
+                  {/* Product */}
+                  <td className="p-3 border-l border-slate-100 text-[#0E1A2F] font-bold">{order.product_name}</td>
+
+                  {/* Phone */}
+                  <td className="p-3 border-l border-slate-100 font-bold text-[#0E1A2F] hover:text-[#C9A46A] transition-colors cursor-pointer" dir="ltr" onClick={() => copyToClipboard(order.phone)} title="انقر للنسخ">
+                    {order.phone}
+                  </td>
+
+                  {/* Name */}
+                  <td className="p-3 border-l border-slate-100 text-[#0E1A2F] font-black">{order.fullname}</td>
+
+                  {/* Order ID */}
+                  <td className="p-3 border-l border-slate-100 text-slate-400 font-mono text-[11px] font-bold">#{order.order_id.split('-')[1] || order.order_id}</td>
+
+                  {/* Time */}
+                  <td className="p-3 text-slate-500 text-xs font-bold" dir="ltr">
+                    <div className="flex flex-col items-center justify-center">
+                      <span className="text-slate-800">{time}</span>
+                      <span className="text-[10px] text-slate-400">{date}</span>
+                    </div>
+                  </td>
                 </tr>
               )})}
             </tbody>
           </table>
         </div>
       </div>
-
-      {/* Bottom Summary Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-12">
-        
-        {/* Price Summary */}
-        <div className="bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl p-6 shadow-sm text-center flex flex-col justify-center">
-          <h3 className="text-[#D29E5B] font-bold mb-5 font-serif text-lg">ملخص الأسعار</h3>
-          <div className="flex items-center justify-center gap-4">
-            <div className="bg-white border border-blue-100 px-4 py-3 rounded-lg w-1/3 shadow-sm">
-              <p className="text-xs text-blue-700 flex justify-center gap-1 mb-1"><Truck size={14}/> رسوم التوصيل</p>
-              <p className="font-bold text-blue-800" dir="ltr">4,500 DZD</p>
-            </div>
-            <div className="text-slate-400 font-bold text-lg">+</div>
-            <div className="bg-white border border-amber-100 px-4 py-3 rounded-lg w-1/3 shadow-sm">
-              <p className="text-xs text-[#D29E5B] flex justify-center gap-1 mb-1"><Box size={14}/> رسوم المنتج</p>
-              <p className="font-bold text-amber-800" dir="ltr">80,450 DZD</p>
-            </div>
-            <div className="text-slate-400 font-bold text-lg">=</div>
-            <div className="bg-emerald-50 px-4 py-3 rounded-lg w-1/3 border border-emerald-200 shadow-sm">
-              <p className="text-xs text-emerald-700 flex justify-center gap-1 mb-1"><Wallet size={14}/> إجمالي السعر</p>
-              <p className="font-bold text-emerald-800" dir="ltr">84,950 DZD</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Status Guide */}
-        <div className="bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl p-6 shadow-sm text-center flex flex-col justify-center">
-          <h3 className="text-[#D29E5B] font-bold mb-5 font-serif text-lg">دليل الحالات</h3>
-          <div className="flex flex-wrap justify-center gap-4">
-            <StatusBadge status="pending" />
-            <StatusBadge status="delivery" />
-            <StatusBadge status="delivered" />
-            <StatusBadge status="cancelled" />
-          </div>
-        </div>
-
-        {/* Important Notes */}
-        <div className="bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl p-6 shadow-sm">
-          <h3 className="text-slate-800 font-bold mb-4 flex items-center justify-center md:justify-start gap-2 font-serif text-lg">
-            <AlertCircle className="text-[#D29E5B]" size={20}/> 
-            ملاحظات مهمة
-          </h3>
-          <ul className="text-sm text-slate-600 space-y-3 px-2">
-            <li className="flex items-start gap-3"><CheckCircle size={16} className="text-[#D29E5B] mt-0.5 shrink-0"/> تأكد من مراجعة الطلبات الجديدة بانتظام.</li>
-            <li className="flex items-start gap-3"><CheckCircle size={16} className="text-[#D29E5B] mt-0.5 shrink-0"/> تواصل مع العملاء لتأكيد الطلبات قيد المراجعة.</li>
-            <li className="flex items-start gap-3"><CheckCircle size={16} className="text-[#D29E5B] mt-0.5 shrink-0"/> حدّث حالة الطلبية بعد كل إجراء.</li>
-            <li className="flex items-start gap-3"><CheckCircle size={16} className="text-[#D29E5B] mt-0.5 shrink-0"/> احتفظ بسجل المنتجات المرتجعة في ورقة منفصلة.</li>
-          </ul>
-        </div>
-      </div>
-
     </div>
   );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  switch (status) {
-    case "pending":
-      return <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-md text-xs font-bold whitespace-nowrap min-w-[110px] justify-center shadow-sm"><Hourglass size={14}/> قيد المراجعة</div>;
-    case "delivery":
-      return <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-md text-xs font-bold whitespace-nowrap min-w-[110px] justify-center shadow-sm"><Truck size={14}/> قيد التوصيل</div>;
-    case "delivered":
-      return <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md text-xs font-bold whitespace-nowrap min-w-[110px] justify-center shadow-sm"><CheckCircle size={14}/> تم التسليم</div>;
-    case "cancelled":
-      return <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-md text-xs font-bold whitespace-nowrap min-w-[110px] justify-center shadow-sm"><AlertCircle size={14}/> ملغاة</div>;
-    default:
-      return null;
-  }
 }
 
 // --- PRODUCTS MANAGER COMPONENT ---

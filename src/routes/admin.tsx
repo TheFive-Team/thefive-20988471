@@ -7,6 +7,7 @@ import {
   MapPin, Phone, User, Hash, Clock, Box, FileText, Settings, 
   LogOut, AlertCircle, RefreshCw
 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -15,18 +16,22 @@ export const Route = createFileRoute("/admin")({
   component: AdminDashboard,
 });
 
-// Mock Orders Data based on the provided screenshot
-const mockOrders = [
-  { id: "ORD-1782872483206", date: "01/07/2026", time: "3:21:24", name: "sami", phone: "660365643", product: "vetement lux", state: "12", stateName: "سعيدة", deliveryType: "توصيل للمنزل", deliveryFee: 500, productFee: 7500, total: 8000, status: "pending" },
-  { id: "ORD-1782872509871", date: "01/07/2026", time: "3:28:57", name: "saa", phone: "660365643", product: "vetement lux", state: "6", stateName: "الجلفة", deliveryType: "توصيل للمنزل", deliveryFee: 500, productFee: 7500, total: 8000, status: "cancelled" },
-  { id: "ORD-1782872515562", date: "01/07/2026", time: "3:30:11", name: "asada", phone: "660365643", product: "vetement lux", state: "6", stateName: "الشلف", deliveryType: "الاستلام من المكتب", deliveryFee: 500, productFee: 7500, total: 8000, status: "delivery" },
-  { id: "ORD-1782875876612", date: "01/07/2026", time: "19:03:13", name: "Mohand", phone: "542099306", product: "vetement lux", state: "6", stateName: "بجاية", deliveryType: "الاستلام من المكتب", deliveryFee: 500, productFee: 7500, total: 8000, status: "pending" },
-  { id: "ORD-1782875850221", date: "01/07/2026", time: "19:07:30", name: "محمد ياسر", phone: "542099306", product: "vetement lux", state: "10", stateName: "المسيلة", deliveryType: "توصيل للمنزل", deliveryFee: 500, productFee: 7500, total: 8000, status: "pending" },
-  { id: "ORD-1782967312241", date: "02/07/2026", time: "2:01:57", name: "logisik pubg", phone: "660365643", product: "logisik pubg", state: "6", stateName: "الأغواط", deliveryType: "الاستلام من المكتب", deliveryFee: 500, productFee: 6500, total: 7000, status: "delivery" },
-  { id: "ORD-1782967356622", date: "02/07/2026", time: "2:42:39", name: "logisik pubg", phone: "660365643", product: "vetement lux", state: "8", stateName: "غرداية", deliveryType: "الاستلام من المكتب", deliveryFee: 500, productFee: 6500, total: 7000, status: "delivered" },
-  { id: "ORD-1782967388123", date: "02/07/2026", time: "2:48:09", name: "logisik pubg", phone: "660365643", product: "vetement lux", state: "10", stateName: "بسكرة", deliveryType: "توصيل للمنزل", deliveryFee: 500, productFee: 6500, total: 7000, status: "delivered" },
-  { id: "ORD-1782967410099", date: "02/07/2026", time: "2:59:08", name: "logisik pubg", phone: "660365643", product: "logisik pubg", state: "10", stateName: "تلمسان", deliveryType: "توصيل للمنزل", deliveryFee: 500, productFee: 6500, total: 7000, status: "pending" },
-];
+export interface SupabaseOrder {
+  id: string;
+  created_at: string;
+  order_id: string;
+  fullname: string;
+  phone: string;
+  wilaya: string;
+  commune: string;
+  address: string;
+  product_name: string;
+  variant_title: string;
+  total_amount: number;
+  delivery_type: string;
+  delivery_fee: number;
+  status: string;
+}
 
 function AdminDashboard() {
   const [token, setToken] = useState("");
@@ -147,6 +152,33 @@ function AdminDashboard() {
 // --- ORDERS DASHBOARD COMPONENT ---
 function OrdersDashboard() {
   const currentDate = new Date().toLocaleDateString("en-GB"); // DD/MM/YYYY
+  const [orders, setOrders] = useState<SupabaseOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchOrders = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+    if (!error && data) {
+      setOrders(data);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const updateStatus = async (id: string, newStatus: string) => {
+    const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', id);
+    if (!error) {
+      fetchOrders();
+    }
+  };
+
+  const pendingCount = orders.filter(o => o.status === 'pending').length;
+  const deliveryCount = orders.filter(o => o.status === 'delivery').length;
+  const deliveredCount = orders.filter(o => o.status === 'delivered').length;
+  const totalSales = orders.reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
   
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto animate-in fade-in duration-500">
@@ -170,7 +202,7 @@ function OrdersDashboard() {
           </div>
           <div>
             <p className="text-xs font-bold text-slate-500 mb-1">إجمالي الطلبات</p>
-            <p className="text-2xl font-black text-slate-900">9 <span className="text-sm font-normal text-slate-400">طلب</span></p>
+            <p className="text-2xl font-black text-slate-900">{orders.length} <span className="text-sm font-normal text-slate-400">طلب</span></p>
           </div>
         </div>
 
@@ -181,7 +213,7 @@ function OrdersDashboard() {
           </div>
           <div>
             <p className="text-xs font-bold text-slate-500 mb-1">قيد المراجعة</p>
-            <p className="text-2xl font-black text-slate-900">4 <span className="text-sm font-normal text-slate-400">طلب</span></p>
+            <p className="text-2xl font-black text-slate-900">{pendingCount} <span className="text-sm font-normal text-slate-400">طلب</span></p>
           </div>
         </div>
 
@@ -192,7 +224,7 @@ function OrdersDashboard() {
           </div>
           <div>
             <p className="text-xs font-bold text-slate-500 mb-1">قيد التوصيل</p>
-            <p className="text-2xl font-black text-slate-900">2 <span className="text-sm font-normal text-slate-400">طلب</span></p>
+            <p className="text-2xl font-black text-slate-900">{deliveryCount} <span className="text-sm font-normal text-slate-400">طلب</span></p>
           </div>
         </div>
 
@@ -203,7 +235,7 @@ function OrdersDashboard() {
           </div>
           <div>
             <p className="text-xs font-bold text-slate-500 mb-1">تم التسليم</p>
-            <p className="text-2xl font-black text-slate-900">2 <span className="text-sm font-normal text-slate-400">طلب</span></p>
+            <p className="text-2xl font-black text-slate-900">{deliveredCount} <span className="text-sm font-normal text-slate-400">طلب</span></p>
           </div>
         </div>
 
@@ -212,7 +244,7 @@ function OrdersDashboard() {
           <div className="flex justify-between items-start">
             <div>
               <p className="text-xs font-bold text-slate-500 mb-1">إجمالي المبيعات</p>
-              <p className="text-xl font-black text-slate-900" dir="ltr">84,950 <span className="text-xs font-normal text-slate-400">DZD</span></p>
+              <p className="text-xl font-black text-slate-900" dir="ltr">{totalSales.toLocaleString()} <span className="text-xs font-normal text-slate-400">DZD</span></p>
             </div>
             <div className="p-2 bg-amber-50 rounded-lg text-[#D29E5B]">
               <Wallet size={20} strokeWidth={1.5}/>
@@ -248,28 +280,48 @@ function OrdersDashboard() {
               </tr>
             </thead>
             <tbody>
-              {mockOrders.map((order, i) => (
+              {loading ? (
+                <tr><td colSpan={11} className="p-8 text-slate-400">جاري تحميل الطلبات...</td></tr>
+              ) : orders.length === 0 ? (
+                <tr><td colSpan={11} className="p-8 text-slate-400">لا توجد طلبات بعد</td></tr>
+              ) : orders.map((order, i) => {
+                const dateObj = new Date(order.created_at);
+                const time = dateObj.toLocaleTimeString("en-GB");
+                const date = dateObj.toLocaleDateString("en-GB");
+                const productFee = order.total_amount - (order.delivery_fee || 0);
+
+                return (
                 <tr key={order.id} className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'}`}>
                   <td className="p-3 border-r border-slate-100">
-                    <StatusBadge status={order.status} />
+                    <select 
+                      className="bg-transparent text-xs font-bold border-none outline-none cursor-pointer w-full text-center"
+                      value={order.status}
+                      onChange={(e) => updateStatus(order.id, e.target.value)}
+                    >
+                      <option value="pending">قيد المراجعة</option>
+                      <option value="delivery">قيد التوصيل</option>
+                      <option value="delivered">تم التسليم</option>
+                      <option value="cancelled">ملغاة</option>
+                    </select>
+                    <div className="mt-1 flex justify-center"><StatusBadge status={order.status} /></div>
                   </td>
-                  <td className="p-3 border-r border-slate-100 font-bold text-slate-800" dir="ltr">{order.total.toLocaleString()} DZD</td>
-                  <td className="p-3 border-r border-slate-100 text-slate-600" dir="ltr">{order.productFee.toLocaleString()} DZD</td>
-                  <td className="p-3 border-r border-slate-100 text-slate-600" dir="ltr">{order.deliveryFee.toLocaleString()} DZD</td>
+                  <td className="p-3 border-r border-slate-100 font-bold text-slate-800" dir="ltr">{Number(order.total_amount || 0).toLocaleString()} DZD</td>
+                  <td className="p-3 border-r border-slate-100 text-slate-600" dir="ltr">{productFee.toLocaleString()} DZD</td>
+                  <td className="p-3 border-r border-slate-100 text-slate-600" dir="ltr">{Number(order.delivery_fee || 0).toLocaleString()} DZD</td>
                   <td className="p-3 border-r border-slate-100 text-slate-600">
                     <div className="flex items-center justify-center gap-2">
-                      {order.deliveryType === "توصيل للمنزل" ? <MapPin size={14} className="text-[#D29E5B]"/> : <Box size={14} className="text-slate-400"/>}
-                      {order.deliveryType}
+                      {order.delivery_type === "توصيل للمنزل" ? <MapPin size={14} className="text-[#D29E5B]"/> : <Box size={14} className="text-slate-400"/>}
+                      {order.delivery_type}
                     </div>
                   </td>
-                  <td className="p-3 border-r border-slate-100 text-slate-700">{order.stateName} <span className="text-slate-400 text-xs ml-1">{order.state}</span></td>
-                  <td className="p-3 border-r border-slate-100 text-slate-700">{order.product}</td>
+                  <td className="p-3 border-r border-slate-100 text-slate-700">{order.wilaya}</td>
+                  <td className="p-3 border-r border-slate-100 text-slate-700">{order.product_name}</td>
                   <td className="p-3 border-r border-slate-100 font-medium text-slate-800" dir="ltr">{order.phone}</td>
-                  <td className="p-3 border-r border-slate-100 text-slate-700">{order.name}</td>
-                  <td className="p-3 border-r border-slate-100 text-slate-500 font-mono text-xs">{order.id}</td>
-                  <td className="p-3 text-slate-500 text-xs" dir="ltr">{order.date}, {order.time}</td>
+                  <td className="p-3 border-r border-slate-100 text-slate-700">{order.fullname}</td>
+                  <td className="p-3 border-r border-slate-100 text-slate-500 font-mono text-xs">{order.order_id}</td>
+                  <td className="p-3 text-slate-500 text-xs" dir="ltr">{date}, {time}</td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>

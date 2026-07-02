@@ -5,7 +5,7 @@ import { commitFile } from "@/lib/github";
 import { 
   ShoppingBag, Hourglass, Truck, CheckCircle, Wallet, Calendar, 
   MapPin, Phone, User, Hash, Clock, Box, FileText, Settings, 
-  LogOut, AlertCircle, RefreshCw
+  LogOut, AlertCircle, RefreshCw, Trash2, Plus
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -398,19 +398,42 @@ function StatusBadge({ status }: { status: string }) {
 
 // --- PRODUCTS MANAGER COMPONENT ---
 function ProductsManager({ products, token, onRefresh, loading }: { products: ShopifyProduct[], token: string, onRefresh: () => void, loading: boolean }) {
-  const [editingProduct, setEditingProduct] = useState<ShopifyProduct | null>(null);
+  const [mode, setMode] = useState<"list" | "edit" | "create">("list");
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<any>({});
   const [isSaving, setIsSaving] = useState(false);
   const [newImageBase64, setNewImageBase64] = useState<string | null>(null);
+  const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
 
   const startEdit = (product: ShopifyProduct) => {
-    setEditingProduct(product);
+    setMode("edit");
+    setEditingProductId(product.node.id);
+    
+    const sizeOption = product.node.options?.find(o => o.name.toLowerCase() === "size");
+    const sizes = sizeOption ? sizeOption.values.join(", ") : "";
+
     setEditForm({
       title: product.node.title,
       handle: product.node.handle,
       descriptionHtml: product.node.descriptionHtml || "",
       price: product.node.priceRange.minVariantPrice.amount,
+      sizes: sizes
     });
+    setCurrentImageUrl(product.node.images.edges[0]?.node.url || null);
+    setNewImageBase64(null);
+  };
+
+  const startCreate = () => {
+    setMode("create");
+    setEditingProductId(null);
+    setEditForm({
+      title: "",
+      handle: "",
+      descriptionHtml: "",
+      price: "",
+      sizes: ""
+    });
+    setCurrentImageUrl(null);
     setNewImageBase64(null);
   };
 
@@ -426,54 +449,88 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
     }
   };
 
+  const generateShopifyNode = (form: any, imageUrl: string | null, id: string) => {
+    const sizeValues = form.sizes ? form.sizes.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+    const options = sizeValues.length > 0 ? [{ name: "size", values: sizeValues }] : [];
+    
+    const variantsEdges = sizeValues.length > 0 
+      ? sizeValues.map((size: string, idx: number) => ({
+          node: {
+            id: `gid://shopify/ProductVariant/${Date.now()}${idx}`,
+            title: size,
+            availableForSale: true,
+            price: { amount: form.price, currencyCode: "DZD" },
+            selectedOptions: [{ name: "size", value: size }]
+          }
+        }))
+      : [{
+          node: {
+            id: `gid://shopify/ProductVariant/${Date.now()}`,
+            title: "Default Title",
+            availableForSale: true,
+            price: { amount: form.price, currencyCode: "DZD" },
+            selectedOptions: []
+          }
+        }];
+
+    return {
+      id,
+      title: form.title,
+      description: "",
+      descriptionHtml: form.descriptionHtml,
+      handle: form.handle || form.title.toLowerCase().replace(/\s+/g, '-'),
+      tags: [],
+      productType: "",
+      vendor: "My Store",
+      priceRange: { minVariantPrice: { amount: form.price, currencyCode: "DZD" } },
+      images: { edges: imageUrl ? [{ node: { url: imageUrl, altText: null } }] : [] },
+      variants: { edges: variantsEdges },
+      options: options
+    };
+  };
+
   const saveProduct = async () => {
-    if (!token || !editingProduct) return;
+    if (!token) return;
+    if (!editForm.title || !editForm.price) {
+      alert("الرجاء إدخال اسم المنتج والسعر / Please enter title and price");
+      return;
+    }
     setIsSaving(true);
     try {
-      let updatedImageUrl = editingProduct.node.images.edges[0]?.node.url;
+      let finalImageUrl = currentImageUrl;
 
-      // Upload new image if selected
       if (newImageBase64) {
         const fileName = `product-${Date.now()}.png`;
         const imagePath = `public/images/${fileName}`;
         await commitFile(imagePath, newImageBase64, `Upload image for ${editForm.title}`, token, true);
-        updatedImageUrl = `/images/${fileName}`;
+        finalImageUrl = `/images/${fileName}`;
       }
 
-      // Create updated products list
-      const updatedProducts = products.map(p => {
-        if (p.node.id === editingProduct.node.id) {
-          const newProduct = { ...p };
-          newProduct.node.title = editForm.title;
-          newProduct.node.handle = editForm.handle;
-          newProduct.node.descriptionHtml = editForm.descriptionHtml;
-          newProduct.node.priceRange.minVariantPrice.amount = editForm.price;
-          newProduct.node.variants.edges.forEach(v => {
-            v.node.price.amount = editForm.price;
-          });
-          if (updatedImageUrl) {
-             if (newProduct.node.images.edges.length > 0) {
-                 newProduct.node.images.edges[0].node.url = updatedImageUrl;
-             } else {
-                 newProduct.node.images.edges = [{ node: { url: updatedImageUrl, altText: null } }];
-             }
+      let updatedProducts = [...products];
+
+      if (mode === "create") {
+        const newId = `gid://shopify/Product/${Date.now()}`;
+        const newNode = generateShopifyNode(editForm, finalImageUrl, newId);
+        updatedProducts.push({ node: newNode as any });
+      } else if (mode === "edit" && editingProductId) {
+        updatedProducts = products.map(p => {
+          if (p.node.id === editingProductId) {
+            return { node: generateShopifyNode(editForm, finalImageUrl, editingProductId) as any };
           }
-          return newProduct;
-        }
-        return p;
-      });
+          return p;
+        });
+      }
       
-      // Commit products.json
       await commitFile(
         "public/data/products.json",
         JSON.stringify(updatedProducts, null, 2),
-        `Update product: ${editForm.title}`,
+        `${mode === "create" ? "Create" : "Update"} product: ${editForm.title}`,
         token,
         false
       );
       
-      alert("تم تحديث المنتج بنجاح! / Product updated successfully!");
-      setEditingProduct(null);
+      alert(mode === "create" ? "تمت إضافة المنتج بنجاح!" : "تم تحديث المنتج بنجاح!");
+      setMode("list");
       onRefresh();
     } catch (err: any) {
       alert("Error: " + err.message);
@@ -482,12 +539,34 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
     }
   };
 
-  if (editingProduct) {
+  const deleteProduct = async (id: string, title: string) => {
+    if (!confirm(`هل أنت متأكد من حذف المنتج: ${title}؟\nAre you sure you want to delete this product?`)) return;
+    
+    setIsSaving(true);
+    try {
+      const updatedProducts = products.filter(p => p.node.id !== id);
+      await commitFile(
+        "public/data/products.json",
+        JSON.stringify(updatedProducts, null, 2),
+        `Delete product: ${title}`,
+        token,
+        false
+      );
+      alert("تم حذف المنتج بنجاح!");
+      onRefresh();
+    } catch (err: any) {
+      alert("Error deleting product: " + err.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (mode !== "list") {
     return (
       <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300 pb-12">
         <div className="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-[#E5E7EB]">
-          <h2 className="text-2xl font-bold font-serif text-[#1e293b]">تعديل المنتج: {editingProduct.node.title}</h2>
-          <button onClick={() => setEditingProduct(null)} className="text-slate-500 hover:text-slate-800 font-bold px-4 py-2 bg-slate-100 rounded-lg">إلغاء ورجوع</button>
+          <h2 className="text-2xl font-bold font-serif text-[#1e293b]">{mode === "create" ? "إضافة منتج جديد" : `تعديل المنتج: ${editForm.title}`}</h2>
+          <button onClick={() => setMode("list")} className="text-slate-500 hover:text-slate-800 font-bold px-4 py-2 bg-slate-100 rounded-lg">إلغاء ورجوع</button>
         </div>
         
         <div className="bg-white p-8 rounded-xl shadow-sm border border-[#E5E7EB] space-y-8">
@@ -505,13 +584,18 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
               <input type="number" className="w-full border border-slate-300 p-3.5 rounded-xl outline-none focus:border-slate-800 text-left font-bold text-lg text-slate-900" dir="ltr" value={editForm.price} onChange={e => setEditForm({...editForm, price: e.target.value})} />
             </div>
             <div className="space-y-3">
+              <label className="font-bold text-slate-700 text-sm">القياسات المتوفرة (Available Sizes)</label>
+              <input type="text" className="w-full border border-slate-300 p-3.5 rounded-xl outline-none focus:border-slate-800 text-left font-bold text-slate-900" dir="ltr" value={editForm.sizes} onChange={e => setEditForm({...editForm, sizes: e.target.value})} placeholder="38, 40, 42, 44" />
+              <p className="text-xs text-slate-500">افصل بين القياسات بفاصلة (مثال: S, M, L) / Separate sizes with commas</p>
+            </div>
+            <div className="space-y-3">
               <label className="font-bold text-slate-700 text-sm">الصورة الرئيسية (Main Photo)</label>
               <div className="flex items-center gap-4 p-2 border border-slate-200 rounded-xl bg-slate-50">
                 <div className="w-16 h-16 bg-white rounded-lg overflow-hidden border shadow-sm">
                    {newImageBase64 ? (
                       <img src={`data:image/png;base64,${newImageBase64}`} className="w-full h-full object-cover" />
-                   ) : editingProduct.node.images.edges[0] ? (
-                      <img src={editingProduct.node.images.edges[0].node.url} className="w-full h-full object-cover" />
+                   ) : currentImageUrl ? (
+                      <img src={currentImageUrl} className="w-full h-full object-cover" />
                    ) : null}
                 </div>
                 <input type="file" accept="image/*" onChange={handleImageUpload} className="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-white file:text-slate-700 file:shadow-sm file:cursor-pointer hover:file:bg-slate-100" />
@@ -542,14 +626,23 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
           <Box className="text-[#D29E5B]"/>
           إدارة المنتجات المتاحة
         </h2>
-        <button 
-          onClick={onRefresh} 
-          disabled={loading}
-          className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition-colors disabled:opacity-50"
-        >
-          <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-          تحديث البيانات
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={startCreate} 
+            disabled={loading || isSaving}
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#D29E5B] text-white rounded-lg font-bold hover:bg-[#c28f4d] transition-colors shadow-sm disabled:opacity-50"
+          >
+            <Plus size={18} />
+            إضافة منتج جديد
+          </button>
+          <button 
+            onClick={onRefresh} 
+            disabled={loading || isSaving}
+            className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-6">
@@ -571,13 +664,23 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
             </div>
             <div className="flex flex-col gap-3 w-full md:w-auto p-5 bg-[#FAFAFA] rounded-xl border border-[#E5E7EB] min-w-[200px] justify-center items-center">
               <p className="font-bold text-xl text-slate-900" dir="ltr">{Number(p.node.priceRange.minVariantPrice.amount).toLocaleString()} DZD</p>
-              <button
-                onClick={() => startEdit(p)}
-                disabled={loading}
-                className="w-full bg-[#1e293b] text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-800 transition-colors disabled:opacity-50 shadow-sm"
-              >
-                تعديل المنتج بالكامل
-              </button>
+              <div className="w-full flex gap-2">
+                <button
+                  onClick={() => startEdit(p)}
+                  disabled={loading || isSaving}
+                  className="flex-1 bg-[#1e293b] text-white px-4 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-800 transition-colors disabled:opacity-50 shadow-sm"
+                >
+                  تعديل
+                </button>
+                <button
+                  onClick={() => deleteProduct(p.node.id, p.node.title)}
+                  disabled={loading || isSaving}
+                  className="bg-red-50 text-red-600 px-4 py-2.5 rounded-lg font-bold text-sm hover:bg-red-100 transition-colors disabled:opacity-50 border border-red-200 shadow-sm flex items-center justify-center"
+                  title="حذف المنتج"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
             </div>
           </div>
         ))}

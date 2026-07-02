@@ -1,4 +1,11 @@
 import { Star } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 export function Reviews() {
   const reviewImages = [
@@ -21,12 +28,28 @@ export function Reviews() {
           <p className="text-zinc-500">آراء عملائنا بعد تجربة المنتج</p>
         </div>
 
-        <div className="flex flex-col gap-6 items-center">
-          {reviewImages.map((imgUrl, i) => (
-            <div key={i} className="w-full max-w-2xl rounded-2xl overflow-hidden shadow-md border border-zinc-200">
-              <img src={imgUrl} alt={`Review ${i + 1}`} className="w-full h-auto object-cover" />
-            </div>
-          ))}
+        <div className="px-10">
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent>
+              {reviewImages.map((imgUrl, i) => (
+                <CarouselItem key={i} className="md:basis-1/2 lg:basis-1/3">
+                  <div className="p-2">
+                    <div className="w-full rounded-2xl overflow-hidden shadow-md border border-zinc-200">
+                      <img src={imgUrl} alt={`Review ${i + 1}`} className="w-full h-auto object-cover" />
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+          </Carousel>
         </div>
       </div>
     </section>

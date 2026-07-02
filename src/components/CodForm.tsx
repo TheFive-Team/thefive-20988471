@@ -4,7 +4,7 @@ import { submitOrderFn } from "@/actions/submitOrder.server";
 import { wilayas } from "@/lib/wilayas";
 import { communesByWilaya } from "@/lib/communes";
 
-export function CodForm({ productPriceAmount, productName, variantTitle }: { productPriceAmount?: string, productName?: string, variantTitle?: string }) {
+export function CodForm({ productPriceAmount, productName, variantTitle, requireSize }: { productPriceAmount?: string, productName?: string, variantTitle?: string, requireSize?: boolean }) {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -39,6 +39,13 @@ export function CodForm({ productPriceAmount, productName, variantTitle }: { pro
     const lastOrder = localStorage.getItem("thefive_last_order");
     if (lastOrder && Date.now() - parseInt(lastOrder) < 60000) {
       setFormError("لقد قمت بتقديم طلب للتو. يرجى الانتظار دقيقة قبل المحاولة مرة أخرى.");
+      return;
+    }
+
+    // 4. Require Size
+    if (requireSize) {
+      setFormError("يرجى اختيار المقاس قبل إتمام الطلب (Veuillez choisir la taille)");
+      document.getElementById("size-selector")?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 

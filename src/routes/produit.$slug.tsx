@@ -36,7 +36,10 @@ function ProductPage() {
 
   const variants = product?.node.variants.edges ?? [];
   const selectedVariant = useMemo(
-    () => variants.find((v) => v.node.id === variantId)?.node ?? variants[0]?.node,
+    () => {
+      if (variants.length === 1) return variants[0]?.node;
+      return variants.find((v) => v.node.id === variantId)?.node;
+    },
     [variantId, variants],
   );
   const images = product?.node.images.edges.map((e) => e.node) ?? [];
@@ -45,13 +48,15 @@ function ProductPage() {
 
   // Meta Pixel — ViewContent
   useEffect(() => {
-    if (!product || !selectedVariant) return;
+    if (!product) return;
+    const variantForPixel = selectedVariant ?? product.node.variants.edges[0]?.node;
+    if (!variantForPixel) return;
     fbq("track", "ViewContent", {
-      content_ids: [numericId(selectedVariant.id)],
+      content_ids: [numericId(variantForPixel.id)],
       content_name: product.node.title,
       content_type: "product",
-      value: parseFloat(selectedVariant.price.amount),
-      currency: selectedVariant.price.currencyCode,
+      value: parseFloat(variantForPixel.price.amount),
+      currency: variantForPixel.price.currencyCode,
     });
   }, [product, selectedVariant]);
 
@@ -132,18 +137,22 @@ function ProductPage() {
 
 
           {variants.length > 1 && (
-            <div className="mt-6">
-              <p className="eyebrow mb-3 text-foreground/70">{tr("product.size")}</p>
-              <div className="flex flex-wrap gap-2">
+            <div id="size-selector" className={`mt-8 p-5 rounded-2xl border-2 transition-all duration-300 ${!selectedVariant ? 'border-red-500/40 bg-red-50/50' : 'border-border/50 bg-secondary/10'}`}>
+              <div className="flex items-center justify-between mb-4">
+                <p className={`font-bold text-base flex items-center gap-2 ${!selectedVariant ? 'text-red-600' : 'text-foreground'}`}>
+                  {tr("product.size")} {!selectedVariant && <span className="text-red-500 text-sm font-normal">* يرجى الاختيار / Required</span>}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
                 {variants.map((v) => (
                   <button
                     key={v.node.id}
                     onClick={() => setVariantId(v.node.id)}
                     disabled={!v.node.availableForSale}
-                    className={`rounded-lg min-w-16 border px-4 py-2.5 text-xs uppercase tracking-[0.2em] transition-all disabled:opacity-40 ${
+                    className={`rounded-xl min-w-16 border px-5 py-3 text-sm uppercase tracking-wider transition-all disabled:opacity-40 ${
                       selectedVariant?.id === v.node.id
-                        ? "border-primary ring-1 ring-primary bg-background shadow-md text-foreground font-bold"
-                        : "border-border text-muted-foreground hover:border-accent hover:bg-accent/20"
+                        ? "border-primary ring-1 ring-primary bg-background shadow-md text-foreground font-bold scale-105"
+                        : "border-border text-muted-foreground hover:border-accent hover:bg-accent/20 bg-background/50"
                     }`}
                   >{v.node.title}</button>
                 ))}
@@ -157,6 +166,7 @@ function ProductPage() {
               productPriceAmount={selectedVariant?.price?.amount ?? p.priceRange.minVariantPrice.amount} 
               productName={p.title}
               variantTitle={selectedVariant?.title}
+              requireSize={variants.length > 1 && !selectedVariant}
             />
           </div>
 

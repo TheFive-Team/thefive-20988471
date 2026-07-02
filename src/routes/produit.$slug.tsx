@@ -144,7 +144,7 @@ function ProductPage() {
 
           {variants.length > 1 && (
             <div id="size-selector" className="mt-6">
-              <p className={`eyebrow mb-3 flex items-center gap-2 transition-colors ${sizeError ? 'text-red-600' : 'text-foreground/70'}`}>
+              <p className={`font-bold text-lg mb-3 flex items-center gap-2 transition-colors ${sizeError ? 'text-red-600' : 'text-foreground'}`}>
                 {tr("product.size")} {sizeError && <span className="text-red-500 normal-case font-bold text-sm ml-2 animate-pulse">* يرجى الاختيار / Required</span>}
               </p>
               <div className="flex flex-wrap gap-3">
@@ -153,10 +153,10 @@ function ProductPage() {
                     key={v.node.id}
                     onClick={() => setVariantId(v.node.id)}
                     disabled={!v.node.availableForSale}
-                    className={`rounded-xl min-w-16 border px-5 py-3 text-sm uppercase tracking-wider transition-all disabled:opacity-40 ${
+                    className={`rounded-xl min-w-16 border-2 px-5 py-3 text-base uppercase tracking-wider transition-all disabled:opacity-40 font-bold ${
                       selectedVariant?.id === v.node.id
-                        ? "border-primary ring-1 ring-primary bg-background shadow-md text-foreground font-bold scale-105"
-                        : "border-border text-muted-foreground hover:border-accent hover:bg-accent/20 bg-background/50"
+                        ? "border-primary bg-background shadow-md text-foreground scale-105"
+                        : "border-foreground/40 text-foreground/80 hover:border-foreground/60 hover:bg-accent/20 bg-background/50"
                     }`}
                   >{v.node.title}</button>
                 ))}

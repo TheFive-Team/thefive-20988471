@@ -20,7 +20,7 @@ export function Reviews() {
   ];
 
   return (
-    <section className="py-16 md:py-24 bg-zinc-50">
+    <section className="py-16 md:py-24 bg-transparent">
       <div className="max-w-6xl mx-auto px-0 md:px-4">
         <div className="text-center mb-8 px-4">
           <h2 className="text-3xl font-bold text-zinc-900 mb-2">تقييمات عملائنا</h2>
@@ -41,8 +41,8 @@ export function Reviews() {
             <CarouselContent className="-ml-2 md:-ml-4">
               {reviewImages.map((imgUrl, i) => (
                 <CarouselItem key={i} className="pl-2 md:pl-4 basis-[90%] sm:basis-[80%] md:basis-1/2 lg:basis-[40%]">
-                  <div className="w-full rounded-2xl overflow-hidden shadow-lg border border-zinc-200">
-                    <img src={imgUrl} alt={`Review ${i + 1}`} className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500" />
+                  <div className="w-full">
+                    <img src={imgUrl} alt={`Review ${i + 1}`} className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500 rounded-2xl" />
                   </div>
                 </CarouselItem>
               ))}

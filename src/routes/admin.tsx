@@ -5,7 +5,7 @@ import { commitFile } from "@/lib/github";
 import { 
   ShoppingBag, Hourglass, Truck, CheckCircle, Wallet, Calendar, 
   MapPin, Phone, User, Hash, Clock, Box, FileText, Settings, 
-  LogOut, AlertCircle, RefreshCw, Trash2, Plus, X
+  LogOut, AlertCircle, RefreshCw, Trash2, Plus, X, Download
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -175,6 +175,45 @@ function OrdersDashboard() {
     }
   };
 
+  const exportToCSV = () => {
+    if (orders.length === 0) return;
+    
+    const headers = ["Order ID", "Date", "Time", "Customer Name", "Phone", "Wilaya", "Commune", "Address", "Product", "Variant", "Total Amount (DZD)", "Delivery Type", "Status"];
+    
+    const rows = orders.map(order => {
+      const dateObj = new Date(order.created_at);
+      return [
+        order.order_id,
+        dateObj.toLocaleDateString("en-GB"),
+        dateObj.toLocaleTimeString("en-GB"),
+        order.fullname,
+        order.phone,
+        order.wilaya,
+        order.commune,
+        order.address,
+        order.product_name,
+        order.variant_title,
+        order.total_amount,
+        order.delivery_type,
+        order.status
+      ];
+    });
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.map(cell => `"${String(cell || '').replace(/"/g, '""')}"`).join(","))
+    ].join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" }); 
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `orders_${new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const pendingCount = orders.filter(o => o.status === 'pending').length;
   const deliveryCount = orders.filter(o => o.status === 'delivery').length;
   const deliveredCount = orders.filter(o => o.status === 'delivered').length;
@@ -258,6 +297,14 @@ function OrdersDashboard() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Main Table Actions */}
+      <div className="flex justify-end px-2">
+         <button onClick={exportToCSV} className="flex items-center gap-2 px-5 py-2.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg font-bold hover:bg-emerald-100 transition-colors shadow-sm">
+           <Download size={18} strokeWidth={2.5} />
+           تصدير إلى Excel/CSV
+         </button>
       </div>
 
       {/* Main Table */}
@@ -416,7 +463,7 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
     setEditForm({
       title: product.node.title,
       handle: product.node.handle,
-      descriptionHtml: product.node.descriptionHtml || "",
+      descriptionHtml: (product.node.descriptionHtml || "").replace(/<br\s*\/?>/gi, '\n'),
       price: product.node.priceRange.minVariantPrice.amount,
       sizes: sizes
     });
@@ -494,7 +541,7 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       id,
       title: form.title,
       description: "",
-      descriptionHtml: form.descriptionHtml,
+      descriptionHtml: (form.descriptionHtml || "").replace(/\n/g, '<br />'),
       handle: form.handle || form.title.toLowerCase().replace(/\s+/g, '-'),
       tags: [],
       productType: "",
@@ -635,8 +682,8 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
           </div>
           
           <div className="space-y-3">
-            <label className="font-bold text-slate-700 text-sm">وصف المنتج (HTML Description)</label>
-            <textarea rows={8} className="w-full border border-slate-300 p-4 rounded-xl outline-none focus:border-slate-800 text-left font-mono text-sm leading-relaxed" dir="ltr" value={editForm.descriptionHtml} onChange={e => setEditForm({...editForm, descriptionHtml: e.target.value})} placeholder="<p>Enter product description in HTML...</p>" />
+            <label className="font-bold text-slate-700 text-sm">وصف المنتج (Product Description)</label>
+            <textarea rows={8} className="w-full border border-slate-300 p-4 rounded-xl outline-none focus:border-slate-800 text-right font-medium text-sm leading-relaxed" dir="auto" value={editForm.descriptionHtml} onChange={e => setEditForm({...editForm, descriptionHtml: e.target.value})} placeholder="اكتب وصف المنتج هنا... المسافات والأسطر الجديدة ستظهر بشكل صحيح" />
           </div>
 
           <div className="flex justify-end gap-4 pt-6 border-t border-slate-100">

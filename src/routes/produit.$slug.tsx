@@ -137,12 +137,8 @@ function ProductPage() {
 
 
           {variants.length > 1 && (
-            <div id="size-selector" className={`mt-8 p-5 rounded-2xl border-2 transition-all duration-300 ${!selectedVariant ? 'border-red-500/40 bg-red-50/50' : 'border-border/50 bg-secondary/10'}`}>
-              <div className="flex items-center justify-between mb-4">
-                <p className={`font-bold text-base flex items-center gap-2 ${!selectedVariant ? 'text-red-600' : 'text-foreground'}`}>
-                  {tr("product.size")} {!selectedVariant && <span className="text-red-500 text-sm font-normal">* يرجى الاختيار / Required</span>}
-                </p>
-              </div>
+            <div id="size-selector" className="mt-6">
+              <p className="eyebrow mb-3 text-foreground/70">{tr("product.size")}</p>
               <div className="flex flex-wrap gap-3">
                 {variants.map((v) => (
                   <button

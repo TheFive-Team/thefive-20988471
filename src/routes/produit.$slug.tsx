@@ -33,6 +33,7 @@ function ProductPage() {
   const isCartLoading = useCartStore((s) => s.isLoading);
   const [variantId, setVariantId] = useState<string | null>(null);
   const [added, setAdded] = useState(false);
+  const [sizeError, setSizeError] = useState(false);
 
   const variants = product?.node.variants.edges ?? [];
   const selectedVariant = useMemo(
@@ -42,6 +43,11 @@ function ProductPage() {
     },
     [variantId, variants],
   );
+
+  useEffect(() => {
+    if (selectedVariant) setSizeError(false);
+  }, [selectedVariant]);
+
   const images = product?.node.images.edges.map((e) => e.node) ?? [];
   const [activeImg, setActiveImg] = useState(0);
   const image = images[activeImg] ?? images[0];
@@ -138,7 +144,9 @@ function ProductPage() {
 
           {variants.length > 1 && (
             <div id="size-selector" className="mt-6">
-              <p className="eyebrow mb-3 text-foreground/70">{tr("product.size")}</p>
+              <p className={`eyebrow mb-3 flex items-center gap-2 transition-colors ${sizeError ? 'text-red-600' : 'text-foreground/70'}`}>
+                {tr("product.size")} {sizeError && <span className="text-red-500 normal-case font-bold text-sm ml-2 animate-pulse">* يرجى الاختيار / Required</span>}
+              </p>
               <div className="flex flex-wrap gap-3">
                 {variants.map((v) => (
                   <button
@@ -163,6 +171,7 @@ function ProductPage() {
               productName={p.title}
               variantTitle={selectedVariant?.title}
               requireSize={variants.length > 1 && !selectedVariant}
+              onSizeError={() => setSizeError(true)}
             />
           </div>
 

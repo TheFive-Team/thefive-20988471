@@ -4,7 +4,7 @@ import { submitOrderFn } from "@/actions/submitOrder.server";
 import { wilayas } from "@/lib/wilayas";
 import { communesByWilaya } from "@/lib/communes";
 
-export function CodForm({ productPriceAmount, productName, variantTitle, requireSize }: { productPriceAmount?: string, productName?: string, variantTitle?: string, requireSize?: boolean }) {
+export function CodForm({ productPriceAmount, productName, variantTitle, requireSize, onSizeError }: { productPriceAmount?: string, productName?: string, variantTitle?: string, requireSize?: boolean, onSizeError?: () => void }) {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -44,7 +44,8 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
 
     // 4. Require Size
     if (requireSize) {
-      setFormError("يرجى اختيار المقاس قبل إتمام الطلب (Veuillez choisir la taille)");
+      if (onSizeError) onSizeError();
+      setFormError("يرجى اختيار المقاس لتأكيد الطلب");
       document.getElementById("size-selector")?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }

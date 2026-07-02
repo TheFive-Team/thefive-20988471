@@ -1,12 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import {
-  shopifyCartCreate, shopifyCartLinesAdd, shopifyCartLinesUpdate,
-  shopifyCartLinesRemove, shopifyCartFetch,
-} from "@/lib/shopify";
 
 export interface CartItem {
-  lineId: string | null;
   variantId: string;
   productHandle: string;
   productTitle: string;
@@ -19,15 +14,11 @@ export interface CartItem {
 
 interface CartStore {
   items: CartItem[];
-  cartId: string | null;
-  checkoutUrl: string | null;
   isLoading: boolean;
-  isSyncing: boolean;
-  addItem: (item: Omit<CartItem, "lineId">) => Promise<void>;
+  addItem: (item: CartItem) => Promise<void>;
   updateQuantity: (variantId: string, quantity: number) => Promise<void>;
   removeItem: (variantId: string) => Promise<void>;
   clearCart: () => void;
-  syncCart: () => Promise<void>;
   getCheckoutUrl: () => string | null;
 }
 
@@ -35,87 +26,51 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
-      cartId: null,
-      checkoutUrl: null,
       isLoading: false,
-      isSyncing: false,
 
       addItem: async (item) => {
-        const { items, cartId, clearCart } = get();
+        const { items } = get();
         const existing = items.find((i) => i.variantId === item.variantId);
-        set({ isLoading: true });
-        try {
-          if (!cartId) {
-            const cart = await shopifyCartCreate(item.variantId, item.quantity);
-            if (!cart) return;
-            const lineId = cart.lines[0]?.id ?? null;
-            set({ cartId: cart.id, checkoutUrl: cart.checkoutUrl, items: [{ ...item, lineId }] });
-          } else if (existing && existing.lineId) {
-            const newQty = existing.quantity + item.quantity;
-            const cart = await shopifyCartLinesUpdate(cartId, existing.lineId, newQty);
-            if (!cart) return;
-            if ("cartNotFound" in cart) { clearCart(); return; }
-            set({ checkoutUrl: cart.checkoutUrl, items: get().items.map((i) =>
-              i.variantId === item.variantId ? { ...i, quantity: newQty } : i) });
-          } else {
-            const cart = await shopifyCartLinesAdd(cartId, item.variantId, item.quantity);
-            if (!cart) return;
-            if ("cartNotFound" in cart) { clearCart(); return; }
-            const newLine = cart.lines.find((l) => l.merchandiseId === item.variantId);
-            set({ checkoutUrl: cart.checkoutUrl, items: [...get().items, { ...item, lineId: newLine?.id ?? null }] });
-          }
-        } catch (e) { console.error("addItem:", e); }
-        finally { set({ isLoading: false }); }
+        if (existing) {
+          set({
+            items: items.map((i) =>
+              i.variantId === item.variantId
+                ? { ...i, quantity: i.quantity + item.quantity }
+                : i
+            ),
+          });
+        } else {
+          set({ items: [...items, item] });
+        }
       },
 
       updateQuantity: async (variantId, quantity) => {
-        if (quantity <= 0) return get().removeItem(variantId);
-        const { items, cartId, clearCart } = get();
-        const item = items.find((i) => i.variantId === variantId);
-        if (!item?.lineId || !cartId) return;
-        set({ isLoading: true });
-        try {
-          const cart = await shopifyCartLinesUpdate(cartId, item.lineId, quantity);
-          if (!cart) return;
-          if ("cartNotFound" in cart) { clearCart(); return; }
-          set({ checkoutUrl: cart.checkoutUrl, items: get().items.map((i) =>
-            i.variantId === variantId ? { ...i, quantity } : i) });
-        } finally { set({ isLoading: false }); }
+        if (quantity <= 0) {
+          get().removeItem(variantId);
+          return;
+        }
+        set({
+          items: get().items.map((i) =>
+            i.variantId === variantId ? { ...i, quantity } : i
+          ),
+        });
       },
 
       removeItem: async (variantId) => {
-        const { items, cartId, clearCart } = get();
-        const item = items.find((i) => i.variantId === variantId);
-        if (!item?.lineId || !cartId) return;
-        set({ isLoading: true });
-        try {
-          const cart = await shopifyCartLinesRemove(cartId, item.lineId);
-          if (!cart) return;
-          if ("cartNotFound" in cart) { clearCart(); return; }
-          const newItems = get().items.filter((i) => i.variantId !== variantId);
-          if (newItems.length === 0) clearCart();
-          else set({ checkoutUrl: cart.checkoutUrl, items: newItems });
-        } finally { set({ isLoading: false }); }
+        set({
+          items: get().items.filter((i) => i.variantId !== variantId),
+        });
       },
 
-      clearCart: () => set({ items: [], cartId: null, checkoutUrl: null }),
-      getCheckoutUrl: () => get().checkoutUrl,
-
-      syncCart: async () => {
-        const { cartId, isSyncing, clearCart } = get();
-        if (!cartId || isSyncing) return;
-        set({ isSyncing: true });
-        try {
-          const cart = await shopifyCartFetch(cartId);
-          if (!cart || cart.totalQuantity === 0) clearCart();
-        } catch (e) { console.error("syncCart:", e); }
-        finally { set({ isSyncing: false }); }
-      },
+      clearCart: () => set({ items: [] }),
+      
+      // Since it's local COD, we just redirect them to the checkout page route
+      getCheckoutUrl: () => "/commande",
     }),
     {
-      name: "fivea-shopify-cart",
+      name: "fivea-local-cart",
       storage: createJSONStorage(() => localStorage),
-      partialize: (s) => ({ items: s.items, cartId: s.cartId, checkoutUrl: s.checkoutUrl }),
+      partialize: (s) => ({ items: s.items }),
     },
   ),
 );

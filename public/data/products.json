@@ -1,0 +1,131 @@
+[
+  {
+    "node": {
+      "id": "gid://shopify/Product/8000957644848",
+      "title": "vetement lux",
+      "description": "",
+      "descriptionHtml": "",
+      "handle": "aura-aura-aura",
+      "tags": [],
+      "productType": "",
+      "vendor": "My Store",
+      "priceRange": {
+        "minVariantPrice": {
+          "amount": "5900.0",
+          "currencyCode": "DZD"
+        }
+      },
+      "images": {
+        "edges": [
+          {
+            "node": {
+              "url": "https://cdn.shopify.com/s/files/1/0692/0863/7488/files/dc564e89-ec79-425e-8cee-543e153a2d31.png?v=1782761681",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "https://cdn.shopify.com/s/files/1/0692/0863/7488/files/85b1d44b-bae3-47b8-a440-6442076ea4d9.png?v=1782761707",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "https://cdn.shopify.com/s/files/1/0692/0863/7488/files/0c40ef4f-7885-4824-b0de-95ae0a1ba963.png?v=1782761721",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "https://cdn.shopify.com/s/files/1/0692/0863/7488/files/f4a79b56-6341-4c0c-b925-b4a992c0dd60.png?v=1782761734",
+              "altText": null
+            }
+          }
+        ]
+      },
+      "variants": {
+        "edges": [
+          {
+            "node": {
+              "id": "gid://shopify/ProductVariant/43314332696624",
+              "title": "6",
+              "availableForSale": true,
+              "price": {
+                "amount": "5900.0",
+                "currencyCode": "DZD"
+              },
+              "selectedOptions": [
+                {
+                  "name": "size",
+                  "value": "6"
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "id": "gid://shopify/ProductVariant/43314332729392",
+              "title": "8",
+              "availableForSale": true,
+              "price": {
+                "amount": "5900.0",
+                "currencyCode": "DZD"
+              },
+              "selectedOptions": [
+                {
+                  "name": "size",
+                  "value": "8"
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "id": "gid://shopify/ProductVariant/43314332762160",
+              "title": "10",
+              "availableForSale": true,
+              "price": {
+                "amount": "5900.0",
+                "currencyCode": "DZD"
+              },
+              "selectedOptions": [
+                {
+                  "name": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "id": "gid://shopify/ProductVariant/43314332794928",
+              "title": "12",
+              "availableForSale": true,
+              "price": {
+                "amount": "5900.0",
+                "currencyCode": "DZD"
+              },
+              "selectedOptions": [
+                {
+                  "name": "size",
+                  "value": "12"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "options": [
+        {
+          "name": "size",
+          "values": [
+            "6",
+            "8",
+            "10",
+            "12"
+          ]
+        }
+      ]
+    }
+  }
+]

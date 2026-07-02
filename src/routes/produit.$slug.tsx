@@ -140,9 +140,9 @@ function ProductPage() {
                     key={v.node.id}
                     onClick={() => setVariantId(v.node.id)}
                     disabled={!v.node.availableForSale}
-                    className={`rounded-lg min-w-16 border px-4 py-2.5 text-xs uppercase tracking-[0.2em] transition-colors disabled:opacity-40 ${
+                    className={`rounded-lg min-w-16 border px-4 py-2.5 text-xs uppercase tracking-[0.2em] transition-all disabled:opacity-40 ${
                       selectedVariant?.id === v.node.id
-                        ? "border-primary bg-background shadow-sm text-foreground"
+                        ? "border-primary ring-1 ring-primary bg-background shadow-md text-foreground font-bold"
                         : "border-border text-muted-foreground hover:border-accent hover:bg-accent/20"
                     }`}
                   >{v.node.title}</button>

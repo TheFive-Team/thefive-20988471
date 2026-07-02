@@ -127,5 +127,80 @@
         }
       ]
     }
+  },
+  {
+    "node": {
+      "id": "gid://shopify/Product/1783025057924",
+      "title": "venom",
+      "description": "",
+      "descriptionHtml": "erftvgybhnjkmdcrfvtgbhnjk",
+      "handle": "venom",
+      "tags": [],
+      "productType": "",
+      "vendor": "My Store",
+      "priceRange": {
+        "minVariantPrice": {
+          "amount": "5050",
+          "currencyCode": "DZD"
+        }
+      },
+      "images": {
+        "edges": [
+          {
+            "node": {
+              "url": "/images/product-1783025038174-0.png",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "/images/product-1783025043962-1.png",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "/images/product-1783025048139-2.png",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "/images/product-1783025052564-3.png",
+              "altText": null
+            }
+          }
+        ]
+      },
+      "variants": {
+        "edges": [
+          {
+            "node": {
+              "id": "gid://shopify/ProductVariant/17830250579240",
+              "title": "21 21 21 12",
+              "availableForSale": true,
+              "price": {
+                "amount": "5050",
+                "currencyCode": "DZD"
+              },
+              "selectedOptions": [
+                {
+                  "name": "size",
+                  "value": "21 21 21 12"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "options": [
+        {
+          "name": "size",
+          "values": [
+            "21 21 21 12"
+          ]
+        }
+      ]
+    }
   }
 ]

@@ -1,11 +1,13 @@
 import { Star } from "lucide-react";
 
 export function Reviews() {
-  // TODO: Replace these placeholder image URLs with your actual GemPages review pictures URLs
   const reviewImages = [
-    "https://placehold.co/600x400/eeeeee/999999?text=Review+Image+1",
-    "https://placehold.co/600x400/eeeeee/999999?text=Review+Image+2",
-    "https://placehold.co/600x400/eeeeee/999999?text=Review+Image+3",
+    "https://cdn.shopify.com/s/files/1/0819/2180/2539/files/2f3a69a5a415a782b3d3957eb6a6e2cf.png?v=1725615609",
+    "https://cdn.shopify.com/s/files/1/0819/2180/2539/files/d5e3da8f85f573efdce199ec82a4d339.png?v=1725615609",
+    "https://cdn.shopify.com/s/files/1/0819/2180/2539/files/bb06f0e427774e502c118671609ad74e.png?v=1725615609",
+    "https://cdn.shopify.com/s/files/1/0819/2180/2539/files/d675685d6b461878bda70c99f01abdc2.png?v=1725615610",
+    "https://cdn.shopify.com/s/files/1/0819/2180/2539/files/42a19d2dbd7fc2af06709d73d61a2936.png?v=1725615610",
+    "https://cdn.shopify.com/s/files/1/0819/2180/2539/files/ec5ad62d29cd2677dd3f124c6e938f32.png?v=1725615610",
   ];
 
   return (

@@ -7,6 +7,7 @@ import { formatMoney } from "@/lib/shopify";
 import { MobileImageGallery } from "@/components/MobileImageGallery";
 import { CodForm } from "@/components/CodForm";
 import { StickyCheckoutBar } from "@/components/StickyCheckoutBar";
+import { Reviews } from "@/components/Reviews";
 
 const numericId = (gid: string) => gid.split("/").pop() ?? gid;
 const fbq = (...args: unknown[]) => {
@@ -201,6 +202,8 @@ function ProductPage() {
           ))}
         </section>
       )}
+
+      <Reviews />
 
       <StickyCheckoutBar price={selectedVariant?.price ?? p.priceRange.minVariantPrice} />
     </div>

@@ -15,6 +15,7 @@ export const submitOrderFn = createServerFn({ method: "POST" })
       productPriceAmount: z.string().optional(),
       productName: z.string().optional(),
       variantTitle: z.string().optional(),
+      deliveryFee: z.number().optional(),
     })
   )
   .handler(async ({ data }) => {
@@ -24,8 +25,8 @@ export const submitOrderFn = createServerFn({ method: "POST" })
       const orderId = `ORD-${Date.now()}`;
       
       const productFee = Number(data.productPriceAmount) || 0;
-      // Note: Typically you'd calculate exact delivery fee based on wilaya, using 600 DZD as default fallback
-      const deliveryFee = data.wilaya ? 600 : 0; 
+      // Use exact delivery fee from frontend or fallback to 600 DZD
+      const deliveryFee = data.deliveryFee !== undefined ? data.deliveryFee : (data.wilaya ? 600 : 0); 
       const totalAmount = productFee + deliveryFee;
 
       // Insert into Supabase

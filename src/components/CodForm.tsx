@@ -64,6 +64,7 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
     try {
       const selectedWilaya = wilayas.find(w => w.code === Number(form.wilaya));
       const wilayaName = selectedWilaya ? `${selectedWilaya.code} - ${selectedWilaya.nameAr}` : form.wilaya;
+      const calculatedDeliveryFee = form.shippingMethod === 'home' ? selectedWilaya?.home : selectedWilaya?.stop;
 
       const response = await submitOrderFn({
         data: {
@@ -72,6 +73,7 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
           wilaya: wilayaName,
           commune: form.commune,
           deliveryType: form.shippingMethod === 'home' ? 'توصيل للمنزل' : 'استلام من المكتب (Stop Desk)',
+          deliveryFee: calculatedDeliveryFee,
           productPriceAmount,
           productName,
           variantTitle

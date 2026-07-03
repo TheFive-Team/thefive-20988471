@@ -320,7 +320,7 @@ function OrdersDashboard() {
     document.body.removeChild(link);
   };
 
-  const totalSales = orders.reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
+  const totalSales = orders.reduce((sum, o) => sum + (Number(o.total_amount) - Number(o.delivery_fee || 0)), 0);
   
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto animate-in fade-in duration-500 font-sans pb-12" style={{ fontFamily: "'Cairo', sans-serif" }}>

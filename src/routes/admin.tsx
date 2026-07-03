@@ -7,6 +7,7 @@ import {
   MapPin, Phone, User, Hash, Clock, Box, FileText, Settings, 
   LogOut, AlertCircle, RefreshCw, Trash2, Plus, X, Download, Search, Filter, Copy, MessageCircle, Edit, ChevronDown
 } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/admin")({
@@ -465,49 +466,45 @@ function OrdersDashboard() {
                           <MessageCircle size={16} strokeWidth={2.5} />
                         </a>
                         
-                        <div className="relative">
-                          <button 
-                            onClick={() => setActiveCallMenuId(activeCallMenuId === order.id ? null : order.id)}
-                            className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 hover:scale-110 transition-all shadow-sm border border-blue-100 relative" 
-                            title="حالة الاتصال"
-                          >
-                            <Phone size={16} strokeWidth={2.5} />
-                            {order.call_status && (
-                              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-white" style={{ backgroundColor: CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.color }}></span>
-                            )}
-                          </button>
-                          
-                          {activeCallMenuId === order.id && (
-                            <>
-                              <div className="fixed inset-0 z-40" onClick={() => setActiveCallMenuId(null)}></div>
-                              <div className="absolute right-0 bottom-full mb-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg z-50 p-2 flex flex-col gap-1">
-                                <p className="text-[10px] font-bold text-slate-400 px-2 pb-1 text-right">حالة الاتصال بالزبون</p>
-                                {CALL_STATUS_OPTIONS.map(opt => (
-                                  <button
-                                    key={opt.value}
-                                    onClick={() => updateCallStatus(order.id, opt.value)}
-                                    className={`flex items-center gap-2 w-full text-right px-3 py-2 rounded-lg text-xs font-bold transition-colors hover:bg-slate-50 ${order.call_status === opt.value ? 'bg-slate-50' : ''}`}
-                                  >
-                                    {opt.icon === "check" ? (
-                                      <CheckCircle size={12} strokeWidth={3} className={opt.text.replace('text-', 'text-')} style={{ color: opt.color }} />
-                                    ) : (
-                                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: opt.color }}></span>
-                                    )}
-                                    <span className={opt.text}>{opt.value}</span>
-                                  </button>
-                                ))}
-                                {order.call_status && (
-                                  <button
-                                    onClick={() => updateCallStatus(order.id, "")}
-                                    className="flex items-center gap-2 w-full text-right px-3 py-2 rounded-lg text-xs font-bold text-red-500 hover:bg-red-50 transition-colors mt-1 border-t border-slate-100"
-                                  >
-                                    <X size={12} strokeWidth={3} /> إزالة الحالة
-                                  </button>
+                        <DropdownMenu modal={false}>
+                          <DropdownMenuTrigger asChild>
+                            <button 
+                              className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 hover:scale-110 transition-all shadow-sm border border-blue-100 relative outline-none" 
+                              title="حالة الاتصال"
+                            >
+                              <Phone size={16} strokeWidth={2.5} />
+                              {order.call_status && (
+                                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-white" style={{ backgroundColor: CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.color }}></span>
+                              )}
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="w-48 z-[9999] rounded-xl p-2 bg-white" align="end" sideOffset={8}>
+                            <p className="text-[10px] font-bold text-slate-400 px-2 pb-1 text-right mb-1">حالة الاتصال بالزبون</p>
+                            {CALL_STATUS_OPTIONS.map(opt => (
+                              <DropdownMenuItem
+                                key={opt.value}
+                                onSelect={() => updateCallStatus(order.id, opt.value)}
+                                className={`flex items-center gap-2 w-full text-right px-3 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer outline-none ${order.call_status === opt.value ? 'bg-slate-50' : 'hover:bg-slate-50 focus:bg-slate-50'}`}
+                                dir="rtl"
+                              >
+                                {opt.icon === "check" ? (
+                                  <CheckCircle size={14} strokeWidth={3} className={opt.text.replace('text-', 'text-')} style={{ color: opt.color }} />
+                                ) : (
+                                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: opt.color }}></span>
                                 )}
-                              </div>
-                            </>
-                          )}
-                        </div>
+                                <span className={opt.text}>{opt.value}</span>
+                              </DropdownMenuItem>
+                            ))}
+                            <DropdownMenuSeparator className="my-1 bg-slate-100" />
+                            <DropdownMenuItem
+                              onSelect={() => updateCallStatus(order.id, "")}
+                              className="flex items-center justify-center gap-2 w-full text-center px-3 py-2.5 rounded-lg text-xs font-bold text-slate-500 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 transition-colors cursor-pointer outline-none"
+                              dir="rtl"
+                            >
+                              <Trash2 size={14} strokeWidth={2.5} /> مسح حالة الاتصال
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
 
                         <button onClick={() => copyToClipboard(order.phone)} className="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center hover:bg-slate-200 hover:scale-110 transition-all shadow-sm border border-slate-200" title="نسخ الرقم">
                           <Copy size={16} strokeWidth={2.5} />
@@ -520,18 +517,27 @@ function OrdersDashboard() {
 
                       {/* Call Status Badge */}
                       {order.call_status && (
-                        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black shadow-sm transition-colors cursor-default ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.bg} ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.text} ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.hover}`}>
-                          {CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.icon === "check" ? (
-                            <CheckCircle size={14} strokeWidth={3} />
-                          ) : (
-                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.color }}></span>
-                          )}
-                          {order.call_status}
+                        <div className="flex items-center gap-1.5">
+                          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black shadow-sm transition-colors cursor-default ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.bg} ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.text} ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.hover}`}>
+                            {CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.icon === "check" ? (
+                              <CheckCircle size={14} strokeWidth={3} />
+                            ) : (
+                              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.color }}></span>
+                            )}
+                            {order.call_status}
+                          </div>
+                          <button 
+                            onClick={() => updateCallStatus(order.id, "")}
+                            className="w-5 h-5 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-red-100 hover:text-red-500 transition-colors"
+                            title="مسح حالة الاتصال"
+                          >
+                            <X size={12} strokeWidth={3} />
+                          </button>
                         </div>
                       )}
                     </div>
                   </td>
-
+                  
                   {/* Notes */}
                   <td className="p-3 border-l border-slate-100">
                     <textarea 

@@ -5,7 +5,7 @@ import { commitFile } from "@/lib/github";
 import { 
   ShoppingBag, Hourglass, Truck, CheckCircle, Wallet, Calendar, 
   MapPin, Phone, User, Hash, Clock, Box, FileText, Settings, 
-  LogOut, AlertCircle, RefreshCw, Trash2, Plus, X, Download, Search, Filter, Copy, MessageCircle, Edit
+  LogOut, AlertCircle, RefreshCw, Trash2, Plus, X, Download, Search, Filter, Copy, MessageCircle, Edit, ChevronDown
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -151,6 +151,14 @@ function AdminDashboard() {
 }
 
 // --- STATUS CONFIGURATION ---
+const CALL_STATUS_OPTIONS = [
+  { value: "لم يرد 1", color: "#FACC15", bg: "bg-[#FACC15]/10", text: "text-[#FACC15]" },
+  { value: "لم يرد 2", color: "#F59E0B", bg: "bg-[#F59E0B]/10", text: "text-[#F59E0B]" },
+  { value: "لم يرد 3", color: "#EA580C", bg: "bg-[#EA580C]/10", text: "text-[#EA580C]" },
+  { value: "تم الرد", color: "#16A34A", bg: "bg-[#16A34A]/10", text: "text-[#16A34A]" },
+  { value: "إعادة الاتصال لاحقًا", color: "#2563EB", bg: "bg-[#2563EB]/10", text: "text-[#2563EB]" },
+];
+
 const STATUS_OPTIONS = [
   { value: "جديد", label: "جديد", color: "text-[#2563EB]", bg: "bg-[#2563EB]/10", icon: Plus },
   { value: "مؤكد", label: "مؤكد", color: "text-[#7C3AED]", bg: "bg-[#7C3AED]/10", icon: CheckCircle },
@@ -183,6 +191,7 @@ function OrdersDashboard() {
   const currentDate = new Date().toLocaleDateString("en-GB"); 
   const [orders, setOrders] = useState<SupabaseOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeCallMenuId, setActiveCallMenuId] = useState<string | null>(null);
   
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -205,6 +214,12 @@ function OrdersDashboard() {
   const updateStatus = async (id: string, newStatus: string) => {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
     await supabase.from('orders').update({ status: newStatus }).eq('id', id);
+  };
+
+  const updateCallStatus = async (id: string, call_status: string) => {
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, call_status } : o));
+    setActiveCallMenuId(null);
+    await supabase.from('orders').update({ call_status }).eq('id', id);
   };
 
   const updateNotes = async (id: string, notes: string) => {

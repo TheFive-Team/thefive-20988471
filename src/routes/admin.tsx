@@ -153,11 +153,11 @@ function AdminDashboard() {
 
 // --- STATUS CONFIGURATION ---
 const CALL_STATUS_OPTIONS = [
-  { value: "لم يرد 1", color: "#FACC15", bg: "bg-[#FACC15]/10", text: "text-[#FACC15]" },
-  { value: "لم يرد 2", color: "#F59E0B", bg: "bg-[#F59E0B]/10", text: "text-[#F59E0B]" },
-  { value: "لم يرد 3", color: "#EA580C", bg: "bg-[#EA580C]/10", text: "text-[#EA580C]" },
-  { value: "تم الرد", color: "#16A34A", bg: "bg-[#16A34A]/10", text: "text-[#16A34A]" },
-  { value: "إعادة الاتصال لاحقًا", color: "#2563EB", bg: "bg-[#2563EB]/10", text: "text-[#2563EB]" },
+  { value: "لم يرد 1", color: "#F59E0B", bg: "bg-[#FEF3C7]", text: "text-[#B45309]", hover: "hover:bg-[#FDE68A]" },
+  { value: "لم يرد 2", color: "#EA580C", bg: "bg-[#FED7AA]", text: "text-[#C2410C]", hover: "hover:bg-[#FDBA74]" },
+  { value: "لم يرد 3", color: "#DC2626", bg: "bg-[#FECACA]", text: "text-[#B91C1C]", hover: "hover:bg-[#FCA5A5]" },
+  { value: "تم الرد", color: "#166534", bg: "bg-[#DCFCE7]", text: "text-[#166534]", hover: "hover:bg-[#BBF7D0]", icon: "check" },
+  { value: "إعادة الاتصال لاحقًا", color: "#2563EB", bg: "bg-[#DBEAFE]", text: "text-[#1E3A8A]", hover: "hover:bg-[#BFDBFE]" },
 ];
 
 const STATUS_OPTIONS = [
@@ -488,8 +488,12 @@ function OrdersDashboard() {
                                     onClick={() => updateCallStatus(order.id, opt.value)}
                                     className={`flex items-center gap-2 w-full text-right px-3 py-2 rounded-lg text-xs font-bold transition-colors hover:bg-slate-50 ${order.call_status === opt.value ? 'bg-slate-50' : ''}`}
                                   >
-                                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: opt.color }}></span>
-                                    {opt.value}
+                                    {opt.icon === "check" ? (
+                                      <CheckCircle size={12} strokeWidth={3} className={opt.text.replace('text-', 'text-')} style={{ color: opt.color }} />
+                                    ) : (
+                                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: opt.color }}></span>
+                                    )}
+                                    <span className={opt.text}>{opt.value}</span>
                                   </button>
                                 ))}
                                 {order.call_status && (
@@ -516,8 +520,12 @@ function OrdersDashboard() {
 
                       {/* Call Status Badge */}
                       {order.call_status && (
-                        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold shadow-sm ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.bg} ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.text}`}>
-                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.color }}></span>
+                        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black shadow-sm transition-colors cursor-default ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.bg} ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.text} ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.hover}`}>
+                          {CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.icon === "check" ? (
+                            <CheckCircle size={14} strokeWidth={3} />
+                          ) : (
+                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.color }}></span>
+                          )}
                           {order.call_status}
                         </div>
                       )}

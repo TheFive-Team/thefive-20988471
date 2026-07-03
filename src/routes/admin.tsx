@@ -9,6 +9,7 @@ import {
 , Sun, Moon, Menu } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/lib/supabase";
+import { syncConfirmedOrdersFn } from "@/actions/syncZRExpress.server";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -34,6 +35,8 @@ export interface SupabaseOrder {
   status: string;
   notes?: string;
   call_status?: string;
+  tracking_number?: string;
+  zr_express_id?: string;
 }
 
 function AdminDashboard() {
@@ -235,6 +238,8 @@ function OrdersDashboard() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const ORDERS_PER_PAGE = 50;
+  
+  const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -262,6 +267,41 @@ function OrdersDashboard() {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, call_status } : o));
     setActiveCallMenuId(null);
     await supabase.from('orders').update({ call_status }).eq('id', id);
+  };
+
+  const syncZRExpress = async () => {
+    setIsSyncing(true);
+    // Find confirmed orders that don't have a tracking number
+    const ordersToSync = orders.filter(o => 
+      (o.status === 'مؤكد' || getStatusConfig(o.status).label === 'مؤكد') && 
+      !o.tracking_number
+    );
+
+    if (ordersToSync.length === 0) {
+      alert("لا يوجد طلبات مؤكدة بانتظار المزامنة.");
+      setIsSyncing(false);
+      return;
+    }
+
+    try {
+      const response = await syncConfirmedOrdersFn({
+        data: { ordersToSync: ordersToSync.map(o => o.id) }
+      });
+
+      if (response.success && response.results) {
+        // Update local state and supabase
+        for (const result of response.results) {
+          setOrders(prev => prev.map(o => o.id === result.id ? { ...o, tracking_number: result.tracking_number, zr_express_id: result.zr_express_id } : o));
+          await supabase.from('orders').update({ tracking_number: result.tracking_number, zr_express_id: result.zr_express_id }).eq('id', result.id);
+        }
+        alert(response.message);
+      }
+    } catch (error) {
+      console.error("Sync error:", error);
+      alert("حدث خطأ أثناء المزامنة.");
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const toggleOrderSelection = (id: string) => {
@@ -435,6 +475,14 @@ function OrdersDashboard() {
       <div className="bg-white dark:bg-[#111827] rounded-2xl border border-slate-200 dark:border-[#374151] p-4 shadow-sm dark:shadow-none flex flex-col gap-4 justify-between">
         <div className="flex flex-1 flex-col sm:flex-row flex-wrap gap-4 w-full justify-between items-center">
           <div className="flex flex-1 flex-col sm:flex-row flex-wrap gap-4 w-full">
+            <button 
+              onClick={syncZRExpress}
+              disabled={isSyncing}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-bold hover:shadow-lg hover:scale-105 transition-all shadow-md disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap text-sm w-full lg:w-auto order-first lg:order-none"
+            >
+              {isSyncing ? <RefreshCw size={18} className="animate-spin" /> : <RefreshCw size={18} />}
+              مزامنة ZR Express 🔄
+            </button>
             {/* Search */}
             <div className="relative flex-1 min-w-[200px] max-w-md">
               <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={18} />
@@ -597,6 +645,7 @@ function OrdersDashboard() {
                 </th>
                 <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">إجراءات</th>
                 <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151] min-w-[200px]">ملاحظات</th>
+                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">التتبع (ZR)</th>
                 <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151] text-[#C9A46A] dark:text-[#D4AF37]">المجموع</th>
                 <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">سعر المنتج</th>
                 <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">التوصيل</th>
@@ -738,6 +787,17 @@ function OrdersDashboard() {
                       defaultValue={order.notes || ""}
                       onBlur={(e) => updateNotes(order.id, e.target.value)}
                     />
+                  </td>
+
+                  {/* Tracking Number */}
+                  <td className="p-3 border-l border-slate-100 dark:border-slate-700 text-xs font-mono font-bold text-slate-600 dark:text-slate-400">
+                    {order.tracking_number ? (
+                      <button onClick={() => copyToClipboard(order.tracking_number || "")} className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-1 mx-auto" title="نسخ رقم التتبع">
+                        <Copy size={12} /> {order.tracking_number}
+                      </button>
+                    ) : (
+                      <span className="text-slate-300 dark:text-slate-600">-</span>
+                    )}
                   </td>
 
                   {/* Total */}

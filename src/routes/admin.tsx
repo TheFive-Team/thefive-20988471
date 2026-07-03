@@ -6,7 +6,7 @@ import {
   ShoppingBag, Hourglass, Truck, CheckCircle, Wallet, Calendar, 
   MapPin, Phone, User, Hash, Clock, Box, FileText, Settings, 
   LogOut, AlertCircle, RefreshCw, Trash2, Plus, X, Download, Search, Filter, Copy, MessageCircle, Edit, ChevronDown
-, Sun, Moon } from "lucide-react";
+, Sun, Moon, Menu } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/lib/supabase";
 
@@ -40,6 +40,7 @@ function AdminDashboard() {
   const [token, setToken] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState<"orders" | "products" | "settings">("orders");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("admin_theme") === "dark";
@@ -122,41 +123,47 @@ function AdminDashboard() {
     <div className={darkMode ? "dark" : ""}>
     <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#0B1120] text-slate-900 dark:text-[#F9FAFB] dark:text-[#F9FAFB] transition-colors duration-300 flex flex-col md:flex-row" dir="rtl">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-white dark:bg-[#111827] border-l border-slate-200 dark:border-[#374151] flex flex-col">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-700 text-center">
-          <h1 className="text-2xl font-serif font-bold tracking-widest text-[#1e293b]">THE FIVE A</h1>
+      <aside className={`transition-all duration-300 flex flex-col bg-white dark:bg-[#111827] border-l border-slate-200 dark:border-[#374151] shrink-0 ${isSidebarCollapsed ? 'w-20' : 'w-full md:w-64'}`}>
+        <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+          {!isSidebarCollapsed && <h1 className="text-2xl font-serif font-bold tracking-widest text-[#1e293b] dark:text-[#F9FAFB] whitespace-nowrap overflow-hidden">THE FIVE A</h1>}
+          <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="p-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 mx-auto transition-colors">
+            <Menu size={20} />
+          </button>
         </div>
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-hidden">
           <button 
             onClick={() => setActiveTab("orders")}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === "orders" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-[#0B1120] shadow-md dark:shadow-none" : "text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]"}`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === "orders" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-[#0B1120] shadow-md dark:shadow-none" : "text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]"} ${isSidebarCollapsed ? 'justify-center w-full' : 'w-full'}`}
+            title="سجل الطلبات"
           >
-            <FileText size={20} />
-            <span className="font-bold">سجل الطلبات</span>
+            <FileText size={20} className="shrink-0" />
+            {!isSidebarCollapsed && <span className="font-bold whitespace-nowrap overflow-hidden">سجل الطلبات</span>}
           </button>
           <button 
             onClick={() => setActiveTab("products")}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === "products" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-[#0B1120] shadow-md dark:shadow-none" : "text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]"}`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === "products" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-[#0B1120] shadow-md dark:shadow-none" : "text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]"} ${isSidebarCollapsed ? 'justify-center w-full' : 'w-full'}`}
+            title="إدارة المنتجات"
           >
-            <Box size={20} />
-            <span className="font-bold">إدارة المنتجات</span>
+            <Box size={20} className="shrink-0" />
+            {!isSidebarCollapsed && <span className="font-bold whitespace-nowrap overflow-hidden">إدارة المنتجات</span>}
           </button>
           <button 
             onClick={() => setActiveTab("settings")}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === "settings" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-[#0B1120] shadow-md dark:shadow-none" : "text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]"}`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === "settings" ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-[#0B1120] shadow-md dark:shadow-none" : "text-slate-600 dark:text-[#9CA3AF] hover:bg-slate-50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]"} ${isSidebarCollapsed ? 'justify-center w-full' : 'w-full'}`}
+            title="الإعدادات"
           >
-            <Settings size={20} />
-            <span className="font-bold">الإعدادات</span>
+            <Settings size={20} className="shrink-0" />
+            {!isSidebarCollapsed && <span className="font-bold whitespace-nowrap overflow-hidden">الإعدادات</span>}
           </button>
         </nav>
-        <div className="p-4 border-t border-slate-100 dark:border-slate-700 dark:border-slate-700 flex flex-col gap-2">
-          <button onClick={() => setDarkMode(!darkMode)} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-[#9CA3AF] dark:text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937] dark:hover:bg-[#1f2937] transition-all font-bold">
-            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-            <span>{darkMode ? "الوضع النهاري" : "الوضع الليلي"}</span>
+        <div className="p-4 border-t border-slate-100 dark:border-slate-700 dark:border-slate-700 flex flex-col gap-2 overflow-hidden">
+          <button onClick={() => setDarkMode(!darkMode)} className={`flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-[#9CA3AF] dark:text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937] dark:hover:bg-[#1f2937] transition-all font-bold ${isSidebarCollapsed ? 'justify-center w-full' : 'w-full'}`} title={darkMode ? "الوضع النهاري" : "الوضع الليلي"}>
+            {darkMode ? <Sun size={20} className="shrink-0" /> : <Moon size={20} className="shrink-0" />}
+            {!isSidebarCollapsed && <span className="whitespace-nowrap overflow-hidden">{darkMode ? "الوضع النهاري" : "الوضع الليلي"}</span>}
           </button>
-          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all font-bold">
-            <LogOut size={20} />
-            <span>تسجيل الخروج</span>
+          <button onClick={handleLogout} className={`flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all font-bold ${isSidebarCollapsed ? 'justify-center w-full' : 'w-full'}`} title="تسجيل الخروج">
+            <LogOut size={20} className="shrink-0" />
+            {!isSidebarCollapsed && <span className="whitespace-nowrap overflow-hidden">تسجيل الخروج</span>}
           </button>
         </div>
       </aside>
@@ -224,6 +231,14 @@ function OrdersDashboard() {
   const [dateRangeFilter, setDateRangeFilter] = useState("all");
   const [customStartDate, setCustomStartDate] = useState("");
   const [customEndDate, setCustomEndDate] = useState("");
+  
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const ORDERS_PER_PAGE = 50;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter, wilayaFilter, dateRangeFilter, customStartDate, customEndDate]);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -565,10 +580,10 @@ function OrdersDashboard() {
         )}
         <div className="overflow-x-auto w-full" style={{ maxHeight: "calc(100vh - 300px)" }}>
           <table className="w-full text-sm text-center border-collapse whitespace-nowrap">
-            <thead className="sticky top-0 z-20 bg-[#F7F5F0] dark:bg-[#0B1120] shadow-sm dark:shadow-none">
+            <thead className="sticky top-0 z-20 bg-[#F7F5F0]/80 dark:bg-[#0B1120]/80 backdrop-blur-md shadow-sm dark:shadow-none">
               <tr className="text-[#0E1A2F] dark:text-[#F9FAFB]">
                 {/* Right-to-Left Column Order */}
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151] bg-[#F7F5F0] dark:bg-[#0B1120] sticky right-0 z-30 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] min-w-[150px]">
+                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151] bg-[#F7F5F0]/80 dark:bg-[#0B1120]/80 backdrop-blur-md sticky right-0 z-30 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] min-w-[150px]">
                   <div className="flex items-center gap-2 justify-center">
                     <input 
                       type="checkbox" 
@@ -601,15 +616,18 @@ function OrdersDashboard() {
                 <tr><td colSpan={15} className="p-16 text-slate-400 dark:text-slate-500 font-bold text-lg">جاري تحميل الطلبات...</td></tr>
               ) : filteredOrders.length === 0 ? (
                 <tr><td colSpan={15} className="p-16 text-slate-400 dark:text-slate-500 font-bold text-lg">لا توجد طلبات مطابقة</td></tr>
-              ) : filteredOrders.map((order, i) => {
-                const dateObj = new Date(order.created_at);
-                const time = dateObj.toLocaleTimeString("en-GB", { hour: '2-digit', minute: '2-digit' });
-                const date = dateObj.toLocaleDateString("en-GB", { day: '2-digit', month: 'short' });
-                const productFee = order.total_amount - (order.delivery_fee || 0);
+              ) : (() => {
+                const totalPages = Math.ceil(filteredOrders.length / ORDERS_PER_PAGE) || 1;
+                const paginatedOrders = filteredOrders.slice((currentPage - 1) * ORDERS_PER_PAGE, currentPage * ORDERS_PER_PAGE);
+                return paginatedOrders.map((order, i) => {
+                  const dateObj = new Date(order.created_at);
+                  const time = dateObj.toLocaleTimeString("en-GB", { hour: '2-digit', minute: '2-digit' });
+                  const date = dateObj.toLocaleDateString("en-GB", { day: '2-digit', month: 'short' });
+                  const productFee = order.total_amount - (order.delivery_fee || 0);
 
-                return (
-                <tr key={order.id} className={`h-[68px] border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]/80 transition-colors ${i % 2 === 0 ? 'bg-white dark:bg-[#111827]' : 'bg-[#FAFAFA]'}`}>
-                  
+                  return (
+                  <tr key={order.id} className={`h-[68px] border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]/80 transition-colors ${i % 2 === 0 ? 'bg-white dark:bg-[#111827]' : 'bg-[#FAFAFA]'}`}>
+                    
                   {/* Status - Sticky Right */}
                   <td className={`p-3 border-l border-slate-100 dark:border-slate-700 bg-inherit sticky right-0 z-10 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] ${i % 2 === 0 ? 'bg-white dark:bg-[#111827]' : 'bg-[#FAFAFA] group-hover:bg-slate-50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]/80'}`}>
                     <div className="flex items-center justify-center gap-2">
@@ -652,7 +670,7 @@ function OrdersDashboard() {
                               )}
                             </button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent className="w-48 z-[9999] rounded-xl p-2 bg-white dark:bg-[#111827]" align="end" sideOffset={8}>
+                          <DropdownMenuContent className="w-48 z-[9999] rounded-xl p-2 bg-white/90 dark:bg-[#111827]/90 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 shadow-xl" align="end" sideOffset={8}>
                             <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 px-2 pb-1 text-right mb-1">حالة الاتصال بالزبون</p>
                             {CALL_STATUS_OPTIONS.map(opt => (
                               <DropdownMenuItem
@@ -778,11 +796,36 @@ function OrdersDashboard() {
                     </div>
                   </td>
                 </tr>
-              )})}
+                );
+              })
+              })()}
             </tbody>
           </table>
         </div>
-
+        {/* Pagination Controls */}
+        {filteredOrders.length > ORDERS_PER_PAGE && (
+          <div className="flex items-center justify-between p-4 border-t border-slate-200 dark:border-[#374151] bg-[#F7F5F0]/50 dark:bg-[#0B1120]/50">
+            <span className="text-sm font-bold text-slate-500 dark:text-[#9CA3AF]">
+              الصفحة {currentPage} من {Math.ceil(filteredOrders.length / ORDERS_PER_PAGE)}
+            </span>
+            <div className="flex gap-2">
+              <button 
+                disabled={currentPage === 1} 
+                onClick={() => setCurrentPage(p => p - 1)}
+                className="px-4 py-2 bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#374151] rounded-lg text-sm font-bold disabled:opacity-50 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
+              >
+                السابق
+              </button>
+              <button 
+                disabled={currentPage === Math.ceil(filteredOrders.length / ORDERS_PER_PAGE)} 
+                onClick={() => setCurrentPage(p => p + 1)}
+                className="px-4 py-2 bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#374151] rounded-lg text-sm font-bold disabled:opacity-50 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
+              >
+                التالي
+              </button>
+            </div>
+          </div>
+        )}
       {/* Delete Confirmation Modal */}
       {orderToDelete && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" onClick={() => setOrderToDelete(null)}>

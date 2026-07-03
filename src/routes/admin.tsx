@@ -221,6 +221,9 @@ function OrdersDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [wilayaFilter, setWilayaFilter] = useState("all");
+  const [dateRangeFilter, setDateRangeFilter] = useState("all");
+  const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -307,7 +310,31 @@ function OrdersDashboard() {
     const matchesStatus = statusFilter === "all" || normalizedStatus === statusFilter;
     const matchesWilaya = wilayaFilter === "all" || o.wilaya === wilayaFilter;
     
-    return matchesSearch && matchesStatus && matchesWilaya;
+    let matchesDate = true;
+    if (dateRangeFilter !== "all") {
+      const orderDate = new Date(o.created_at);
+      const now = new Date();
+      if (dateRangeFilter === "today") {
+        matchesDate = orderDate.toDateString() === now.toDateString();
+      } else if (dateRangeFilter === "7days") {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(now.getDate() - 7);
+        matchesDate = orderDate >= sevenDaysAgo;
+      } else if (dateRangeFilter === "thisMonth") {
+        matchesDate = orderDate.getMonth() === now.getMonth() && orderDate.getFullYear() === now.getFullYear();
+      } else if (dateRangeFilter === "custom") {
+        if (customStartDate) {
+          matchesDate = matchesDate && orderDate >= new Date(customStartDate);
+        }
+        if (customEndDate) {
+          const end = new Date(customEndDate);
+          end.setHours(23, 59, 59, 999);
+          matchesDate = matchesDate && orderDate <= end;
+        }
+      }
+    }
+    
+    return matchesSearch && matchesStatus && matchesWilaya && matchesDate;
   });
 
   const uniqueWilayas = Array.from(new Set(orders.map(o => o.wilaya))).filter(Boolean);
@@ -349,7 +376,7 @@ function OrdersDashboard() {
     document.body.removeChild(link);
   };
 
-  const totalSales = orders.reduce((sum, o) => sum + (Number(o.total_amount) - Number(o.delivery_fee || 0)), 0);
+  const totalSales = filteredOrders.reduce((sum, o) => sum + (Number(o.total_amount) - Number(o.delivery_fee || 0)), 0);
   
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto animate-in fade-in duration-500 font-sans pb-12" style={{ fontFamily: "'Cairo', sans-serif" }}>
@@ -359,7 +386,7 @@ function OrdersDashboard() {
         <div className="bg-[#0E1A2F] dark:bg-[#E5E7EB] rounded-xl p-6 flex items-center justify-between shadow-sm dark:shadow-none text-white dark:text-[#0B1120] border border-[#0E1A2F]">
           <div>
             <p className="text-sm font-bold text-slate-300 mb-2">إجمالي الطلبات</p>
-            <p className="text-4xl font-black">{orders.length}</p>
+            <p className="text-4xl font-black">{filteredOrders.length}</p>
           </div>
           <ShoppingBag size={48} className="text-[#C9A46A] dark:text-[#D4AF37] opacity-90" strokeWidth={1.5}/>
         </div>
@@ -367,7 +394,7 @@ function OrdersDashboard() {
         <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200 dark:border-[#374151] p-6 flex items-center justify-between shadow-sm dark:shadow-none hover:shadow-md dark:shadow-none transition-shadow">
           <div>
             <p className="text-sm font-bold text-slate-500 dark:text-[#9CA3AF] mb-2">طلبات جديدة</p>
-            <p className="text-4xl font-black text-slate-900 dark:text-[#F9FAFB]">{orders.filter(o => o.status === 'pending' || o.status === 'جديد').length}</p>
+            <p className="text-4xl font-black text-slate-900 dark:text-[#F9FAFB]">{filteredOrders.filter(o => o.status === 'pending' || o.status === 'جديد').length}</p>
           </div>
           <div className="p-4 bg-blue-50 rounded-2xl text-blue-600"><Plus size={28} strokeWidth={2}/></div>
         </div>
@@ -375,7 +402,7 @@ function OrdersDashboard() {
         <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200 dark:border-[#374151] p-6 flex items-center justify-between shadow-sm dark:shadow-none hover:shadow-md dark:shadow-none transition-shadow">
           <div>
             <p className="text-sm font-bold text-slate-500 dark:text-[#9CA3AF] mb-2">قيد التوصيل</p>
-            <p className="text-4xl font-black text-slate-900 dark:text-[#F9FAFB]">{orders.filter(o => o.status === 'delivery' || o.status === 'قيد التوصيل').length}</p>
+            <p className="text-4xl font-black text-slate-900 dark:text-[#F9FAFB]">{filteredOrders.filter(o => o.status === 'delivery' || o.status === 'قيد التوصيل').length}</p>
           </div>
           <div className="p-4 bg-orange-50 rounded-2xl text-orange-600"><Truck size={28} strokeWidth={2}/></div>
         </div>
@@ -390,51 +417,93 @@ function OrdersDashboard() {
       </div>
 
       {/* Control Bar */}
-      <div className="bg-white dark:bg-[#111827] rounded-2xl border border-slate-200 dark:border-[#374151] p-4 shadow-sm dark:shadow-none flex flex-col lg:flex-row gap-4 justify-between items-center">
-        <div className="flex flex-1 flex-col sm:flex-row gap-4 w-full">
-          {/* Search */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={18} />
-            <input 
-              type="text" 
-              placeholder="البحث بالاسم، الهاتف، أو رقم الطلب..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-xl py-3 pr-11 pl-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] transition-all placeholder:text-slate-400 dark:text-slate-500 text-slate-800 dark:text-[#F9FAFB]"
-            />
-          </div>
-          
-          {/* Status Filter */}
-          <div className="relative">
-            <Filter className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
-            <select 
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-xl py-3 pr-11 pl-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] appearance-none min-w-[160px] cursor-pointer text-slate-800 dark:text-[#F9FAFB] transition-all"
-            >
-              <option value="all">كل الحالات</option>
-              {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-            </select>
+      <div className="bg-white dark:bg-[#111827] rounded-2xl border border-slate-200 dark:border-[#374151] p-4 shadow-sm dark:shadow-none flex flex-col gap-4 justify-between">
+        <div className="flex flex-1 flex-col sm:flex-row flex-wrap gap-4 w-full justify-between items-center">
+          <div className="flex flex-1 flex-col sm:flex-row flex-wrap gap-4 w-full">
+            {/* Search */}
+            <div className="relative flex-1 min-w-[200px] max-w-md">
+              <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={18} />
+              <input 
+                type="text" 
+                placeholder="البحث بالاسم، الهاتف، أو رقم الطلب..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-xl py-3 pr-11 pl-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] transition-all placeholder:text-slate-400 dark:text-slate-500 text-slate-800 dark:text-[#F9FAFB]"
+              />
+            </div>
+            
+            {/* Date Range Filter */}
+            <div className="relative">
+              <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
+              <select 
+                value={dateRangeFilter}
+                onChange={(e) => setDateRangeFilter(e.target.value)}
+                className="bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-xl py-3 pr-11 pl-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] appearance-none min-w-[160px] cursor-pointer text-slate-800 dark:text-[#F9FAFB] transition-all"
+              >
+                <option value="all">كل الأوقات</option>
+                <option value="today">اليوم</option>
+                <option value="7days">آخر 7 أيام</option>
+                <option value="thisMonth">هذا الشهر</option>
+                <option value="custom">تاريخ مخصص...</option>
+              </select>
+            </div>
+
+            {/* Status Filter */}
+            <div className="relative">
+              <Filter className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
+              <select 
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-xl py-3 pr-11 pl-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] appearance-none min-w-[160px] cursor-pointer text-slate-800 dark:text-[#F9FAFB] transition-all"
+              >
+                <option value="all">كل الحالات</option>
+                {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+              </select>
+            </div>
+
+            {/* Wilaya Filter */}
+            <div className="relative">
+              <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
+              <select 
+                value={wilayaFilter}
+                onChange={(e) => setWilayaFilter(e.target.value)}
+                className="bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-xl py-3 pr-11 pl-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] appearance-none min-w-[160px] cursor-pointer text-slate-800 dark:text-[#F9FAFB] transition-all"
+              >
+                <option value="all">كل الولايات</option>
+                {uniqueWilayas.map(w => <option key={w} value={w}>{w}</option>)}
+              </select>
+            </div>
           </div>
 
-          {/* Wilaya Filter */}
-          <div className="relative">
-            <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
-            <select 
-              value={wilayaFilter}
-              onChange={(e) => setWilayaFilter(e.target.value)}
-              className="bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-xl py-3 pr-11 pl-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] appearance-none min-w-[160px] cursor-pointer text-slate-800 dark:text-[#F9FAFB] transition-all"
-            >
-              <option value="all">كل الولايات</option>
-              {uniqueWilayas.map(w => <option key={w} value={w}>{w}</option>)}
-            </select>
-          </div>
+          <button onClick={exportToCSV} className="flex items-center justify-center gap-2 px-6 py-3 bg-[#0E1A2F] dark:bg-[#E5E7EB] text-white dark:text-[#0B1120] rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-md dark:shadow-none whitespace-nowrap text-sm w-full lg:w-auto">
+            <Download size={18} strokeWidth={2.5} />
+            {selectedOrders.size > 0 ? `تصدير المحدد (${selectedOrders.size})` : "تصدير إلى Excel"}
+          </button>
         </div>
-
-        <button onClick={exportToCSV} className="flex items-center justify-center gap-2 px-6 py-3 bg-[#0E1A2F] dark:bg-[#E5E7EB] text-white dark:text-[#0B1120] rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-md dark:shadow-none whitespace-nowrap text-sm w-full lg:w-auto">
-          <Download size={18} strokeWidth={2.5} />
-          {selectedOrders.size > 0 ? `تصدير المحدد (${selectedOrders.size})` : "تصدير إلى Excel"}
-        </button>
+        
+        {/* Custom Date Range Inputs */}
+        {dateRangeFilter === "custom" && (
+          <div className="flex items-center gap-4 pt-3 border-t border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-2">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-slate-500">من:</span>
+              <input 
+                type="date" 
+                value={customStartDate}
+                onChange={(e) => setCustomStartDate(e.target.value)}
+                className="bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-lg py-2 px-3 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] text-slate-800 dark:text-[#F9FAFB]"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-slate-500">إلى:</span>
+              <input 
+                type="date" 
+                value={customEndDate}
+                onChange={(e) => setCustomEndDate(e.target.value)}
+                className="bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-lg py-2 px-3 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] text-slate-800 dark:text-[#F9FAFB]"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Compact Status Summary Bar */}

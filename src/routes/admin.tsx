@@ -251,9 +251,16 @@ function OrdersDashboard() {
   };
 
   const confirmDelete = async (id: string) => {
+    const previousOrders = [...orders];
     setOrders(prev => prev.filter(o => o.id !== id));
     setOrderToDelete(null);
-    await supabase.from('orders').delete().eq('id', id);
+    
+    const { error } = await supabase.from('orders').delete().eq('id', id);
+    if (error) {
+      console.error("Delete Error:", error);
+      alert("فشل الحذف! يرجى التأكد من تفعيل صلاحية الحذف (DELETE Policy) في Supabase (RLS).");
+      setOrders(previousOrders);
+    }
   };
 
   const copyToClipboard = (text: string) => {

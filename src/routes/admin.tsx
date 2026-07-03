@@ -214,6 +214,7 @@ function OrdersDashboard() {
   const [orders, setOrders] = useState<SupabaseOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCallMenuId, setActiveCallMenuId] = useState<string | null>(null);
+  const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
   
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -249,9 +250,9 @@ function OrdersDashboard() {
     await supabase.from('orders').update({ notes }).eq('id', id);
   };
 
-  const deleteOrder = async (id: string) => {
-    if (!confirm("هل أنت متأكد من حذف هذا الطلب نهائياً؟")) return;
+  const confirmDelete = async (id: string) => {
     setOrders(prev => prev.filter(o => o.id !== id));
+    setOrderToDelete(null);
     await supabase.from('orders').delete().eq('id', id);
   };
 
@@ -530,7 +531,7 @@ function OrdersDashboard() {
                           <Copy size={16} strokeWidth={2.5} />
                         </button>
                         <div className="w-[1px] h-5 bg-slate-200 mx-0.5"></div>
-                        <button onClick={() => deleteOrder(order.id)} className="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 hover:scale-110 transition-all shadow-sm dark:shadow-none border border-red-100" title="حذف نهائي">
+                        <button onClick={(e) => { e.stopPropagation(); setOrderToDelete(order.id); }} className="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 hover:scale-110 transition-all shadow-sm dark:shadow-none border border-red-100 dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40" title="حذف نهائي">
                           <Trash2 size={16} strokeWidth={2.5} />
                         </button>
                       </div>
@@ -628,6 +629,32 @@ function OrdersDashboard() {
             </tbody>
           </table>
         </div>
+
+      {/* Delete Confirmation Modal */}
+      {orderToDelete && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" onClick={() => setOrderToDelete(null)}>
+          <div className="bg-white dark:bg-[#111827] rounded-2xl p-6 w-[90%] max-w-md shadow-2xl border border-slate-200 dark:border-slate-700" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center gap-4 mb-4 text-red-600 dark:text-red-400">
+              <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+                <Trash2 size={24} />
+              </div>
+              <h3 className="text-xl font-bold">تأكيد الحذف</h3>
+            </div>
+            <div className="space-y-2 mb-8 text-right">
+              <p className="text-slate-700 dark:text-slate-300 font-medium">هل أنت متأكد أنك تريد حذف هذا الطلب؟</p>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">لا يمكن التراجع عن هذه العملية.</p>
+            </div>
+            <div className="flex items-center justify-end gap-3" dir="rtl">
+              <button onClick={(e) => { e.stopPropagation(); setOrderToDelete(null); }} className="px-5 py-2.5 rounded-xl font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                إلغاء
+              </button>
+              <button onClick={(e) => { e.stopPropagation(); confirmDelete(orderToDelete); }} className="px-5 py-2.5 rounded-xl font-bold bg-red-600 text-white hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20">
+                حذف الطلب
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );

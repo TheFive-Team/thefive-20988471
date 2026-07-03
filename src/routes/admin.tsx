@@ -457,21 +457,69 @@ function OrdersDashboard() {
                   </td>
 
                   {/* Actions */}
-                  <td className="p-3 border-l border-slate-100">
-                    <div className="flex items-center justify-center gap-2">
-                      <a href={`https://wa.me/213${order.phone.replace(/^0+/, '')}`} target="_blank" rel="noreferrer" className="w-9 h-9 rounded-xl bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 hover:scale-110 transition-all shadow-sm border border-green-100" title="مراسلة عبر واتساب">
-                        <MessageCircle size={18} strokeWidth={2.5} />
-                      </a>
-                      <a href={`tel:${order.phone}`} className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 hover:scale-110 transition-all shadow-sm border border-blue-100" title="اتصال بالعميل">
-                        <Phone size={18} strokeWidth={2.5} />
-                      </a>
-                      <button onClick={() => copyToClipboard(order.phone)} className="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center hover:bg-slate-200 hover:scale-110 transition-all shadow-sm border border-slate-200" title="نسخ الرقم">
-                        <Copy size={18} strokeWidth={2.5} />
-                      </button>
-                      <div className="w-[1px] h-6 bg-slate-200 mx-1"></div>
-                      <button onClick={() => deleteOrder(order.id)} className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 hover:scale-110 transition-all shadow-sm border border-red-100" title="حذف نهائي">
-                        <Trash2 size={18} strokeWidth={2.5} />
-                      </button>
+                  <td className="p-3 border-l border-slate-100 relative">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <a href={`https://wa.me/213${order.phone.replace(/^0+/, '')}`} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-xl bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 hover:scale-110 transition-all shadow-sm border border-green-100" title="مراسلة عبر واتساب">
+                          <MessageCircle size={16} strokeWidth={2.5} />
+                        </a>
+                        
+                        <div className="relative">
+                          <button 
+                            onClick={() => setActiveCallMenuId(activeCallMenuId === order.id ? null : order.id)}
+                            className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 hover:scale-110 transition-all shadow-sm border border-blue-100 relative" 
+                            title="حالة الاتصال"
+                          >
+                            <Phone size={16} strokeWidth={2.5} />
+                            {order.call_status && (
+                              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-white" style={{ backgroundColor: CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.color }}></span>
+                            )}
+                          </button>
+                          
+                          {activeCallMenuId === order.id && (
+                            <>
+                              <div className="fixed inset-0 z-40" onClick={() => setActiveCallMenuId(null)}></div>
+                              <div className="absolute right-0 bottom-full mb-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg z-50 p-2 flex flex-col gap-1">
+                                <p className="text-[10px] font-bold text-slate-400 px-2 pb-1 text-right">حالة الاتصال بالزبون</p>
+                                {CALL_STATUS_OPTIONS.map(opt => (
+                                  <button
+                                    key={opt.value}
+                                    onClick={() => updateCallStatus(order.id, opt.value)}
+                                    className={`flex items-center gap-2 w-full text-right px-3 py-2 rounded-lg text-xs font-bold transition-colors hover:bg-slate-50 ${order.call_status === opt.value ? 'bg-slate-50' : ''}`}
+                                  >
+                                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: opt.color }}></span>
+                                    {opt.value}
+                                  </button>
+                                ))}
+                                {order.call_status && (
+                                  <button
+                                    onClick={() => updateCallStatus(order.id, "")}
+                                    className="flex items-center gap-2 w-full text-right px-3 py-2 rounded-lg text-xs font-bold text-red-500 hover:bg-red-50 transition-colors mt-1 border-t border-slate-100"
+                                  >
+                                    <X size={12} strokeWidth={3} /> إزالة الحالة
+                                  </button>
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </div>
+
+                        <button onClick={() => copyToClipboard(order.phone)} className="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center hover:bg-slate-200 hover:scale-110 transition-all shadow-sm border border-slate-200" title="نسخ الرقم">
+                          <Copy size={16} strokeWidth={2.5} />
+                        </button>
+                        <div className="w-[1px] h-5 bg-slate-200 mx-0.5"></div>
+                        <button onClick={() => deleteOrder(order.id)} className="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 hover:scale-110 transition-all shadow-sm border border-red-100" title="حذف نهائي">
+                          <Trash2 size={16} strokeWidth={2.5} />
+                        </button>
+                      </div>
+
+                      {/* Call Status Badge */}
+                      {order.call_status && (
+                        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold shadow-sm ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.bg} ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.text}`}>
+                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.color }}></span>
+                          {order.call_status}
+                        </div>
+                      )}
                     </div>
                   </td>
 

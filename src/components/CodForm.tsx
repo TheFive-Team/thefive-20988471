@@ -71,7 +71,7 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
           phone: form.phone,
           wilaya: wilayaName,
           commune: form.commune,
-          address: form.shippingMethod === 'home' ? 'توصيل للمنزل' : 'الاستلام من المكتب',
+          deliveryType: form.shippingMethod === 'home' ? 'توصيل للمنزل' : 'استلام من المكتب (Stop Desk)',
           productPriceAmount,
           productName,
           variantTitle

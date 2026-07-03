@@ -10,6 +10,7 @@ export const submitOrderFn = createServerFn({ method: "POST" })
       wilaya: z.string(),
       commune: z.string(),
       address: z.string().optional(),
+      deliveryType: z.string().optional(),
       variantId: z.string().optional(),
       productPriceAmount: z.string().optional(),
       productName: z.string().optional(),
@@ -38,7 +39,7 @@ export const submitOrderFn = createServerFn({ method: "POST" })
         product_name: data.productName || "",
         variant_title: data.variantTitle || "",
         total_amount: totalAmount,
-        delivery_type: "توصيل للمنزل",
+        delivery_type: data.deliveryType || "توصيل للمنزل",
         delivery_fee: deliveryFee,
         status: "pending"
       });
@@ -65,6 +66,7 @@ export const submitOrderFn = createServerFn({ method: "POST" })
             wilaya: data.wilaya,
             commune: data.commune,
             address: data.address || "",
+            deliveryType: data.deliveryType || "توصيل للمنزل",
             productPriceAmount: totalAmount,
             productName: data.productName || "",
             variantTitle: data.variantTitle || ""

@@ -215,6 +215,7 @@ function OrdersDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeCallMenuId, setActiveCallMenuId] = useState<string | null>(null);
   const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
+  const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
   
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -243,6 +244,30 @@ function OrdersDashboard() {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, call_status } : o));
     setActiveCallMenuId(null);
     await supabase.from('orders').update({ call_status }).eq('id', id);
+  };
+
+  const toggleOrderSelection = (id: string) => {
+    const newSet = new Set(selectedOrders);
+    if (newSet.has(id)) newSet.delete(id);
+    else newSet.add(id);
+    setSelectedOrders(newSet);
+  };
+
+  const toggleAllFilteredOrders = () => {
+    if (selectedOrders.size === filteredOrders.length && filteredOrders.length > 0) {
+      setSelectedOrders(new Set());
+    } else {
+      setSelectedOrders(new Set(filteredOrders.map(o => o.id)));
+    }
+  };
+
+  const updateBulkStatus = async (newStatus: string) => {
+    if (selectedOrders.size === 0) return;
+    const ids = Array.from(selectedOrders);
+    // Optimistic update
+    setOrders(prev => prev.map(o => ids.includes(o.id) ? { ...o, status: newStatus } : o));
+    setSelectedOrders(new Set()); // clear selection after action
+    await supabase.from('orders').update({ status: newStatus }).in('id', ids);
   };
 
   const updateNotes = async (id: string, notes: string) => {
@@ -288,9 +313,13 @@ function OrdersDashboard() {
   const uniqueWilayas = Array.from(new Set(orders.map(o => o.wilaya))).filter(Boolean);
 
   const exportToCSV = () => {
-    if (filteredOrders.length === 0) return;
+    const ordersToExport = selectedOrders.size > 0 
+      ? filteredOrders.filter(o => selectedOrders.has(o.id))
+      : filteredOrders;
+      
+    if (ordersToExport.length === 0) return;
     const headers = ["Order ID", "Date", "Time", "Customer Name", "Phone", "Wilaya", "Commune", "Address", "Product", "Variant", "Total Amount (DZD)", "Delivery Type", "Status", "Notes"];
-    const rows = filteredOrders.map(order => {
+    const rows = ordersToExport.map(order => {
       const dateObj = new Date(order.created_at);
       return [
         order.order_id,
@@ -404,7 +433,7 @@ function OrdersDashboard() {
 
         <button onClick={exportToCSV} className="flex items-center justify-center gap-2 px-6 py-3 bg-[#0E1A2F] dark:bg-[#E5E7EB] text-white dark:text-[#0B1120] rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-md dark:shadow-none whitespace-nowrap text-sm w-full lg:w-auto">
           <Download size={18} strokeWidth={2.5} />
-          تصدير إلى Excel
+          {selectedOrders.size > 0 ? `تصدير المحدد (${selectedOrders.size})` : "تصدير إلى Excel"}
         </button>
       </div>
 
@@ -436,12 +465,52 @@ function OrdersDashboard() {
 
       {/* Main Table */}
       <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#374151] rounded-2xl shadow-sm dark:shadow-none overflow-hidden relative">
+        {selectedOrders.size > 0 && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900/30 p-4 flex items-center justify-between animate-in slide-in-from-top-2">
+            <div className="flex items-center gap-3">
+              <span className="font-bold text-blue-700 dark:text-blue-400">
+                تم تحديد {selectedOrders.size} طلب
+              </span>
+              <div className="h-4 w-[1px] bg-blue-200 dark:bg-blue-800"></div>
+              <select
+                className="bg-white dark:bg-[#111827] border border-blue-200 dark:border-blue-800 text-sm font-bold text-blue-700 dark:text-blue-400 rounded-lg px-3 py-1.5 outline-none cursor-pointer"
+                onChange={(e) => {
+                  if(e.target.value) {
+                    updateBulkStatus(e.target.value);
+                    e.target.value = "";
+                  }
+                }}
+                defaultValue=""
+              >
+                <option value="" disabled>تغيير الحالة إلى...</option>
+                {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+              </select>
+            </div>
+            <button 
+              onClick={() => setSelectedOrders(new Set())}
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-bold px-3 py-1.5 bg-blue-100 dark:bg-blue-900/40 rounded-lg transition-colors"
+            >
+              إلغاء التحديد
+            </button>
+          </div>
+        )}
         <div className="overflow-x-auto w-full" style={{ maxHeight: "calc(100vh - 300px)" }}>
           <table className="w-full text-sm text-center border-collapse whitespace-nowrap">
             <thead className="sticky top-0 z-20 bg-[#F7F5F0] dark:bg-[#0B1120] shadow-sm dark:shadow-none">
               <tr className="text-[#0E1A2F] dark:text-[#F9FAFB]">
                 {/* Right-to-Left Column Order */}
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151] bg-[#F7F5F0] dark:bg-[#0B1120] sticky right-0 z-30 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] min-w-[150px]">الحالة</th>
+                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151] bg-[#F7F5F0] dark:bg-[#0B1120] sticky right-0 z-30 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] min-w-[150px]">
+                  <div className="flex items-center gap-2 justify-center">
+                    <input 
+                      type="checkbox" 
+                      className="w-4 h-4 rounded border-slate-300 cursor-pointer"
+                      checked={selectedOrders.size === filteredOrders.length && filteredOrders.length > 0}
+                      onChange={toggleAllFilteredOrders}
+                      title="تحديد الكل"
+                    />
+                    <span>الحالة</span>
+                  </div>
+                </th>
                 <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">إجراءات</th>
                 <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151] min-w-[200px]">ملاحظات</th>
                 <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151] text-[#C9A46A] dark:text-[#D4AF37]">المجموع</th>
@@ -474,15 +543,23 @@ function OrdersDashboard() {
                   
                   {/* Status - Sticky Right */}
                   <td className={`p-3 border-l border-slate-100 dark:border-slate-700 bg-inherit sticky right-0 z-10 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] ${i % 2 === 0 ? 'bg-white dark:bg-[#111827]' : 'bg-[#FAFAFA] group-hover:bg-slate-50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]/80'}`}>
-                    <div className="relative group cursor-pointer w-full h-full flex items-center justify-center">
-                      <select 
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                        value={getStatusConfig(order.status).value}
-                        onChange={(e) => updateStatus(order.id, e.target.value)}
-                      >
-                        {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-                      </select>
-                      <StatusBadge status={order.status} />
+                    <div className="flex items-center justify-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        className="w-4 h-4 rounded border-slate-300 z-20 cursor-pointer relative"
+                        checked={selectedOrders.has(order.id)}
+                        onChange={() => toggleOrderSelection(order.id)}
+                      />
+                      <div className="relative group cursor-pointer flex-1 h-full flex items-center justify-center">
+                        <select 
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                          value={getStatusConfig(order.status).value}
+                          onChange={(e) => updateStatus(order.id, e.target.value)}
+                        >
+                          {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                        </select>
+                        <StatusBadge status={order.status} />
+                      </div>
                     </div>
                   </td>
 

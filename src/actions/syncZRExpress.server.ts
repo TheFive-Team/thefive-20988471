@@ -10,18 +10,18 @@ const API_BASE = process.env.ZR_BASE_URL || 'https://api.zrexpress.app';
 async function searchTerritory(query: string): Promise<string | null> {
   if (!query) return null;
   try {
-    // Attempting to search the territory by name
-    const url = `${API_BASE}/api/v1/territories/search?name=${encodeURIComponent(query)}&query=${encodeURIComponent(query)}`;
+    const url = `${API_BASE}/api/v1/territories/search`;
     console.log(`[ZR Express] Searching territory: ${query}`);
     
     const res = await fetch(url, {
-      method: "GET",
+      method: "POST",
       headers: {
         'Authorization': `Bearer ${API_KEY}`,
         'X-Api-Key': API_KEY,
         'X-Tenant': TENANT_ID,
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify({ keyword: query })
     });
     
     if (!res.ok) {

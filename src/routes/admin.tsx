@@ -212,8 +212,8 @@ function StatusBadge({ status }: { status: string }) {
   const config = getStatusConfig(status);
   const Icon = config.icon;
   return (
-    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap min-w-[100px] justify-center shadow-sm dark:shadow-none transition-colors ${config.bg} ${config.color}`}>
-      <Icon size={14} strokeWidth={2.5}/> {config.label}
+    <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap min-w-[110px] justify-center shadow-sm dark:shadow-none transition-colors ${config.bg} ${config.color}`}>
+      <Icon size={16} strokeWidth={2.5}/> {config.label}
     </div>
   );
 }
@@ -435,74 +435,74 @@ function OrdersDashboard() {
   const totalSales = filteredOrders.reduce((sum, o) => sum + (Number(o.total_amount) - Number(o.delivery_fee || 0)), 0);
   
   return (
-    <div className="space-y-6 max-w-[1600px] mx-auto animate-in fade-in duration-500 font-sans pb-12" style={{ fontFamily: "'Cairo', sans-serif" }}>
+    <div className="space-y-8 max-w-[1800px] mx-auto w-full animate-in fade-in duration-500 font-sans pb-12" style={{ fontFamily: "'Cairo', sans-serif" }}>
       
       {/* Top Metrics Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-[#0E1A2F] dark:bg-[#E5E7EB] rounded-xl p-6 flex items-center justify-between shadow-sm dark:shadow-none text-white dark:text-[#0B1120] border border-[#0E1A2F]">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="bg-[#0E1A2F] dark:bg-[#E5E7EB] rounded-2xl p-8 flex items-center justify-between shadow-sm dark:shadow-none text-white dark:text-[#0B1120] border border-[#0E1A2F]">
           <div>
-            <p className="text-sm font-bold text-slate-300 mb-2">إجمالي الطلبات</p>
-            <p className="text-4xl font-black">{filteredOrders.length}</p>
+            <p className="text-base font-bold text-slate-300 mb-3">إجمالي الطلبات</p>
+            <p className="text-5xl font-black">{filteredOrders.length}</p>
           </div>
-          <ShoppingBag size={48} className="text-[#C9A46A] dark:text-[#D4AF37] opacity-90" strokeWidth={1.5}/>
+          <ShoppingBag size={64} className="text-[#C9A46A] dark:text-[#D4AF37] opacity-90" strokeWidth={1.5}/>
         </div>
 
-        <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200 dark:border-[#374151] p-6 flex items-center justify-between shadow-sm dark:shadow-none hover:shadow-md dark:shadow-none transition-shadow">
+        <div className="bg-white dark:bg-[#111827] rounded-2xl border border-[#E5E7EB] dark:border-[#374151] p-8 flex items-center justify-between shadow-sm dark:shadow-none hover:shadow-md dark:shadow-none transition-shadow">
           <div>
-            <p className="text-sm font-bold text-slate-500 dark:text-[#9CA3AF] mb-2">طلبات جديدة</p>
-            <p className="text-4xl font-black text-slate-900 dark:text-[#F9FAFB]">{filteredOrders.filter(o => o.status === 'pending' || o.status === 'جديد').length}</p>
+            <p className="text-base font-bold text-slate-500 dark:text-[#9CA3AF] mb-3">طلبات جديدة</p>
+            <p className="text-5xl font-black text-slate-900 dark:text-[#F9FAFB]">{filteredOrders.filter(o => o.status === 'pending' || o.status === 'جديد').length}</p>
           </div>
-          <div className="p-4 bg-blue-50 rounded-2xl text-blue-600"><Plus size={28} strokeWidth={2}/></div>
+          <div className="p-4 bg-blue-50 rounded-2xl text-blue-600"><Plus size={40} strokeWidth={2}/></div>
         </div>
 
-        <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200 dark:border-[#374151] p-6 flex items-center justify-between shadow-sm dark:shadow-none hover:shadow-md dark:shadow-none transition-shadow">
+        <div className="bg-white dark:bg-[#111827] rounded-2xl border border-[#E5E7EB] dark:border-[#374151] p-8 flex items-center justify-between shadow-sm dark:shadow-none hover:shadow-md dark:shadow-none transition-shadow">
           <div>
-            <p className="text-sm font-bold text-slate-500 dark:text-[#9CA3AF] mb-2">قيد التوصيل</p>
-            <p className="text-4xl font-black text-slate-900 dark:text-[#F9FAFB]">{filteredOrders.filter(o => o.status === 'delivery' || o.status === 'قيد التوصيل').length}</p>
+            <p className="text-base font-bold text-slate-500 dark:text-[#9CA3AF] mb-3">قيد التوصيل</p>
+            <p className="text-5xl font-black text-slate-900 dark:text-[#F9FAFB]">{filteredOrders.filter(o => o.status === 'delivery' || o.status === 'قيد التوصيل').length}</p>
           </div>
-          <div className="p-4 bg-orange-50 rounded-2xl text-orange-600"><Truck size={28} strokeWidth={2}/></div>
+          <div className="p-4 bg-orange-50 rounded-2xl text-orange-600"><Truck size={40} strokeWidth={2}/></div>
         </div>
 
-        <div className="bg-[#C9A46A] dark:bg-[#D4AF37] rounded-xl p-6 flex items-center justify-between shadow-sm dark:shadow-none text-white dark:text-[#0B1120] border border-[#C9A46A] dark:border-[#D4AF37]">
+        <div className="bg-[#C9A46A] dark:bg-[#D4AF37] rounded-2xl p-8 flex items-center justify-between shadow-sm dark:shadow-none text-white dark:text-[#0B1120] border border-[#C9A46A] dark:border-[#D4AF37]">
           <div>
-            <p className="text-sm font-bold text-white dark:text-[#0B1120]/90 mb-2">المبيعات الإجمالية</p>
-            <p className="text-2xl font-black" dir="ltr">{totalSales.toLocaleString()} <span className="text-sm font-normal">DZD</span></p>
+            <p className="text-base font-bold text-white dark:text-[#0B1120]/90 mb-3">المبيعات الإجمالية</p>
+            <p className="text-3xl font-black" dir="ltr">{totalSales.toLocaleString()} <span className="text-lg font-normal">DZD</span></p>
           </div>
-          <Wallet size={48} className="text-white dark:text-[#0B1120] opacity-90" strokeWidth={1.5}/>
+          <Wallet size={64} className="text-white dark:text-[#0B1120] opacity-90" strokeWidth={1.5}/>
         </div>
       </div>
 
       {/* Control Bar */}
-      <div className="bg-white dark:bg-[#111827] rounded-2xl border border-slate-200 dark:border-[#374151] p-4 shadow-sm dark:shadow-none flex flex-col gap-4 justify-between">
-        <div className="flex flex-1 flex-col sm:flex-row flex-wrap gap-4 w-full justify-between items-center">
-          <div className="flex flex-1 flex-col sm:flex-row flex-wrap gap-4 w-full">
+      <div className="bg-white dark:bg-[#111827] rounded-2xl border border-[#E5E7EB] dark:border-[#374151] p-6 shadow-sm dark:shadow-none flex flex-col gap-6 justify-between">
+        <div className="flex flex-1 flex-col xl:flex-row flex-wrap gap-6 w-full justify-between items-center">
+          <div className="flex flex-1 flex-col md:flex-row flex-wrap gap-4 w-full">
             <button 
               onClick={syncZRExpress}
               disabled={isSyncing}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-bold hover:shadow-lg hover:scale-105 transition-all shadow-md disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap text-sm w-full lg:w-auto order-first lg:order-none"
+              className="flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-bold hover:shadow-lg hover:scale-[1.02] transition-all shadow-md disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap text-base w-full md:w-auto order-first md:order-none"
             >
-              {isSyncing ? <RefreshCw size={18} className="animate-spin" /> : <RefreshCw size={18} />}
+              {isSyncing ? <RefreshCw size={20} className="animate-spin" /> : <RefreshCw size={20} />}
               مزامنة ZR Express 🔄
             </button>
             {/* Search */}
-            <div className="relative flex-1 min-w-[200px] max-w-md">
-              <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={18} />
+            <div className="relative flex-1 min-w-[280px] max-w-xl">
+              <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={20} />
               <input 
                 type="text" 
                 placeholder="البحث بالاسم، الهاتف، أو رقم الطلب..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-xl py-3 pr-11 pl-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] transition-all placeholder:text-slate-400 dark:text-slate-500 text-slate-800 dark:text-[#F9FAFB]"
+                className="w-full h-[52px] bg-[#F7F5F0] dark:bg-[#0B1120] border border-transparent rounded-xl py-3 pr-12 pl-4 text-base font-bold outline-none focus:border-[#0E1A2F] focus:bg-white focus:ring-2 focus:ring-[#0E1A2F]/10 transition-all placeholder:text-slate-400 dark:text-slate-500 text-slate-800 dark:text-[#F9FAFB] shadow-inner"
               />
             </div>
             
             {/* Date Range Filter */}
-            <div className="relative">
-              <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
+            <div className="relative min-w-[180px]">
+              <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={18} />
               <select 
                 value={dateRangeFilter}
                 onChange={(e) => setDateRangeFilter(e.target.value)}
-                className="bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-xl py-3 pr-11 pl-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] appearance-none min-w-[160px] cursor-pointer text-slate-800 dark:text-[#F9FAFB] transition-all"
+                className="h-[52px] w-full bg-[#F7F5F0] dark:bg-[#0B1120] border border-transparent rounded-xl py-3 pr-12 pl-4 text-base font-bold outline-none focus:border-[#0E1A2F] focus:bg-white focus:ring-2 focus:ring-[#0E1A2F]/10 appearance-none cursor-pointer text-slate-800 dark:text-[#F9FAFB] transition-all shadow-inner"
               >
                 <option value="all">كل الأوقات</option>
                 <option value="today">اليوم</option>
@@ -513,12 +513,12 @@ function OrdersDashboard() {
             </div>
 
             {/* Status Filter */}
-            <div className="relative">
-              <Filter className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
+            <div className="relative min-w-[180px]">
+              <Filter className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={18} />
               <select 
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-xl py-3 pr-11 pl-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] appearance-none min-w-[160px] cursor-pointer text-slate-800 dark:text-[#F9FAFB] transition-all"
+                className="h-[52px] w-full bg-[#F7F5F0] dark:bg-[#0B1120] border border-transparent rounded-xl py-3 pr-12 pl-4 text-base font-bold outline-none focus:border-[#0E1A2F] focus:bg-white focus:ring-2 focus:ring-[#0E1A2F]/10 appearance-none cursor-pointer text-slate-800 dark:text-[#F9FAFB] transition-all shadow-inner"
               >
                 <option value="all">كل الحالات</option>
                 {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
@@ -526,12 +526,12 @@ function OrdersDashboard() {
             </div>
 
             {/* Wilaya Filter */}
-            <div className="relative">
-              <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
+            <div className="relative min-w-[180px]">
+              <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={18} />
               <select 
                 value={wilayaFilter}
                 onChange={(e) => setWilayaFilter(e.target.value)}
-                className="bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-xl py-3 pr-11 pl-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] appearance-none min-w-[160px] cursor-pointer text-slate-800 dark:text-[#F9FAFB] transition-all"
+                className="h-[52px] w-full bg-[#F7F5F0] dark:bg-[#0B1120] border border-transparent rounded-xl py-3 pr-12 pl-4 text-base font-bold outline-none focus:border-[#0E1A2F] focus:bg-white focus:ring-2 focus:ring-[#0E1A2F]/10 appearance-none cursor-pointer text-slate-800 dark:text-[#F9FAFB] transition-all shadow-inner"
               >
                 <option value="all">كل الولايات</option>
                 {uniqueWilayas.map(w => <option key={w} value={w}>{w}</option>)}
@@ -539,22 +539,22 @@ function OrdersDashboard() {
             </div>
           </div>
 
-          <button onClick={exportToCSV} className="flex items-center justify-center gap-2 px-6 py-3 bg-[#0E1A2F] dark:bg-[#E5E7EB] text-white dark:text-[#0B1120] rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-md dark:shadow-none whitespace-nowrap text-sm w-full lg:w-auto">
-            <Download size={18} strokeWidth={2.5} />
+          <button onClick={exportToCSV} className="flex items-center justify-center gap-2 px-8 py-3.5 bg-[#0E1A2F] dark:bg-[#E5E7EB] text-white dark:text-[#0B1120] rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-md dark:shadow-none whitespace-nowrap text-base w-full md:w-auto">
+            <Download size={20} strokeWidth={2.5} />
             {selectedOrders.size > 0 ? `تصدير المحدد (${selectedOrders.size})` : "تصدير إلى Excel"}
           </button>
         </div>
         
         {/* Custom Date Range Inputs */}
         {dateRangeFilter === "custom" && (
-          <div className="flex items-center gap-4 pt-3 border-t border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-2">
+          <div className="flex items-center gap-4 pt-4 border-t border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-2">
             <div className="flex items-center gap-2">
               <span className="text-sm font-bold text-slate-500">من:</span>
               <input 
                 type="date" 
                 value={customStartDate}
                 onChange={(e) => setCustomStartDate(e.target.value)}
-                className="bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-lg py-2 px-3 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] text-slate-800 dark:text-[#F9FAFB]"
+                className="bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-lg py-2.5 px-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-2 focus:ring-[#0E1A2F]/10 text-slate-800 dark:text-[#F9FAFB]"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -563,7 +563,7 @@ function OrdersDashboard() {
                 type="date" 
                 value={customEndDate}
                 onChange={(e) => setCustomEndDate(e.target.value)}
-                className="bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-lg py-2 px-3 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-1 focus:ring-[#0E1A2F] text-slate-800 dark:text-[#F9FAFB]"
+                className="bg-[#F7F5F0] dark:bg-[#0B1120] border-transparent rounded-lg py-2.5 px-4 text-sm font-bold outline-none focus:border-[#0E1A2F] focus:ring-2 focus:ring-[#0E1A2F]/10 text-slate-800 dark:text-[#F9FAFB]"
               />
             </div>
           </div>
@@ -571,7 +571,7 @@ function OrdersDashboard() {
       </div>
 
       {/* Compact Status Summary Bar */}
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-4">
         {STATUS_OPTIONS.map(statusObj => {
           const count = orders.filter(o => {
             // Need to match exactly what getStatusConfig returns so legacy maps to new properly
@@ -582,31 +582,31 @@ function OrdersDashboard() {
           const Icon = statusObj.icon;
           
           return (
-            <div key={statusObj.value} className={`flex-1 min-w-[140px] bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#374151] rounded-xl p-3 flex items-center justify-between shadow-sm dark:shadow-none hover:border-slate-300 transition-all cursor-default group relative overflow-hidden`}>
-              <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity ${statusObj.bg}`}></div>
-              <div className="flex items-center gap-2 relative z-10">
-                <div className={`p-1.5 rounded-lg ${statusObj.bg} ${statusObj.color}`}>
-                  <Icon size={14} strokeWidth={2.5} />
+            <div key={statusObj.value} className={`flex-1 min-w-[160px] bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151] rounded-2xl p-4 flex items-center justify-between shadow-sm dark:shadow-none hover:border-slate-300 transition-all cursor-default group relative overflow-hidden`}>
+              <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity ${statusObj.bg.replace('/10', '')}`}></div>
+              <div className="flex items-center gap-3 relative z-10">
+                <div className={`p-2.5 rounded-xl ${statusObj.bg} ${statusObj.color}`}>
+                  <Icon size={18} strokeWidth={2.5} />
                 </div>
-                <span className="text-xs font-bold text-slate-600 dark:text-[#9CA3AF] group-hover:text-slate-800 dark:text-[#F9FAFB] transition-colors">{statusObj.label}</span>
+                <span className="text-sm font-bold text-slate-600 dark:text-[#9CA3AF] group-hover:text-slate-900 dark:group-hover:text-[#F9FAFB] transition-colors">{statusObj.label}</span>
               </div>
-              <span className="text-base font-black text-slate-800 dark:text-[#F9FAFB] relative z-10">{count}</span>
+              <span className="text-2xl font-black text-slate-900 dark:text-[#F9FAFB] relative z-10">{count}</span>
             </div>
           );
         })}
       </div>
 
       {/* Main Table */}
-      <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#374151] rounded-2xl shadow-sm dark:shadow-none overflow-hidden relative">
+      <div className="bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151] rounded-2xl shadow-sm dark:shadow-none overflow-hidden relative">
         {selectedOrders.size > 0 && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900/30 p-4 flex items-center justify-between animate-in slide-in-from-top-2">
-            <div className="flex items-center gap-3">
+          <div className="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900/30 p-5 flex items-center justify-between animate-in slide-in-from-top-2">
+            <div className="flex items-center gap-4">
               <span className="font-bold text-blue-700 dark:text-blue-400">
                 تم تحديد {selectedOrders.size} طلب
               </span>
-              <div className="h-4 w-[1px] bg-blue-200 dark:bg-blue-800"></div>
+              <div className="h-5 w-[1px] bg-blue-200 dark:bg-blue-800"></div>
               <select
-                className="bg-white dark:bg-[#111827] border border-blue-200 dark:border-blue-800 text-sm font-bold text-blue-700 dark:text-blue-400 rounded-lg px-3 py-1.5 outline-none cursor-pointer"
+                className="bg-white dark:bg-[#111827] border border-blue-200 dark:border-blue-800 text-sm font-bold text-blue-700 dark:text-blue-400 rounded-lg px-4 py-2 outline-none cursor-pointer"
                 onChange={(e) => {
                   if(e.target.value) {
                     updateBulkStatus(e.target.value);
@@ -621,22 +621,22 @@ function OrdersDashboard() {
             </div>
             <button 
               onClick={() => setSelectedOrders(new Set())}
-              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-bold px-3 py-1.5 bg-blue-100 dark:bg-blue-900/40 rounded-lg transition-colors"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-bold px-4 py-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg transition-colors"
             >
               إلغاء التحديد
             </button>
           </div>
         )}
-        <div className="overflow-x-auto w-full" style={{ maxHeight: "calc(100vh - 300px)" }}>
-          <table className="w-full text-sm text-center border-collapse whitespace-nowrap">
-            <thead className="sticky top-0 z-20 bg-[#F7F5F0]/80 dark:bg-[#0B1120]/80 backdrop-blur-md shadow-sm dark:shadow-none">
+        <div className="overflow-x-auto w-full" style={{ maxHeight: "calc(100vh - 280px)" }}>
+          <table className="w-full text-base text-center border-collapse whitespace-nowrap">
+            <thead className="sticky top-0 z-20 bg-[#F7F5F0]/90 dark:bg-[#0B1120]/90 backdrop-blur-md shadow-sm dark:shadow-none">
               <tr className="text-[#0E1A2F] dark:text-[#F9FAFB]">
                 {/* Right-to-Left Column Order */}
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151] bg-[#F7F5F0]/80 dark:bg-[#0B1120]/80 backdrop-blur-md sticky right-0 z-30 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] min-w-[150px]">
-                  <div className="flex items-center gap-2 justify-center">
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151] bg-[#F7F5F0]/90 dark:bg-[#0B1120]/90 backdrop-blur-md sticky right-0 z-30 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] min-w-[160px]">
+                  <div className="flex items-center gap-3 justify-center">
                     <input 
                       type="checkbox" 
-                      className="w-4 h-4 rounded border-slate-300 cursor-pointer"
+                      className="w-5 h-5 rounded border-slate-300 cursor-pointer"
                       checked={selectedOrders.size === filteredOrders.length && filteredOrders.length > 0}
                       onChange={toggleAllFilteredOrders}
                       title="تحديد الكل"
@@ -644,21 +644,21 @@ function OrdersDashboard() {
                     <span>الحالة</span>
                   </div>
                 </th>
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">إجراءات</th>
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151] min-w-[200px]">ملاحظات</th>
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">التتبع (ZR)</th>
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151] text-[#C9A46A] dark:text-[#D4AF37]">المجموع</th>
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">سعر المنتج</th>
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">التوصيل</th>
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">النوع</th>
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">البلدية</th>
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">الولاية</th>
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">المقاس</th>
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">المنتج</th>
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">الهاتف</th>
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151] min-w-[150px]">الاسم</th>
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151] text-slate-500 dark:text-[#9CA3AF]">رقم الطلب</th>
-                <th className="p-4 font-bold border-b border-slate-200 dark:border-[#374151]">الوقت</th>
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">إجراءات</th>
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151] min-w-[220px]">ملاحظات</th>
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">التتبع (ZR)</th>
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151] text-[#C9A46A] dark:text-[#D4AF37]">المجموع</th>
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">سعر المنتج</th>
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">التوصيل</th>
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">النوع</th>
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">البلدية</th>
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">الولاية</th>
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">المقاس</th>
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">المنتج</th>
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">الهاتف</th>
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151] min-w-[180px]">الاسم</th>
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151] text-slate-500 dark:text-[#9CA3AF]">رقم الطلب</th>
+                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">الوقت</th>
               </tr>
             </thead>
             <tbody>
@@ -676,14 +676,14 @@ function OrdersDashboard() {
                   const productFee = order.total_amount - (order.delivery_fee || 0);
 
                   return (
-                  <tr key={order.id} className={`h-[68px] border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]/80 transition-colors ${i % 2 === 0 ? 'bg-white dark:bg-[#111827]' : 'bg-[#FAFAFA]'}`}>
+                  <tr key={order.id} className={`h-[72px] border-b border-[#E5E7EB] dark:border-slate-700 hover:bg-[#F7F5F0]/50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]/80 transition-colors ${i % 2 === 0 ? 'bg-white dark:bg-[#111827]' : 'bg-[#FAFAFA]'}`}>
                     
                   {/* Status - Sticky Right */}
-                  <td className={`p-3 border-l border-slate-100 dark:border-slate-700 bg-inherit sticky right-0 z-10 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] ${i % 2 === 0 ? 'bg-white dark:bg-[#111827]' : 'bg-[#FAFAFA] group-hover:bg-slate-50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]/80'}`}>
-                    <div className="flex items-center justify-center gap-2">
+                  <td className={`p-4 border-l border-[#E5E7EB] dark:border-slate-700 bg-inherit sticky right-0 z-10 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] ${i % 2 === 0 ? 'bg-white dark:bg-[#111827]' : 'bg-[#FAFAFA] group-hover:bg-[#F7F5F0]/50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]/80'}`}>
+                    <div className="flex items-center justify-center gap-3">
                       <input 
                         type="checkbox" 
-                        className="w-4 h-4 rounded border-slate-300 z-20 cursor-pointer relative"
+                        className="w-5 h-5 rounded border-slate-300 z-20 cursor-pointer relative"
                         checked={selectedOrders.has(order.id)}
                         onChange={() => toggleOrderSelection(order.id)}
                       />
@@ -701,22 +701,22 @@ function OrdersDashboard() {
                   </td>
 
                   {/* Actions */}
-                  <td className="p-3 border-l border-slate-100 dark:border-slate-700 relative">
+                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 relative">
                     <div className="flex flex-col items-center justify-center gap-2">
-                      <div className="flex items-center justify-center gap-1.5">
-                        <a href={`https://wa.me/213${order.phone.replace(/^0+/, '')}`} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-xl bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 hover:scale-110 transition-all shadow-sm dark:shadow-none border border-green-100" title="مراسلة عبر واتساب">
-                          <MessageCircle size={16} strokeWidth={2.5} />
+                      <div className="flex items-center justify-center gap-2">
+                        <a href={`https://wa.me/213${order.phone.replace(/^0+/, '')}`} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 hover:scale-110 transition-all shadow-sm dark:shadow-none border border-green-100" title="مراسلة عبر واتساب">
+                          <MessageCircle size={18} strokeWidth={2.5} />
                         </a>
                         
                         <DropdownMenu modal={false}>
                           <DropdownMenuTrigger asChild>
                             <button 
-                              className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 hover:scale-110 transition-all shadow-sm dark:shadow-none border border-blue-100 relative outline-none" 
+                              className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 hover:scale-110 transition-all shadow-sm dark:shadow-none border border-blue-100 relative outline-none" 
                               title="حالة الاتصال"
                             >
-                              <Phone size={16} strokeWidth={2.5} />
+                              <Phone size={18} strokeWidth={2.5} />
                               {order.call_status && (
-                                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-white" style={{ backgroundColor: CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.color }}></span>
+                                <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white" style={{ backgroundColor: CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.color }}></span>
                               )}
                             </button>
                           </DropdownMenuTrigger>
@@ -748,18 +748,18 @@ function OrdersDashboard() {
                           </DropdownMenuContent>
                         </DropdownMenu>
 
-                        <button onClick={() => copyToClipboard(order.phone)} className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-[#374151] text-slate-600 dark:text-[#9CA3AF] flex items-center justify-center hover:bg-slate-200 hover:scale-110 transition-all shadow-sm dark:shadow-none border border-slate-200 dark:border-[#374151]" title="نسخ الرقم">
-                          <Copy size={16} strokeWidth={2.5} />
+                        <button onClick={() => copyToClipboard(order.phone)} className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-[#374151] text-slate-600 dark:text-[#9CA3AF] flex items-center justify-center hover:bg-slate-200 hover:scale-110 transition-all shadow-sm dark:shadow-none border border-slate-200 dark:border-[#374151]" title="نسخ الرقم">
+                          <Copy size={18} strokeWidth={2.5} />
                         </button>
-                        <div className="w-[1px] h-5 bg-slate-200 mx-0.5"></div>
-                        <button onClick={(e) => { e.stopPropagation(); setOrderToDelete(order.id); }} className="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 hover:scale-110 transition-all shadow-sm dark:shadow-none border border-red-100 dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40" title="حذف نهائي">
-                          <Trash2 size={16} strokeWidth={2.5} />
+                        <div className="w-[1px] h-6 bg-slate-200 mx-0.5"></div>
+                        <button onClick={(e) => { e.stopPropagation(); setOrderToDelete(order.id); }} className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 hover:scale-110 transition-all shadow-sm dark:shadow-none border border-red-100 dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40" title="حذف نهائي">
+                          <Trash2 size={18} strokeWidth={2.5} />
                         </button>
                       </div>
 
                       {/* Call Status Badge */}
                       {order.call_status && (
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 mt-1">
                           <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black shadow-sm dark:shadow-none transition-colors cursor-default ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.bg} ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.text} ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.hover}`}>
                             {CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.icon === "check" ? (
                               <CheckCircle size={14} strokeWidth={3} />
@@ -770,10 +770,10 @@ function OrdersDashboard() {
                           </div>
                           <button 
                             onClick={() => updateCallStatus(order.id, "")}
-                            className="w-5 h-5 flex items-center justify-center rounded-full bg-slate-100 dark:bg-[#374151] text-slate-400 dark:text-slate-500 hover:bg-red-100 hover:text-red-500 transition-colors"
+                            className="w-6 h-6 flex items-center justify-center rounded-full bg-slate-100 dark:bg-[#374151] text-slate-400 dark:text-slate-500 hover:bg-red-100 hover:text-red-500 transition-colors"
                             title="مسح حالة الاتصال"
                           >
-                            <X size={12} strokeWidth={3} />
+                            <X size={14} strokeWidth={3} />
                           </button>
                         </div>
                       )}
@@ -781,9 +781,9 @@ function OrdersDashboard() {
                   </td>
                   
                   {/* Notes */}
-                  <td className="p-3 border-l border-slate-100 dark:border-slate-700">
+                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700">
                     <textarea 
-                      className="w-full h-10 resize-none bg-[#F7F5F0] dark:bg-[#0B1120] border border-transparent hover:border-slate-200 dark:hover:border-[#4B5563] dark:border-[#374151] focus:border-[#C9A46A] dark:focus:border-[#D4AF37] dark:border-[#D4AF37] focus:bg-white dark:bg-[#111827] rounded-lg p-2 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none transition-all placeholder:text-slate-400 dark:text-slate-500 placeholder:font-normal"
+                      className="w-full h-12 resize-none bg-[#F7F5F0] dark:bg-[#0B1120] border border-transparent hover:border-slate-200 dark:hover:border-[#4B5563] dark:border-[#374151] focus:border-[#C9A46A] dark:focus:border-[#D4AF37] dark:border-[#D4AF37] focus:bg-white dark:bg-[#111827] rounded-lg p-2.5 text-sm font-bold text-slate-700 dark:text-slate-200 outline-none transition-all placeholder:text-slate-400 dark:text-slate-500 placeholder:font-normal"
                       placeholder="أضف ملاحظة..."
                       defaultValue={order.notes || ""}
                       onBlur={(e) => updateNotes(order.id, e.target.value)}
@@ -791,10 +791,10 @@ function OrdersDashboard() {
                   </td>
 
                   {/* Tracking Number */}
-                  <td className="p-3 border-l border-slate-100 dark:border-slate-700 text-xs font-mono font-bold text-slate-600 dark:text-slate-400">
+                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-sm font-mono font-bold text-slate-600 dark:text-slate-400">
                     {order.tracking_number ? (
-                      <button onClick={() => copyToClipboard(order.tracking_number || "")} className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-1 mx-auto" title="نسخ رقم التتبع">
-                        <Copy size={12} /> {order.tracking_number}
+                      <button onClick={() => copyToClipboard(order.tracking_number || "")} className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 mx-auto" title="نسخ رقم التتبع">
+                        <Copy size={14} /> {order.tracking_number}
                       </button>
                     ) : (
                       <span className="text-slate-300 dark:text-slate-600">-</span>
@@ -802,58 +802,58 @@ function OrdersDashboard() {
                   </td>
 
                   {/* Total */}
-                  <td className="p-3 border-l border-slate-100 dark:border-slate-700 font-black text-[#0E1A2F] dark:text-[#F9FAFB] bg-[#C9A46A] dark:bg-[#D4AF37]/5" dir="ltr">
-                    {Number(order.total_amount || 0).toLocaleString()} <span className="text-[10px] text-[#C9A46A] dark:text-[#D4AF37] font-bold">DZD</span>
+                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 font-black text-lg text-[#0E1A2F] dark:text-[#F9FAFB] bg-[#C9A46A]/10 dark:bg-[#D4AF37]/10" dir="ltr">
+                    {Number(order.total_amount || 0).toLocaleString()} <span className="text-xs text-[#C9A46A] dark:text-[#D4AF37] font-bold">DZD</span>
                   </td>
 
                   {/* Product Fee */}
-                  <td className="p-3 border-l border-slate-100 dark:border-slate-700 font-bold text-slate-600 dark:text-[#9CA3AF]" dir="ltr">
+                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 font-bold text-slate-600 dark:text-[#9CA3AF]" dir="ltr">
                     {productFee.toLocaleString()}
                   </td>
 
                   {/* Delivery Fee */}
-                  <td className="p-3 border-l border-slate-100 dark:border-slate-700 font-bold text-slate-600 dark:text-[#9CA3AF]" dir="ltr">
+                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 font-bold text-slate-600 dark:text-[#9CA3AF]" dir="ltr">
                     {Number(order.delivery_fee || 0).toLocaleString()}
                   </td>
 
                   {/* Delivery Type */}
-                  <td className="p-3 border-l border-slate-100 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold">
-                    <div className="flex items-center justify-center gap-1.5 px-2 py-1 bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#374151] rounded-md whitespace-nowrap shadow-sm dark:shadow-none">
-                      {order.delivery_type === "توصيل للمنزل" ? <MapPin size={12} className="text-[#C9A46A] dark:text-[#D4AF37]"/> : <Box size={12} className="text-slate-400 dark:text-slate-500"/>}
+                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-bold">
+                    <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151] rounded-lg whitespace-nowrap shadow-sm dark:shadow-none">
+                      {order.delivery_type === "توصيل للمنزل" ? <MapPin size={14} className="text-[#C9A46A] dark:text-[#D4AF37]"/> : <Box size={14} className="text-slate-400 dark:text-slate-500"/>}
                       {order.delivery_type}
                     </div>
                   </td>
 
                   {/* Commune */}
-                  <td className="p-3 border-l border-slate-100 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold">{order.commune}</td>
+                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-base">{order.commune}</td>
                   
                   {/* Wilaya */}
-                  <td className="p-3 border-l border-slate-100 dark:border-slate-700 text-slate-900 dark:text-[#F9FAFB] font-black">{order.wilaya}</td>
+                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-slate-900 dark:text-[#F9FAFB] font-black text-base">{order.wilaya}</td>
 
                   {/* Variant */}
-                  <td className="p-3 border-l border-slate-100 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold">
-                    {order.variant_title && <span className="px-2.5 py-1 bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#374151] shadow-sm dark:shadow-none rounded-md text-xs">{order.variant_title}</span>}
+                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold">
+                    {order.variant_title && <span className="px-3 py-1.5 bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151] shadow-sm dark:shadow-none rounded-lg text-sm">{order.variant_title}</span>}
                   </td>
 
                   {/* Product */}
-                  <td className="p-3 border-l border-slate-100 dark:border-slate-700 text-[#0E1A2F] dark:text-[#F9FAFB] font-bold">{order.product_name}</td>
+                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-[#0E1A2F] dark:text-[#F9FAFB] font-bold text-base">{order.product_name}</td>
 
                   {/* Phone */}
-                  <td className="p-3 border-l border-slate-100 dark:border-slate-700 font-bold text-[#0E1A2F] dark:text-[#F9FAFB] hover:text-[#C9A46A] dark:text-[#D4AF37] transition-colors cursor-pointer" dir="ltr" onClick={() => copyToClipboard(order.phone)} title="انقر للنسخ">
+                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 font-black text-[#0E1A2F] dark:text-[#F9FAFB] hover:text-[#C9A46A] dark:text-[#D4AF37] transition-colors cursor-pointer text-base" dir="ltr" onClick={() => copyToClipboard(order.phone)} title="انقر للنسخ">
                     {order.phone}
                   </td>
 
                   {/* Name */}
-                  <td className="p-3 border-l border-slate-100 dark:border-slate-700 text-[#0E1A2F] dark:text-[#F9FAFB] font-black">{order.fullname}</td>
+                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-[#0E1A2F] dark:text-[#F9FAFB] font-black text-base">{order.fullname}</td>
 
                   {/* Order ID */}
-                  <td className="p-3 border-l border-slate-100 dark:border-slate-700 text-slate-400 dark:text-slate-500 font-mono text-[11px] font-bold">#{order.order_id.split('-')[1] || order.order_id}</td>
+                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-slate-400 dark:text-slate-500 font-mono text-[13px] font-bold">#{order.order_id.split('-')[1] || order.order_id}</td>
 
                   {/* Time */}
-                  <td className="p-3 text-slate-500 dark:text-[#9CA3AF] text-xs font-bold" dir="ltr">
+                  <td className="p-4 text-slate-500 dark:text-[#9CA3AF] text-sm font-bold" dir="ltr">
                     <div className="flex flex-col items-center justify-center">
-                      <span className="text-slate-800 dark:text-[#F9FAFB]">{time}</span>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500">{date}</span>
+                      <span className="text-slate-800 dark:text-[#F9FAFB] text-sm">{time}</span>
+                      <span className="text-xs text-slate-400 dark:text-slate-500">{date}</span>
                     </div>
                   </td>
                 </tr>

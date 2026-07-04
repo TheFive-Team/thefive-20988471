@@ -165,9 +165,12 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
       }
     } // End of for loop
     
+    const failedCount = data.ordersToSync.length - successCount;
     return {
       success: successCount > 0,
-      message: `تم مزامنة ${successCount} من أصل ${data.ordersToSync.length} طلبات مع ZR Express بنجاح!`,
+      message: successCount > 0 
+        ? `تم مزامنة ${successCount} طلب بنجاح!${failedCount > 0 ? ` (فشلت مزامنة ${failedCount} طلبات)` : ''}`
+        : `فشلت مزامنة جميع الطلبات المحددة (${failedCount}). يُرجى التحقق من Vercel Logs لمعرفة السبب (غالباً خطأ في مطابقة الولاية/البلدية).`,
       results
     };
     } catch (globalError: any) {

@@ -2,9 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/lib/supabase";
 
-const SECRET_KEY = process.env.ZR_EXPRESS_SECRET_KEY || '';
-const TENANT_ID = process.env.ZR_EXPRESS_TENANT_ID || '';
-const API_BASE = 'https://api.zrexpress.app';
+const API_KEY = process.env.ZR_API_KEY || process.env.ZR_EXPRESS_SECRET_KEY || '';
+const TENANT_ID = process.env.ZR_TENANT_ID || process.env.ZR_EXPRESS_TENANT_ID || '';
+const API_BASE = process.env.ZR_BASE_URL || 'https://api.zrexpress.app';
 
 // Helper to fetch territory UUID
 async function searchTerritory(query: string): Promise<string | null> {
@@ -17,8 +17,8 @@ async function searchTerritory(query: string): Promise<string | null> {
     const res = await fetch(url, {
       method: "GET",
       headers: {
-        'Authorization': `Bearer ${SECRET_KEY}`,
-        'X-Api-Key': SECRET_KEY,
+        'Authorization': `Bearer ${API_KEY}`,
+        'X-Api-Key': API_KEY,
         'X-Tenant': TENANT_ID,
         'Content-Type': 'application/json'
       }
@@ -62,7 +62,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
         throw new Error("Failed to fetch orders from database: " + JSON.stringify(error));
       }
 
-      if (!SECRET_KEY || !TENANT_ID) {
+      if (!API_KEY || !TENANT_ID) {
         throw new Error("ZR Express API Keys are missing from environment variables.");
       }
 
@@ -79,15 +79,23 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
         // Fetch Commune UUID
         let communeUuid = await searchTerritory(order.commune);
 
-        // Fallbacks: if the API search didn't return a UUID, we must warn or use a dummy UUID
-        // (ZR API requires UUID format, so we can't send strings)
+        // Fallbacks: if the API search didn't return a UUID, we generate a random one to pass validation format
+        // (If it's an invalid UUID in ZR's DB, their API will return an error message which we will display)
         if (!wilayaUuid) {
           console.warn(`[ZR Express] Could not find UUID for wilaya: ${order.wilaya}. API may reject this.`);
-          wilayaUuid = "00000000-0000-0000-0000-000000000000"; // Dummy UUID to satisfy format, might be rejected by API
+          wilayaUuid = crypto.randomUUID();
         }
         if (!communeUuid) {
           console.warn(`[ZR Express] Could not find UUID for commune: ${order.commune}`);
-          communeUuid = "00000000-0000-0000-0000-000000000000";
+          communeUuid = crypto.randomUUID();
+        }
+
+        // Format phone to international
+        let phoneStr = order.phone || "";
+        if (phoneStr.startsWith('0')) {
+          phoneStr = '+213' + phoneStr.substring(1);
+        } else if (!phoneStr.startsWith('+')) {
+          phoneStr = '+213' + phoneStr;
         }
 
         // 3. Construct Payload exactly as requested
@@ -96,7 +104,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             customerId: crypto.randomUUID(), // Generate a random UUID for the customer
             name: order.fullname || "Client",
             phone: {
-              number1: order.phone || ""
+              number1: phoneStr
             }
           },
           deliveryAddress: {
@@ -122,8 +130,8 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
         const response = await fetch(`${API_BASE}/api/v1/parcels`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${SECRET_KEY}`,
-            'X-Api-Key': SECRET_KEY,
+            'Authorization': `Bearer ${API_KEY}`,
+            'X-Api-Key': API_KEY,
             'X-Tenant': TENANT_ID,
             'Content-Type': 'application/json'
           },

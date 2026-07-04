@@ -627,16 +627,16 @@ function OrdersDashboard() {
             </button>
           </div>
         )}
-        <div className="overflow-x-auto w-full" style={{ maxHeight: "calc(100vh - 280px)" }}>
-          <table className="w-full text-base text-center border-collapse whitespace-nowrap">
-            <thead className="sticky top-0 z-20 bg-[#F7F5F0]/90 dark:bg-[#0B1120]/90 backdrop-blur-md shadow-sm dark:shadow-none">
+        <div className="overflow-x-auto w-full pb-4" style={{ maxHeight: "calc(100vh - 280px)" }}>
+          <table className="w-full text-sm text-center border-collapse">
+            <thead className="sticky top-0 z-20 bg-[#F7F5F0]/95 dark:bg-[#0B1120]/95 backdrop-blur-md shadow-sm dark:shadow-none">
               <tr className="text-[#0E1A2F] dark:text-[#F9FAFB]">
                 {/* Right-to-Left Column Order */}
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151] bg-[#F7F5F0]/90 dark:bg-[#0B1120]/90 backdrop-blur-md sticky right-0 z-30 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] min-w-[160px]">
-                  <div className="flex items-center gap-3 justify-center">
+                <th className="px-3 py-4 font-bold border-b border-[#E5E7EB] dark:border-[#374151] bg-[#F7F5F0]/95 dark:bg-[#0B1120]/95 backdrop-blur-md sticky right-0 z-30 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] w-[110px]">
+                  <div className="flex items-center gap-2 justify-center">
                     <input 
                       type="checkbox" 
-                      className="w-5 h-5 rounded border-slate-300 cursor-pointer"
+                      className="w-4 h-4 rounded border-slate-300 cursor-pointer"
                       checked={selectedOrders.size === filteredOrders.length && filteredOrders.length > 0}
                       onChange={toggleAllFilteredOrders}
                       title="تحديد الكل"
@@ -644,28 +644,26 @@ function OrdersDashboard() {
                     <span>الحالة</span>
                   </div>
                 </th>
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">إجراءات</th>
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151] min-w-[220px]">ملاحظات</th>
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">التتبع (ZR)</th>
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151] text-[#C9A46A] dark:text-[#D4AF37]">المجموع</th>
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">سعر المنتج</th>
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">التوصيل</th>
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">النوع</th>
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">البلدية</th>
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">الولاية</th>
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">المقاس</th>
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">المنتج</th>
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">الهاتف</th>
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151] min-w-[180px]">الاسم</th>
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151] text-slate-500 dark:text-[#9CA3AF]">رقم الطلب</th>
-                <th className="p-5 font-bold border-b border-[#E5E7EB] dark:border-[#374151]">الوقت</th>
+                <th className="px-3 py-4 font-bold border-b border-[#E5E7EB] dark:border-[#374151] whitespace-nowrap w-[150px]">إجراءات</th>
+                <th className="px-3 py-4 font-bold border-b border-[#E5E7EB] dark:border-[#374151] whitespace-nowrap min-w-[150px]">ملاحظات</th>
+                <th className="px-3 py-4 font-bold border-b border-[#E5E7EB] dark:border-[#374151] whitespace-nowrap w-[90px]">التتبع</th>
+                <th className="px-3 py-4 font-bold border-b border-[#E5E7EB] dark:border-[#374151] whitespace-nowrap text-[#C9A46A] dark:text-[#D4AF37] w-[100px]">المجموع</th>
+                <th className="px-3 py-4 font-bold border-b border-[#E5E7EB] dark:border-[#374151] whitespace-nowrap w-[110px]">المنتج / التوصيل</th>
+                <th className="px-3 py-4 font-bold border-b border-[#E5E7EB] dark:border-[#374151] whitespace-nowrap w-[90px]">النوع</th>
+                <th className="px-3 py-4 font-bold border-b border-[#E5E7EB] dark:border-[#374151] whitespace-nowrap w-[130px]">الولاية / البلدية</th>
+                <th className="px-3 py-4 font-bold border-b border-[#E5E7EB] dark:border-[#374151] whitespace-nowrap w-[80px]">المقاس</th>
+                <th className="px-3 py-4 font-bold border-b border-[#E5E7EB] dark:border-[#374151] whitespace-nowrap w-[150px]">المنتج</th>
+                <th className="px-3 py-4 font-bold border-b border-[#E5E7EB] dark:border-[#374151] whitespace-nowrap w-[110px]">الهاتف</th>
+                <th className="px-3 py-4 font-bold border-b border-[#E5E7EB] dark:border-[#374151] whitespace-nowrap w-[140px]">الاسم</th>
+                <th className="px-3 py-4 font-bold border-b border-[#E5E7EB] dark:border-[#374151] whitespace-nowrap text-slate-500 w-[80px]">الطلب</th>
+                <th className="px-3 py-4 font-bold border-b border-[#E5E7EB] dark:border-[#374151] whitespace-nowrap w-[70px]">الوقت</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={15} className="p-16 text-slate-400 dark:text-slate-500 font-bold text-lg">جاري تحميل الطلبات...</td></tr>
+                <tr><td colSpan={14} className="p-16 text-slate-400 dark:text-slate-500 font-bold text-lg">جاري تحميل الطلبات...</td></tr>
               ) : filteredOrders.length === 0 ? (
-                <tr><td colSpan={15} className="p-16 text-slate-400 dark:text-slate-500 font-bold text-lg">لا توجد طلبات مطابقة</td></tr>
+                <tr><td colSpan={14} className="p-16 text-slate-400 dark:text-slate-500 font-bold text-lg">لا توجد طلبات مطابقة</td></tr>
               ) : (() => {
                 const totalPages = Math.ceil(filteredOrders.length / ORDERS_PER_PAGE) || 1;
                 const paginatedOrders = filteredOrders.slice((currentPage - 1) * ORDERS_PER_PAGE, currentPage * ORDERS_PER_PAGE);
@@ -676,14 +674,14 @@ function OrdersDashboard() {
                   const productFee = order.total_amount - (order.delivery_fee || 0);
 
                   return (
-                  <tr key={order.id} className={`h-[72px] border-b border-[#E5E7EB] dark:border-slate-700 hover:bg-[#F7F5F0]/50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]/80 transition-colors ${i % 2 === 0 ? 'bg-white dark:bg-[#111827]' : 'bg-[#FAFAFA]'}`}>
+                  <tr key={order.id} className={`h-[72px] border-b border-[#E5E7EB] dark:border-slate-700 hover:bg-[#F7F5F0]/60 dark:hover:bg-[#1f2937] transition-colors ${i % 2 === 0 ? 'bg-white dark:bg-[#111827]' : 'bg-[#FAFAFA]'}`}>
                     
                   {/* Status - Sticky Right */}
-                  <td className={`p-4 border-l border-[#E5E7EB] dark:border-slate-700 bg-inherit sticky right-0 z-10 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] ${i % 2 === 0 ? 'bg-white dark:bg-[#111827]' : 'bg-[#FAFAFA] group-hover:bg-[#F7F5F0]/50 dark:hover:bg-[#1f2937] dark:bg-[#1f2937]/80'}`}>
-                    <div className="flex items-center justify-center gap-3">
+                  <td className={`px-2 py-2 border-l border-[#E5E7EB] dark:border-slate-700 bg-inherit sticky right-0 z-10 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] ${i % 2 === 0 ? 'bg-white dark:bg-[#111827]' : 'bg-[#FAFAFA] group-hover:bg-[#F7F5F0]/60 dark:hover:bg-[#1f2937]'}`}>
+                    <div className="flex items-center justify-center gap-2">
                       <input 
                         type="checkbox" 
-                        className="w-5 h-5 rounded border-slate-300 z-20 cursor-pointer relative"
+                        className="w-4 h-4 rounded border-slate-300 z-20 cursor-pointer relative"
                         checked={selectedOrders.has(order.id)}
                         onChange={() => toggleOrderSelection(order.id)}
                       />
@@ -701,22 +699,25 @@ function OrdersDashboard() {
                   </td>
 
                   {/* Actions */}
-                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 relative">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <div className="flex items-center justify-center gap-2">
-                        <a href={`https://wa.me/213${order.phone.replace(/^0+/, '')}`} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 hover:scale-110 transition-all shadow-sm dark:shadow-none border border-green-100" title="مراسلة عبر واتساب">
-                          <MessageCircle size={18} strokeWidth={2.5} />
-                        </a>
+                  <td className="px-2 py-2 border-l border-[#E5E7EB] dark:border-slate-700 relative">
+                    <div className="flex flex-col items-center justify-center gap-1.5">
+                      <div className="flex items-center justify-center gap-1">
+                        <button onClick={(e) => { e.stopPropagation(); setOrderToDelete(order.id); }} className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition-colors shadow-sm border border-red-100" title="حذف نهائي">
+                          <Trash2 size={15} strokeWidth={2.5} />
+                        </button>
+                        <button onClick={() => copyToClipboard(order.phone)} className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#374151] text-slate-600 dark:text-[#9CA3AF] flex items-center justify-center hover:bg-slate-200 transition-colors shadow-sm border border-slate-200" title="نسخ الرقم">
+                          <Copy size={15} strokeWidth={2.5} />
+                        </button>
                         
                         <DropdownMenu modal={false}>
                           <DropdownMenuTrigger asChild>
                             <button 
-                              className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 hover:scale-110 transition-all shadow-sm dark:shadow-none border border-blue-100 relative outline-none" 
+                              className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition-colors shadow-sm border border-blue-100 relative outline-none" 
                               title="حالة الاتصال"
                             >
-                              <Phone size={18} strokeWidth={2.5} />
+                              <Phone size={15} strokeWidth={2.5} />
                               {order.call_status && (
-                                <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white" style={{ backgroundColor: CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.color }}></span>
+                                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-white" style={{ backgroundColor: CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.color }}></span>
                               )}
                             </button>
                           </DropdownMenuTrigger>
@@ -748,32 +749,23 @@ function OrdersDashboard() {
                           </DropdownMenuContent>
                         </DropdownMenu>
 
-                        <button onClick={() => copyToClipboard(order.phone)} className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-[#374151] text-slate-600 dark:text-[#9CA3AF] flex items-center justify-center hover:bg-slate-200 hover:scale-110 transition-all shadow-sm dark:shadow-none border border-slate-200 dark:border-[#374151]" title="نسخ الرقم">
-                          <Copy size={18} strokeWidth={2.5} />
-                        </button>
-                        <div className="w-[1px] h-6 bg-slate-200 mx-0.5"></div>
-                        <button onClick={(e) => { e.stopPropagation(); setOrderToDelete(order.id); }} className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 hover:scale-110 transition-all shadow-sm dark:shadow-none border border-red-100 dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40" title="حذف نهائي">
-                          <Trash2 size={18} strokeWidth={2.5} />
-                        </button>
+                        <a href={`https://wa.me/213${order.phone.replace(/^0+/, '')}`} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 transition-colors shadow-sm border border-green-100" title="مراسلة عبر واتساب">
+                          <MessageCircle size={15} strokeWidth={2.5} />
+                        </a>
                       </div>
 
                       {/* Call Status Badge */}
                       {order.call_status && (
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black shadow-sm dark:shadow-none transition-colors cursor-default ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.bg} ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.text} ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.hover}`}>
-                            {CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.icon === "check" ? (
-                              <CheckCircle size={14} strokeWidth={3} />
-                            ) : (
-                              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.color }}></span>
-                            )}
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black shadow-sm cursor-default ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.bg} ${CALL_STATUS_OPTIONS.find(c => c.value === order.call_status)?.text}`}>
                             {order.call_status}
                           </div>
                           <button 
                             onClick={() => updateCallStatus(order.id, "")}
-                            className="w-6 h-6 flex items-center justify-center rounded-full bg-slate-100 dark:bg-[#374151] text-slate-400 dark:text-slate-500 hover:bg-red-100 hover:text-red-500 transition-colors"
+                            className="w-4 h-4 flex items-center justify-center rounded-full bg-slate-100 dark:bg-[#374151] text-slate-400 hover:bg-red-100 hover:text-red-500 transition-colors"
                             title="مسح حالة الاتصال"
                           >
-                            <X size={14} strokeWidth={3} />
+                            <X size={10} strokeWidth={3} />
                           </button>
                         </div>
                       )}
@@ -781,9 +773,9 @@ function OrdersDashboard() {
                   </td>
                   
                   {/* Notes */}
-                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700">
+                  <td className="px-3 py-2 border-l border-[#E5E7EB] dark:border-slate-700">
                     <textarea 
-                      className="w-full h-12 resize-none bg-[#F7F5F0] dark:bg-[#0B1120] border border-transparent hover:border-slate-200 dark:hover:border-[#4B5563] dark:border-[#374151] focus:border-[#C9A46A] dark:focus:border-[#D4AF37] dark:border-[#D4AF37] focus:bg-white dark:bg-[#111827] rounded-lg p-2.5 text-sm font-bold text-slate-700 dark:text-slate-200 outline-none transition-all placeholder:text-slate-400 dark:text-slate-500 placeholder:font-normal"
+                      className="w-full h-11 resize-none bg-[#F7F5F0] dark:bg-[#0B1120] border border-transparent hover:border-slate-200 focus:border-[#C9A46A] focus:bg-white dark:bg-[#111827] rounded-lg p-2 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none transition-all placeholder:text-slate-400 placeholder:font-normal"
                       placeholder="أضف ملاحظة..."
                       defaultValue={order.notes || ""}
                       onBlur={(e) => updateNotes(order.id, e.target.value)}
@@ -791,10 +783,10 @@ function OrdersDashboard() {
                   </td>
 
                   {/* Tracking Number */}
-                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-sm font-mono font-bold text-slate-600 dark:text-slate-400">
+                  <td className="px-3 py-2 border-l border-[#E5E7EB] dark:border-slate-700 text-xs font-mono font-bold text-slate-600 dark:text-slate-400 whitespace-nowrap">
                     {order.tracking_number ? (
-                      <button onClick={() => copyToClipboard(order.tracking_number || "")} className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 mx-auto" title="نسخ رقم التتبع">
-                        <Copy size={14} /> {order.tracking_number}
+                      <button onClick={() => copyToClipboard(order.tracking_number || "")} className="px-2 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-md hover:bg-slate-200 transition-colors flex items-center gap-1.5 mx-auto" title="نسخ رقم التتبع">
+                        <Copy size={12} /> {order.tracking_number}
                       </button>
                     ) : (
                       <span className="text-slate-300 dark:text-slate-600">-</span>
@@ -802,58 +794,66 @@ function OrdersDashboard() {
                   </td>
 
                   {/* Total */}
-                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 font-black text-lg text-[#0E1A2F] dark:text-[#F9FAFB] bg-[#C9A46A]/10 dark:bg-[#D4AF37]/10" dir="ltr">
-                    {Number(order.total_amount || 0).toLocaleString()} <span className="text-xs text-[#C9A46A] dark:text-[#D4AF37] font-bold">DZD</span>
+                  <td className="px-3 py-2 border-l border-[#E5E7EB] dark:border-slate-700 font-black text-base text-[#0E1A2F] dark:text-[#F9FAFB] bg-[#C9A46A]/10 dark:bg-[#D4AF37]/10 whitespace-nowrap" dir="ltr">
+                    {Number(order.total_amount || 0).toLocaleString()} <span className="text-[10px] text-[#C9A46A] dark:text-[#D4AF37] font-bold">DZD</span>
                   </td>
 
-                  {/* Product Fee */}
-                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 font-bold text-slate-600 dark:text-[#9CA3AF]" dir="ltr">
-                    {productFee.toLocaleString()}
-                  </td>
-
-                  {/* Delivery Fee */}
-                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 font-bold text-slate-600 dark:text-[#9CA3AF]" dir="ltr">
-                    {Number(order.delivery_fee || 0).toLocaleString()}
+                  {/* Product & Delivery Fee (Stacked) */}
+                  <td className="px-3 py-2 border-l border-[#E5E7EB] dark:border-slate-700 font-bold whitespace-nowrap" dir="ltr">
+                    <div className="flex flex-col items-center justify-center gap-0.5">
+                      <div className="text-slate-800 dark:text-[#F9FAFB] text-sm">
+                        {productFee.toLocaleString()} <span className="text-[9px] text-slate-500 font-normal">DZD</span>
+                      </div>
+                      <div className="text-slate-500 dark:text-[#9CA3AF] text-xs">
+                        + {Number(order.delivery_fee || 0).toLocaleString()} <span className="text-[9px] font-normal">DZD</span>
+                      </div>
+                    </div>
                   </td>
 
                   {/* Delivery Type */}
-                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-bold">
-                    <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151] rounded-lg whitespace-nowrap shadow-sm dark:shadow-none">
-                      {order.delivery_type === "توصيل للمنزل" ? <MapPin size={14} className="text-[#C9A46A] dark:text-[#D4AF37]"/> : <Box size={14} className="text-slate-400 dark:text-slate-500"/>}
+                  <td className="px-3 py-2 border-l border-[#E5E7EB] dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold whitespace-nowrap">
+                    <div className="flex items-center justify-center gap-1 px-2 py-1.5 bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151] rounded-md shadow-sm">
+                      {order.delivery_type === "توصيل للمنزل" ? <MapPin size={12} className="text-[#C9A46A] dark:text-[#D4AF37]"/> : <Box size={12} className="text-slate-400 dark:text-slate-500"/>}
                       {order.delivery_type}
                     </div>
                   </td>
 
-                  {/* Commune */}
-                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-base">{order.commune}</td>
-                  
-                  {/* Wilaya */}
-                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-slate-900 dark:text-[#F9FAFB] font-black text-base">{order.wilaya}</td>
+                  {/* Wilaya & Commune (Stacked) */}
+                  <td className="px-3 py-2 border-l border-[#E5E7EB] dark:border-slate-700 whitespace-normal break-words leading-tight">
+                    <div className="flex flex-col items-center justify-center gap-1">
+                      <span className="text-[#0E1A2F] dark:text-[#F9FAFB] font-black text-sm">{order.wilaya}</span>
+                      <span className="text-slate-500 dark:text-[#9CA3AF] text-xs font-bold bg-slate-50 dark:bg-slate-800 px-1.5 py-0.5 rounded">{order.commune}</span>
+                    </div>
+                  </td>
 
                   {/* Variant */}
-                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold">
-                    {order.variant_title && <span className="px-3 py-1.5 bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151] shadow-sm dark:shadow-none rounded-lg text-sm">{order.variant_title}</span>}
+                  <td className="px-3 py-2 border-l border-[#E5E7EB] dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold whitespace-nowrap">
+                    {order.variant_title && <span className="px-2 py-1 bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151] shadow-sm rounded-md text-[11px]">{order.variant_title}</span>}
                   </td>
 
                   {/* Product */}
-                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-[#0E1A2F] dark:text-[#F9FAFB] font-bold text-base">{order.product_name}</td>
+                  <td className="px-3 py-2 border-l border-[#E5E7EB] dark:border-slate-700 text-[#0E1A2F] dark:text-[#F9FAFB] font-bold text-sm whitespace-normal break-words leading-tight">
+                    {order.product_name}
+                  </td>
 
                   {/* Phone */}
-                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 font-black text-[#0E1A2F] dark:text-[#F9FAFB] hover:text-[#C9A46A] dark:text-[#D4AF37] transition-colors cursor-pointer text-base" dir="ltr" onClick={() => copyToClipboard(order.phone)} title="انقر للنسخ">
+                  <td className="px-3 py-2 border-l border-[#E5E7EB] dark:border-slate-700 font-black text-[#0E1A2F] dark:text-[#F9FAFB] hover:text-[#C9A46A] dark:text-[#D4AF37] transition-colors cursor-pointer text-sm whitespace-nowrap" dir="ltr" onClick={() => copyToClipboard(order.phone)} title="انقر للنسخ">
                     {order.phone}
                   </td>
 
                   {/* Name */}
-                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-[#0E1A2F] dark:text-[#F9FAFB] font-black text-base">{order.fullname}</td>
+                  <td className="px-3 py-2 border-l border-[#E5E7EB] dark:border-slate-700 text-[#0E1A2F] dark:text-[#F9FAFB] font-black text-sm whitespace-normal break-words leading-tight">
+                    {order.fullname}
+                  </td>
 
                   {/* Order ID */}
-                  <td className="p-4 border-l border-[#E5E7EB] dark:border-slate-700 text-slate-400 dark:text-slate-500 font-mono text-[13px] font-bold">#{order.order_id.split('-')[1] || order.order_id}</td>
+                  <td className="px-3 py-2 border-l border-[#E5E7EB] dark:border-slate-700 text-slate-400 dark:text-slate-500 font-mono text-xs font-bold whitespace-nowrap">#{order.order_id.split('-')[1] || order.order_id}</td>
 
                   {/* Time */}
-                  <td className="p-4 text-slate-500 dark:text-[#9CA3AF] text-sm font-bold" dir="ltr">
+                  <td className="px-3 py-2 text-slate-500 dark:text-[#9CA3AF] font-bold whitespace-nowrap" dir="ltr">
                     <div className="flex flex-col items-center justify-center">
-                      <span className="text-slate-800 dark:text-[#F9FAFB] text-sm">{time}</span>
-                      <span className="text-xs text-slate-400 dark:text-slate-500">{date}</span>
+                      <span className="text-slate-800 dark:text-[#F9FAFB] text-xs">{time}</span>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500">{date}</span>
                     </div>
                   </td>
                 </tr>

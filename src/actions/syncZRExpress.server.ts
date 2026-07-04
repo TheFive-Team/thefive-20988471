@@ -1,11 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { createClient } from "@supabase/supabase-js";
-
-// We re-initialize Supabase inside the server action to ensure it runs on the server
-const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from "@/lib/supabase";
 
 const SECRET_KEY = process.env.ZR_EXPRESS_SECRET_KEY || '';
 const TENANT_ID = process.env.ZR_EXPRESS_TENANT_ID || '';
@@ -56,19 +51,23 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
     ordersToSync: z.array(z.string()) // Array of Supabase Order IDs
   }))
   .handler(async ({ data }) => {
-    
-    // 1. Fetch the orders from Supabase
-    const { data: orders, error } = await supabase
-      .from('orders')
-      .select('*')
-      .in('id', data.ordersToSync);
-      
-    if (error || !orders) {
-      throw new Error("Failed to fetch orders from database");
-    }
+    try {
+      // 1. Fetch the orders from Supabase
+      const { data: orders, error } = await supabase
+        .from('orders')
+        .select('*')
+        .in('id', data.ordersToSync);
+        
+      if (error || !orders) {
+        throw new Error("Failed to fetch orders from database: " + JSON.stringify(error));
+      }
 
-    const results = [];
-    let successCount = 0;
+      if (!SECRET_KEY || !TENANT_ID) {
+        throw new Error("ZR Express API Keys are missing from environment variables.");
+      }
+
+      const results = [];
+      let successCount = 0;
 
     // 2. Loop through orders and create parcels in ZR Express
     for (const order of orders) {
@@ -156,11 +155,19 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
       } catch (err) {
         console.error(`[ZR Express] Exception processing order ${order.id}:`, err);
       }
-    }
-
+    } // End of for loop
+    
     return {
       success: successCount > 0,
       message: `تم مزامنة ${successCount} من أصل ${data.ordersToSync.length} طلبات مع ZR Express بنجاح!`,
       results
     };
+    } catch (globalError: any) {
+      console.error("[ZR Express] Global Sync Error:", globalError);
+      return {
+        success: false,
+        message: `حدث خطأ: ${globalError?.message || 'غير معروف'}`,
+        results: []
+      };
+    }
   });

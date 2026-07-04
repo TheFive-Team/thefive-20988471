@@ -294,8 +294,9 @@ function OrdersDashboard() {
           setOrders(prev => prev.map(o => o.id === result.id ? { ...o, tracking_number: result.tracking_number, zr_express_id: result.zr_express_id } : o));
           await supabase.from('orders').update({ tracking_number: result.tracking_number, zr_express_id: result.zr_express_id }).eq('id', result.id);
         }
-        alert(response.message);
       }
+      // Always alert the server's message, whether success or fail
+      alert(response.message);
     } catch (error) {
       console.error("Sync error:", error);
       alert("حدث خطأ أثناء المزامنة.");

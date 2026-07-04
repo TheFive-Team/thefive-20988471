@@ -13,7 +13,7 @@ function cleanTerritoryName(name: string): string {
   return name.replace(/[0-9-]/g, '').trim();
 }
 
-async function searchTerritory(query: string): Promise<string | null> {
+async function searchTerritory(query: string, expectedLevel: string): Promise<string | null> {
   const cleanQuery = cleanTerritoryName(query);
   if (!cleanQuery) return null;
   try {
@@ -32,19 +32,17 @@ async function searchTerritory(query: string): Promise<string | null> {
     });
     
     if (!res.ok) {
-      console.error(`[ZR Express] Territory search failed for ${query}:`, res.status, await res.text());
+      console.error(`[ZR Express] Territory search failed for ${cleanQuery}:`, res.status);
       return null;
     }
     
     const data = await res.json();
-    console.log(`[ZR Express] Territory search response for ${query}:`, JSON.stringify(data).substring(0, 200));
+    console.log(`[ZR Express] Territory search response for ${cleanQuery}:`, JSON.stringify(data).substring(0, 250));
     
-    // Guessing the response structure (commonly it's an array or object with items/data)
-    const items = Array.isArray(data) ? data : (data.items || data.data || data.content || []);
-    
-    if (items.length > 0) {
-      // Try common ID fields
-      return items[0].id || items[0].territoryId || items[0].uuid || null;
+    if (data && data.items && data.items.length > 0) {
+      // Find the first item that matches the expected level (wilaya or commune)
+      const match = data.items.find((item: any) => item.level === expectedLevel) || data.items[0];
+      return match.id;
     }
   } catch (error) {
     console.error(`[ZR Express] Territory search error for ${query}:`, error);
@@ -82,9 +80,10 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
         console.log(`[ZR Express] Syncing order ${order.id}...`);
         
         // Fetch Wilaya UUID
-        let wilayaUuid = await searchTerritory(order.wilaya);
+        let wilayaUuid = await searchTerritory(order.wilaya, "wilaya");
+
         // Fetch Commune UUID
-        let communeUuid = await searchTerritory(order.commune);
+        let communeUuid = await searchTerritory(order.commune, "commune");
 
         // Fallbacks: if the API search didn't return a UUID, we generate a random one to pass validation format
         // (If it's an invalid UUID in ZR's DB, their API will return an error message which we will display)

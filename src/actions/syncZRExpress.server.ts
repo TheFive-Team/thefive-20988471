@@ -7,11 +7,18 @@ const TENANT_ID = process.env.ZR_TENANT_ID || process.env.ZR_EXPRESS_TENANT_ID |
 const API_BASE = process.env.ZR_BASE_URL || 'https://api.zrexpress.app';
 
 // Helper to fetch territory UUID
+// Helper to clean territory names (e.g. "14 - تيارت" -> "تيارت")
+function cleanTerritoryName(name: string): string {
+  if (!name) return "";
+  return name.replace(/[0-9-]/g, '').trim();
+}
+
 async function searchTerritory(query: string): Promise<string | null> {
-  if (!query) return null;
+  const cleanQuery = cleanTerritoryName(query);
+  if (!cleanQuery) return null;
   try {
     const url = `${API_BASE}/api/v1/territories/search`;
-    console.log(`[ZR Express] Searching territory: ${query}`);
+    console.log(`[ZR Express] Searching territory: ${cleanQuery} (original: ${query})`);
     
     const res = await fetch(url, {
       method: "POST",
@@ -21,7 +28,7 @@ async function searchTerritory(query: string): Promise<string | null> {
         'X-Tenant': TENANT_ID,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ keyword: query })
+      body: JSON.stringify({ keyword: cleanQuery })
     });
     
     if (!res.ok) {

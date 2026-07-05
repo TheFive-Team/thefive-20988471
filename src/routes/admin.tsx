@@ -324,7 +324,11 @@ function ZROfficeSelect({ wilaya, onSelect, selectedOffice }: { wilaya: string, 
           <div className="font-bold text-[#C9A46A]">{selectedOffice.name}</div>
           <div className="text-slate-300 font-normal mt-0.5">{selectedOffice.commune} - {selectedOffice.wilaya}</div>
         </div>
-        <button onClick={() => onSelect(null)} className="text-[10px] font-bold text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 underline underline-offset-2 transition-colors">
+        <button 
+          type="button"
+          onClick={(e) => { e.preventDefault(); onSelect(null); }} 
+          className="text-[10px] font-bold text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 underline underline-offset-2 transition-colors"
+        >
           تغيير المكتب
         </button>
       </div>
@@ -334,8 +338,9 @@ function ZROfficeSelect({ wilaya, onSelect, selectedOffice }: { wilaya: string, 
   return (
     <div className="relative w-full mt-2">
       <button 
+        type="button"
         ref={buttonRef}
-        onClick={(e) => { e.stopPropagation(); setIsOpen(!isOpen); }} 
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsOpen(!isOpen); }} 
         className="w-full text-xs font-bold bg-white dark:bg-[#111827] text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 px-3 py-2 rounded-md flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
       >
         <span>مكتب ZR</span>

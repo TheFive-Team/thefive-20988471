@@ -10,6 +10,8 @@ import {
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/lib/supabase";
 import { syncConfirmedOrdersFn } from "@/actions/syncZRExpress.server";
+import { wilayas } from "@/lib/wilayas";
+import ZR_OFFICES from "@/lib/zr_offices.json";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -224,23 +226,38 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-// --- MOCK ZR OFFICES (FOR UI DEMO) ---
-const MOCK_OFFICES: Record<string, any[]> = {
-  "Oran": [
-    { id: "1", name: "Hub Maraval 31", wilaya: "Oran", commune: "Maraval", address: "Rue de Maraval", phone: "0555000001", cp: "31000" },
-    { id: "2", name: "Hub El Morchid 31", wilaya: "Oran", commune: "El Morchid", address: "El Morchid, Oran", phone: "0555000002", cp: "31000" },
-    { id: "3", name: "Hub Canastel 31", wilaya: "Oran", commune: "Canastel", address: "Canastel, Oran", phone: "0555000003", cp: "31000" },
-  ],
-  "وهران": [
-    { id: "1", name: "Hub Maraval 31", wilaya: "وهران", commune: "Maraval", address: "Rue de Maraval", phone: "0555000001", cp: "31000" },
-    { id: "2", name: "Hub El Morchid 31", wilaya: "وهران", commune: "El Morchid", address: "El Morchid, Oran", phone: "0555000002", cp: "31000" },
-    { id: "3", name: "Hub Canastel 31", wilaya: "وهران", commune: "Canastel", address: "Canastel, Oran", phone: "0555000003", cp: "31000" },
-  ]
+// Helper to normalize strings for comparison (removes accents, lowercases, trims)
+const normalizeStr = (str: string) => {
+  if (!str) return "";
+  return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
 };
 
-const getOfficesForWilaya = (wilaya: string) => MOCK_OFFICES[wilaya] || [
-  { id: "99", name: "مكتب ZR الرئيسي", wilaya, commune: "وسط المدينة", address: "الفرع الرئيسي", phone: "0555123456", cp: "00000" }
-];
+const getOfficesForWilaya = (wilayaName: string) => {
+  if (!wilayaName) return [];
+  const normalizedInput = normalizeStr(wilayaName);
+  
+  // Find the wilaya in our list by matching either Arabic or French name
+  const wilayaObj = wilayas.find(w => 
+    normalizeStr(w.name) === normalizedInput || 
+    normalizeStr(w.nameAr) === normalizedInput ||
+    w.name.toLowerCase() === wilayaName.toLowerCase() ||
+    w.nameAr === wilayaName
+  );
+
+  // If found, we use the French name to filter ZR_OFFICES, else we try to filter using the input directly
+  const targetVille = wilayaObj ? normalizeStr(wilayaObj.name) : normalizedInput;
+
+  // Filter the JSON dataset where ville matches (we map id from name for React keys)
+  return ZR_OFFICES.filter(office => normalizeStr(office.ville) === targetVille).map(o => ({
+    id: o.name,
+    name: o.name,
+    wilaya: o.ville,
+    commune: o.commune,
+    address: o.address,
+    phone: o.phone,
+    cp: o.cp
+  }));
+};
 
 function ZROfficeSelect({ wilaya, onSelect, selectedOffice }: { wilaya: string, onSelect: (office: any) => void, selectedOffice?: any }) {
   const [isOpen, setIsOpen] = useState(false);

@@ -37,6 +37,12 @@ export interface SupabaseOrder {
   call_status?: string;
   tracking_number?: string;
   zr_express_id?: string;
+  selectedDeskName?: string | null;
+  selectedDeskWilaya?: string | null;
+  selectedDeskCommune?: string | null;
+  selectedDeskAddress?: string | null;
+  selectedDeskCP?: string | null;
+  selectedDeskPhone?: string | null;
 }
 
 function AdminDashboard() {
@@ -218,6 +224,91 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+// --- MOCK ZR OFFICES (FOR UI DEMO) ---
+const MOCK_OFFICES: Record<string, any[]> = {
+  "Oran": [
+    { id: "1", name: "Hub Maraval 31", wilaya: "Oran", commune: "Maraval", address: "Rue de Maraval", phone: "0555000001", cp: "31000" },
+    { id: "2", name: "Hub El Morchid 31", wilaya: "Oran", commune: "El Morchid", address: "El Morchid, Oran", phone: "0555000002", cp: "31000" },
+    { id: "3", name: "Hub Canastel 31", wilaya: "Oran", commune: "Canastel", address: "Canastel, Oran", phone: "0555000003", cp: "31000" },
+  ],
+  "وهران": [
+    { id: "1", name: "Hub Maraval 31", wilaya: "وهران", commune: "Maraval", address: "Rue de Maraval", phone: "0555000001", cp: "31000" },
+    { id: "2", name: "Hub El Morchid 31", wilaya: "وهران", commune: "El Morchid", address: "El Morchid, Oran", phone: "0555000002", cp: "31000" },
+    { id: "3", name: "Hub Canastel 31", wilaya: "وهران", commune: "Canastel", address: "Canastel, Oran", phone: "0555000003", cp: "31000" },
+  ]
+};
+
+const getOfficesForWilaya = (wilaya: string) => MOCK_OFFICES[wilaya] || [
+  { id: "99", name: "مكتب ZR الرئيسي", wilaya, commune: "وسط المدينة", address: "الفرع الرئيسي", phone: "0555123456", cp: "00000" }
+];
+
+function ZROfficeSelect({ wilaya, onSelect, selectedOffice }: { wilaya: string, onSelect: (office: any) => void, selectedOffice?: any }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const offices = getOfficesForWilaya(wilaya).filter(o => 
+    o.name.toLowerCase().includes(search.toLowerCase()) || 
+    o.commune.toLowerCase().includes(search.toLowerCase())
+  );
+
+  if (selectedOffice) {
+    return (
+      <div className="flex flex-col items-center gap-1 mt-2">
+        <div className="bg-slate-900 dark:bg-slate-800 text-white px-2 py-1.5 rounded-md text-[11px] text-center w-full shadow-sm leading-tight border border-slate-700">
+          <div className="font-bold text-[#C9A46A]">{selectedOffice.name}</div>
+          <div className="text-slate-300 font-normal mt-0.5">{selectedOffice.commune} - {selectedOffice.wilaya}</div>
+        </div>
+        <button onClick={() => onSelect(null)} className="text-[10px] font-bold text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 underline underline-offset-2 transition-colors">
+          تغيير المكتب
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full mt-2">
+      <button 
+        onClick={(e) => { e.stopPropagation(); setIsOpen(!isOpen); }} 
+        className="w-full text-xs font-bold bg-white dark:bg-[#111827] text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 px-3 py-2 rounded-md flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
+      >
+        <span>مكتب ZR</span>
+        <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)}></div>
+          <div className="absolute top-full right-0 z-50 mt-1 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl w-56 p-1 origin-top-right animate-in fade-in zoom-in-95">
+            <div className="p-1 border-b border-slate-100 dark:border-slate-800 relative">
+              <Search size={12} className="absolute right-2.5 top-3 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="بحث عن مكتب..." 
+                className="w-full text-xs p-1.5 pr-7 bg-slate-50 dark:bg-slate-900 rounded border border-transparent focus:border-slate-300 dark:focus:border-slate-600 outline-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                onClick={e => e.stopPropagation()}
+              />
+            </div>
+            <div className="max-h-48 overflow-y-auto p-1 custom-scrollbar">
+              {offices.map(o => (
+                <div 
+                  key={o.id} 
+                  onClick={(e) => { e.stopPropagation(); onSelect(o); setIsOpen(false); }}
+                  className="p-2 mb-1 last:mb-0 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-md cursor-pointer text-right transition-colors"
+                >
+                  <div className="text-xs font-bold text-slate-900 dark:text-slate-100">{o.name}</div>
+                  <div className="text-[10px] text-slate-500 font-medium mt-0.5">{o.commune} | {o.phone}</div>
+                  <div className="text-[10px] text-slate-400 truncate mt-0.5" title={o.address}>{o.address}</div>
+                </div>
+              ))}
+              {offices.length === 0 && <div className="text-center p-3 text-xs text-slate-500 font-medium">لا يوجد مكاتب لهذه الولاية</div>}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 // --- ORDERS DASHBOARD COMPONENT ---
 function OrdersDashboard() {
   const currentDate = new Date().toLocaleDateString("en-GB"); 
@@ -267,6 +358,27 @@ function OrdersDashboard() {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, call_status } : o));
     setActiveCallMenuId(null);
     await supabase.from('orders').update({ call_status }).eq('id', id);
+  };
+
+  const updateZROffice = async (id: string, office: any) => {
+    const updates = office ? {
+      selectedDeskName: office.name,
+      selectedDeskWilaya: office.wilaya,
+      selectedDeskCommune: office.commune,
+      selectedDeskAddress: office.address,
+      selectedDeskCP: office.cp || "",
+      selectedDeskPhone: office.phone
+    } : {
+      selectedDeskName: null,
+      selectedDeskWilaya: null,
+      selectedDeskCommune: null,
+      selectedDeskAddress: null,
+      selectedDeskCP: null,
+      selectedDeskPhone: null
+    };
+
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, ...updates } : o));
+    await supabase.from('orders').update(updates).eq('id', id);
   };
 
   const syncZRExpress = async () => {
@@ -812,9 +924,26 @@ function OrdersDashboard() {
 
                   {/* Delivery Type */}
                   <td className="px-3 py-2 border-l border-[#E5E7EB] dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold whitespace-nowrap">
-                    <div className="flex items-center justify-center gap-1 px-2 py-1.5 bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151] rounded-md shadow-sm">
-                      {order.delivery_type === "توصيل للمنزل" ? <MapPin size={12} className="text-[#C9A46A] dark:text-[#D4AF37]"/> : <Box size={12} className="text-slate-400 dark:text-slate-500"/>}
-                      {order.delivery_type}
+                    <div className="flex flex-col items-center justify-center gap-1 w-full">
+                      <div className="flex items-center justify-center gap-1 px-2 py-1.5 bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151] rounded-md shadow-sm w-full">
+                        {order.delivery_type === "توصيل للمنزل" ? <MapPin size={12} className="text-[#C9A46A] dark:text-[#D4AF37] shrink-0"/> : <Box size={12} className="text-slate-400 dark:text-slate-500 shrink-0"/>}
+                        <span className="truncate">{order.delivery_type}</span>
+                      </div>
+                      
+                      {(order.delivery_type?.includes("مكتب") || order.delivery_type?.toLowerCase().includes("stop desk") || order.delivery_type?.includes("استلام")) && (
+                        <ZROfficeSelect 
+                          wilaya={order.wilaya} 
+                          selectedOffice={order.selectedDeskName ? {
+                            name: order.selectedDeskName,
+                            wilaya: order.selectedDeskWilaya,
+                            commune: order.selectedDeskCommune,
+                            address: order.selectedDeskAddress,
+                            phone: order.selectedDeskPhone,
+                            cp: order.selectedDeskCP
+                          } : null}
+                          onSelect={(office) => updateZROffice(order.id, office)}
+                        />
+                      )}
                     </div>
                   </td>
 

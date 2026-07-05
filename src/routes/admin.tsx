@@ -234,14 +234,17 @@ const normalizeStr = (str: string) => {
 
 const getOfficesForWilaya = (wilayaName: string) => {
   if (!wilayaName) return [];
-  const normalizedInput = normalizeStr(wilayaName);
+  
+  // Clean up format like "31 - وهران" or "16-Alger" to just "وهران" / "Alger"
+  const cleanName = wilayaName.split('-').pop()?.trim() || wilayaName;
+  const normalizedInput = normalizeStr(cleanName);
   
   // Find the wilaya in our list by matching either Arabic or French name
   const wilayaObj = wilayas.find(w => 
     normalizeStr(w.name) === normalizedInput || 
     normalizeStr(w.nameAr) === normalizedInput ||
-    w.name.toLowerCase() === wilayaName.toLowerCase() ||
-    w.nameAr === wilayaName
+    w.name.toLowerCase() === cleanName.toLowerCase() ||
+    w.nameAr === cleanName
   );
 
   // If found, we use the French name to filter ZR_OFFICES, else we try to filter using the input directly

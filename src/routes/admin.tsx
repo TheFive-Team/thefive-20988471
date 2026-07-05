@@ -268,6 +268,7 @@ function ZROfficeSelect({ wilaya, onSelect, selectedOffice }: { wilaya: string, 
   const [search, setSearch] = useState("");
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
   
   const offices = getOfficesForWilaya(wilaya).filter(o => 
@@ -317,6 +318,17 @@ function ZROfficeSelect({ wilaya, onSelect, selectedOffice }: { wilaya: string, 
     }
   }, [isOpen]);
 
+  // Focus input without scrolling the page when opened
+  useEffect(() => {
+    if (isOpen) {
+      // Small timeout ensures the portal has mounted and position is set before focusing
+      const timer = setTimeout(() => {
+        inputRef.current?.focus({ preventScroll: true });
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
   if (selectedOffice) {
     return (
       <div className="flex flex-col items-center gap-1 mt-2">
@@ -359,13 +371,13 @@ function ZROfficeSelect({ wilaya, onSelect, selectedOffice }: { wilaya: string, 
             <div className="p-1 border-b border-slate-100 dark:border-slate-800 relative">
               <Search size={12} className="absolute right-2.5 top-3 text-slate-400" />
               <input 
+                ref={inputRef}
                 type="text" 
                 placeholder="بحث عن مكتب..." 
                 className="w-full text-xs p-1.5 pr-7 bg-slate-50 dark:bg-slate-900 rounded border border-transparent focus:border-slate-300 dark:focus:border-slate-600 outline-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 onClick={e => e.stopPropagation()}
-                autoFocus
               />
             </div>
             <div className="max-h-[260px] overflow-y-auto overscroll-contain p-1 custom-scrollbar">

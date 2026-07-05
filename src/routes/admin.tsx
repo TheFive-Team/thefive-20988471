@@ -446,6 +446,47 @@ function OrdersDashboard() {
     await supabase.from('orders').update(updates).eq('id', id);
   };
 
+  const updateDeliveryType = async (id: string, newType: string) => {
+    const order = orders.find(o => o.id === id);
+    if (!order || order.delivery_type === newType) return;
+
+    // Clean up format like "31 - وهران"
+    const cleanName = order.wilaya.split('-').pop()?.trim() || order.wilaya;
+    const normalizedInput = normalizeStr(cleanName);
+    
+    const wilayaObj = wilayas.find(w => 
+      normalizeStr(w.name) === normalizedInput || 
+      normalizeStr(w.nameAr) === normalizedInput ||
+      w.name.toLowerCase() === cleanName.toLowerCase() ||
+      w.nameAr === cleanName
+    );
+
+    let newDeliveryFee = order.delivery_fee;
+    if (wilayaObj) {
+      newDeliveryFee = newType.includes("مكتب") || newType.toLowerCase().includes("stop desk") ? wilayaObj.stop : wilayaObj.home;
+    }
+
+    const newTotalAmount = (Number(order.total_amount || 0) - Number(order.delivery_fee || 0)) + Number(newDeliveryFee || 0);
+
+    const updates: any = {
+      delivery_type: newType,
+      delivery_fee: newDeliveryFee,
+      total_amount: newTotalAmount
+    };
+
+    if (!newType.includes("مكتب") && !newType.toLowerCase().includes("stop desk")) {
+      updates.selectedDeskName = null;
+      updates.selectedDeskWilaya = null;
+      updates.selectedDeskCommune = null;
+      updates.selectedDeskAddress = null;
+      updates.selectedDeskCP = null;
+      updates.selectedDeskPhone = null;
+    }
+
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, ...updates } : o));
+    await supabase.from('orders').update(updates).eq('id', id);
+  };
+
   const syncZRExpress = async () => {
     setIsSyncing(true);
     // Find confirmed orders that don't have a tracking number
@@ -989,10 +1030,21 @@ function OrdersDashboard() {
 
                   {/* Delivery Type */}
                   <td className="px-3 py-2 border-l border-[#E5E7EB] dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold whitespace-nowrap">
-                    <div className="flex flex-col items-center justify-center gap-1 w-full">
-                      <div className="flex items-center justify-center gap-1 px-2 py-1.5 bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151] rounded-md shadow-sm w-full">
-                        {order.delivery_type === "توصيل للمنزل" ? <MapPin size={12} className="text-[#C9A46A] dark:text-[#D4AF37] shrink-0"/> : <Box size={12} className="text-slate-400 dark:text-slate-500 shrink-0"/>}
-                        <span className="truncate">{order.delivery_type}</span>
+                    <div className="flex flex-col items-center justify-center gap-1 w-full relative">
+                      <div className="relative group cursor-pointer w-full">
+                        <select 
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                          value={order.delivery_type?.includes("مكتب") || order.delivery_type?.toLowerCase().includes("stop desk") ? "استلام من المكتب (Stop Desk)" : "توصيل للمنزل"}
+                          onChange={(e) => updateDeliveryType(order.id, e.target.value)}
+                        >
+                          <option value="توصيل للمنزل">توصيل للمنزل</option>
+                          <option value="استلام من المكتب (Stop Desk)">استلام من المكتب (Stop Desk)</option>
+                        </select>
+                        <div className="flex items-center justify-center gap-1 px-2 py-1.5 bg-white dark:bg-[#111827] border border-[#E5E7EB] dark:border-[#374151] rounded-md shadow-sm w-full group-hover:bg-slate-50 dark:group-hover:bg-slate-800 transition-colors">
+                          {!order.delivery_type?.includes("مكتب") && !order.delivery_type?.toLowerCase().includes("stop desk") ? <MapPin size={12} className="text-[#C9A46A] dark:text-[#D4AF37] shrink-0"/> : <Box size={12} className="text-slate-400 dark:text-slate-500 shrink-0"/>}
+                          <span className="truncate">{order.delivery_type?.includes("مكتب") || order.delivery_type?.toLowerCase().includes("stop desk") ? "استلام من المكتب" : "توصيل للمنزل"}</span>
+                          <ChevronDown size={10} className="text-slate-400 shrink-0 mr-1" />
+                        </div>
                       </div>
                       
                       {(order.delivery_type?.includes("مكتب") || order.delivery_type?.toLowerCase().includes("stop desk") || order.delivery_type?.includes("استلام")) && (

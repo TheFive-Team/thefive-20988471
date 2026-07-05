@@ -267,6 +267,7 @@ function ZROfficeSelect({ wilaya, onSelect, selectedOffice }: { wilaya: string, 
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
   
   const offices = getOfficesForWilaya(wilaya).filter(o => 
@@ -274,36 +275,45 @@ function ZROfficeSelect({ wilaya, onSelect, selectedOffice }: { wilaya: string, 
     o.commune.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Position calculation and scroll/resize listeners
   useEffect(() => {
-    if (isOpen && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const spaceAbove = rect.top;
-      
-      const dropdownHeight = 250;
-      const dropUp = spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
-      
-      setDropdownStyle({
-        position: 'fixed',
-        left: rect.left,
-        width: rect.width >= 224 ? rect.width : 224, // min-width for dropdown
-        ...(dropUp ? { bottom: window.innerHeight - rect.top + 4 } : { top: rect.bottom + 4 }),
-        zIndex: 99999
-      });
-    }
-  }, [isOpen]);
+    const updatePosition = () => {
+      if (isOpen && buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const spaceAbove = rect.top;
+        
+        const dropdownHeight = 250;
+        const dropUp = spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
+        
+        setDropdownStyle({
+          position: 'fixed',
+          left: rect.left,
+          width: rect.width >= 224 ? rect.width : 224, // min-width for dropdown
+          ...(dropUp ? { bottom: window.innerHeight - rect.top + 4 } : { top: rect.bottom + 4 }),
+          zIndex: 99999
+        });
+      }
+    };
 
-  // Close on scroll to prevent detached floating dropdowns
-  useEffect(() => {
+    updatePosition(); // Initial calculation
+
     if (isOpen) {
       const handleScroll = (e: Event) => {
-        // Prevent closing if we are just scrolling inside the dropdown itself
-        if (e.target instanceof Node && buttonRef.current && !buttonRef.current.contains(e.target as Node)) {
-           setIsOpen(false);
+        // Prevent action if scrolling inside the dropdown itself
+        if (e.target instanceof Node && dropdownRef.current?.contains(e.target as Node)) {
+           return;
         }
+        // Recalculate position dynamically when scrolling the page/table
+        requestAnimationFrame(updatePosition);
       };
+
       window.addEventListener('scroll', handleScroll, true);
-      return () => window.removeEventListener('scroll', handleScroll, true);
+      window.addEventListener('resize', handleScroll);
+      return () => {
+        window.removeEventListener('scroll', handleScroll, true);
+        window.removeEventListener('resize', handleScroll);
+      };
     }
   }, [isOpen]);
 
@@ -336,6 +346,7 @@ function ZROfficeSelect({ wilaya, onSelect, selectedOffice }: { wilaya: string, 
         <>
           <div className="fixed inset-0 z-[99998]" onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}></div>
           <div 
+            ref={dropdownRef}
             style={dropdownStyle}
             className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-700 rounded-lg shadow-2xl p-1 animate-in fade-in zoom-in-95"
             dir="rtl"
@@ -352,7 +363,7 @@ function ZROfficeSelect({ wilaya, onSelect, selectedOffice }: { wilaya: string, 
                 autoFocus
               />
             </div>
-            <div className="max-h-48 overflow-y-auto p-1 custom-scrollbar">
+            <div className="max-h-[260px] overflow-y-auto overscroll-contain p-1 custom-scrollbar">
               {offices.map(o => (
                 <div 
                   key={o.id} 

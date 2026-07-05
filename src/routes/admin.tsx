@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
 import { commitFile } from "@/lib/github";
 import { 
@@ -265,10 +266,46 @@ const getOfficesForWilaya = (wilayaName: string) => {
 function ZROfficeSelect({ wilaya, onSelect, selectedOffice }: { wilaya: string, onSelect: (office: any) => void, selectedOffice?: any }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+  
   const offices = getOfficesForWilaya(wilaya).filter(o => 
     o.name.toLowerCase().includes(search.toLowerCase()) || 
     o.commune.toLowerCase().includes(search.toLowerCase())
   );
+
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      
+      const dropdownHeight = 250;
+      const dropUp = spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
+      
+      setDropdownStyle({
+        position: 'fixed',
+        left: rect.left,
+        width: rect.width >= 224 ? rect.width : 224, // min-width for dropdown
+        ...(dropUp ? { bottom: window.innerHeight - rect.top + 4 } : { top: rect.bottom + 4 }),
+        zIndex: 99999
+      });
+    }
+  }, [isOpen]);
+
+  // Close on scroll to prevent detached floating dropdowns
+  useEffect(() => {
+    if (isOpen) {
+      const handleScroll = (e: Event) => {
+        // Prevent closing if we are just scrolling inside the dropdown itself
+        if (e.target instanceof Node && buttonRef.current && !buttonRef.current.contains(e.target as Node)) {
+           setIsOpen(false);
+        }
+      };
+      window.addEventListener('scroll', handleScroll, true);
+      return () => window.removeEventListener('scroll', handleScroll, true);
+    }
+  }, [isOpen]);
 
   if (selectedOffice) {
     return (
@@ -287,16 +324,22 @@ function ZROfficeSelect({ wilaya, onSelect, selectedOffice }: { wilaya: string, 
   return (
     <div className="relative w-full mt-2">
       <button 
+        ref={buttonRef}
         onClick={(e) => { e.stopPropagation(); setIsOpen(!isOpen); }} 
         className="w-full text-xs font-bold bg-white dark:bg-[#111827] text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 px-3 py-2 rounded-md flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
       >
         <span>مكتب ZR</span>
         <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
       </button>
-      {isOpen && (
+      
+      {isOpen && typeof document !== 'undefined' && createPortal(
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)}></div>
-          <div className="absolute top-full right-0 z-50 mt-1 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl w-56 p-1 origin-top-right animate-in fade-in zoom-in-95">
+          <div className="fixed inset-0 z-[99998]" onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}></div>
+          <div 
+            style={dropdownStyle}
+            className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-700 rounded-lg shadow-2xl p-1 animate-in fade-in zoom-in-95"
+            dir="rtl"
+          >
             <div className="p-1 border-b border-slate-100 dark:border-slate-800 relative">
               <Search size={12} className="absolute right-2.5 top-3 text-slate-400" />
               <input 
@@ -306,6 +349,7 @@ function ZROfficeSelect({ wilaya, onSelect, selectedOffice }: { wilaya: string, 
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 onClick={e => e.stopPropagation()}
+                autoFocus
               />
             </div>
             <div className="max-h-48 overflow-y-auto p-1 custom-scrollbar">
@@ -323,7 +367,8 @@ function ZROfficeSelect({ wilaya, onSelect, selectedOffice }: { wilaya: string, 
               {offices.length === 0 && <div className="text-center p-3 text-xs text-slate-500 font-medium">لا يوجد مكاتب لهذه الولاية</div>}
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
     </div>
   );

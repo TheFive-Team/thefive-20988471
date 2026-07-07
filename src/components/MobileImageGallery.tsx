@@ -38,7 +38,14 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
           <div className="flex">
             {images.map((img, idx) => (
               <div className="flex-[0_0_100%] min-w-0" key={idx}>
-                <img src={img.url} alt={img.altText || `Product view ${idx + 1}`} className="w-full h-auto object-cover aspect-[4/5]" />
+                <img 
+                  src={img.url} 
+                  alt={img.altText || `Product view ${idx + 1}`} 
+                  className="w-full h-auto object-cover aspect-[4/5]" 
+                  loading={idx === 0 ? "eager" : "lazy"}
+                  decoding={idx === 0 ? "sync" : "async"}
+                  fetchPriority={idx === 0 ? "high" : "auto"}
+                />
               </div>
             ))}
           </div>
@@ -54,7 +61,13 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
                   className={`flex-[0_0_22%] min-w-0 cursor-pointer rounded-xl overflow-hidden border-2 transition-all ${idx === selectedIndex ? 'border-primary opacity-100 shadow-sm' : 'border-transparent hover:border-accent opacity-60'}`}
                   onClick={() => onThumbClick(idx)}
                 >
-                  <img src={img.url} alt={`Thumbnail ${idx + 1}`} className="w-full h-auto object-cover aspect-square" />
+                  <img 
+                    src={img.url} 
+                    alt={`Thumbnail ${idx + 1}`} 
+                    className="w-full h-auto object-cover aspect-square" 
+                    loading="lazy" 
+                    decoding="async" 
+                  />
                 </div>
               ))}
             </div>

@@ -42,7 +42,7 @@ export function Reviews() {
               {reviewImages.map((imgUrl, i) => (
                 <CarouselItem key={i} className="pl-2 md:pl-4 basis-[90%] sm:basis-[80%] md:basis-1/2 lg:basis-[40%]">
                   <div className="w-full">
-                    <img src={imgUrl} alt={`Review ${i + 1}`} className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500 rounded-2xl" />
+                    <img src={imgUrl} alt={`Review ${i + 1}`} loading="lazy" decoding="async" className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500 rounded-2xl" />
                   </div>
                 </CarouselItem>
               ))}

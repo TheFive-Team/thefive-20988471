@@ -1,20 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useShopifyProduct } from "@/hooks/useShopifyProducts";
 import { useCartStore } from "@/stores/cartStore";
 import { formatMoney } from "@/lib/shopify";
 import { MobileImageGallery } from "@/components/MobileImageGallery";
 import { CodForm } from "@/components/CodForm";
-import { StickyCheckoutBar } from "@/components/StickyCheckoutBar";
-import { Reviews } from "@/components/Reviews";
+
+const Reviews = lazy(() => import("@/components/Reviews").then(m => ({ default: m.Reviews })));
+const StickyCheckoutBar = lazy(() => import("@/components/StickyCheckoutBar").then(m => ({ default: m.StickyCheckoutBar })));
 
 const numericId = (gid: string) => gid.split("/").pop() ?? gid;
-const fbq = (...args: unknown[]) => {
-  if (typeof window === "undefined") return;
-  const w = window as unknown as { fbq?: (...a: unknown[]) => void };
-  w.fbq?.(...args);
-};
+import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
 
 export const Route = createFileRoute("/produit/$slug")({
   head: ({ params }) => ({
@@ -58,11 +55,10 @@ function ProductPage() {
     if (!product) return;
     const variantForPixel = selectedVariant ?? product.node.variants.edges[0]?.node;
     if (!variantForPixel) return;
-    fbq("track", "ViewContent", {
-      content_ids: [numericId(variantForPixel.id)],
-      content_name: product.node.title,
-      content_type: "product",
-      value: parseFloat(variantForPixel.price.amount),
+    trackViewContent({
+      productName: product.node.title,
+      productId: numericId(variantForPixel.id),
+      price: parseFloat(variantForPixel.price.amount),
       currency: variantForPixel.price.currencyCode,
     });
   }, [product, selectedVariant]);
@@ -96,11 +92,10 @@ function ProductPage() {
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
-    fbq("track", "AddToCart", {
-      content_ids: [numericId(selectedVariant.id)],
-      content_name: p.title,
-      content_type: "product",
-      value: parseFloat(selectedVariant.price.amount),
+    trackAddToCart({
+      productName: p.title,
+      productId: numericId(selectedVariant.id),
+      price: parseFloat(selectedVariant.price.amount),
       currency: selectedVariant.price.currencyCode,
     });
   };
@@ -111,6 +106,9 @@ function ProductPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10 sm:py-24">
+      {images[0] && (
+        <link rel="preload" as="image" href={images[0].url} fetchPriority="high" />
+      )}
       <div className="grid gap-0 md:grid-cols-2 md:gap-10 lg:gap-12">
         <div className="block md:hidden -mx-6 sm:-mx-10">
           {/* Dynamic gallery from Shopify */}
@@ -118,7 +116,7 @@ function ProductPage() {
         </div>
         <div className="hidden md:block">
           <div className="bg-secondary rounded-2xl overflow-hidden shadow-xl shadow-secondary/5">
-            {image && <img src={image.url} alt={image.altText ?? p.title} width={800} height={1000} className="h-full w-full object-cover" />}
+            {image && <img src={image.url} alt={image.altText ?? p.title} width={800} height={1000} className="h-full w-full object-cover" fetchPriority="high" loading="eager" decoding="sync" />}
           </div>
           {images.length > 1 && (
             <div className="mt-4 grid grid-cols-5 gap-3">
@@ -128,7 +126,7 @@ function ProductPage() {
                   onClick={() => setActiveImg(i)}
                   className={`aspect-square rounded-xl overflow-hidden shadow-sm bg-secondary border ${i === activeImg ? "border-primary" : "border-transparent hover:border-accent"}`}
                 >
-                  <img src={img.url} alt={img.altText ?? `${p.title} ${i + 1}`} className="h-full w-full object-cover" />
+                  <img src={img.url} alt={img.altText ?? `${p.title} ${i + 1}`} className="h-full w-full object-cover" loading="lazy" decoding="async" />
                 </button>
               ))}
             </div>
@@ -198,14 +196,20 @@ function ProductPage() {
               src={img.url} 
               alt={img.altText || `${p.title} detail view ${idx + 1}`} 
               className="w-full max-w-2xl h-auto object-cover rounded-2xl shadow-md" 
+              loading="lazy"
+              decoding="async"
             />
           ))}
         </section>
       )}
 
-      <Reviews />
+      <Suspense fallback={<div className="h-32 w-full animate-pulse bg-secondary/30 mt-16 rounded-2xl" />}>
+        <Reviews />
+      </Suspense>
 
-      <StickyCheckoutBar price={selectedVariant?.price ?? p.priceRange.minVariantPrice} />
+      <Suspense fallback={null}>
+        <StickyCheckoutBar price={selectedVariant?.price ?? p.priceRange.minVariantPrice} />
+      </Suspense>
     </div>
   );
 }

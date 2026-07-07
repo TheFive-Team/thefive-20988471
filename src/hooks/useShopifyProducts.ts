@@ -9,10 +9,16 @@ export function useShopifyProducts(query?: string) {
   });
 }
 
-export function useShopifyProduct(handle: string) {
-  return useQuery<ShopifyProduct | null>({
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+
+export function productQueryOptions(handle: string) {
+  return queryOptions({
     queryKey: ["shopify", "product", handle],
     queryFn: () => fetchProductByHandle(handle),
     staleTime: 60_000,
   });
+}
+
+export function useShopifyProduct(handle: string) {
+  return useSuspenseQuery(productQueryOptions(handle));
 }

@@ -45,6 +45,8 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
                   loading={idx === 0 ? "eager" : "lazy"}
                   decoding={idx === 0 ? "sync" : "async"}
                   fetchPriority={idx === 0 ? "high" : "auto"}
+                  width={800}
+                  height={1000}
                 />
               </div>
             ))}
@@ -67,6 +69,8 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
                     className="w-full h-auto object-cover aspect-square" 
                     loading="lazy" 
                     decoding="async" 
+                    width={200}
+                    height={200}
                   />
                 </div>
               ))}

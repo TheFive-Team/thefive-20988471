@@ -8,12 +8,14 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, type ReactNode, lazy, Suspense } from "react";
+import { initMetaPixel, trackPageView } from "@/lib/metaPixel";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider, useI18n } from "@/lib/i18n";
-import { SiteHeader, SiteFooter } from "@/components/site-layout";
+import { SiteHeader } from "@/components/site-layout";
+const SiteFooter = lazy(() => import("@/components/site-layout").then(m => ({ default: m.SiteFooter })));
 import { useCartSync } from "@/hooks/useCartSync";
 
 function PromoBar() {
@@ -139,20 +141,23 @@ function RootComponent() {
   const location = useLocation();
   const isProductPage = location.pathname.startsWith("/produit");
 
+  // Meta Pixel - Init
+  useEffect(() => {
+    initMetaPixel(META_PIXEL_ID);
+  }, []);
+
+  // Meta Pixel - PageView tracking on route change
+  useEffect(() => {
+    trackPageView();
+  }, [location.pathname]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         {META_PIXEL_ID && (
-          <>
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${META_PIXEL_ID}');fbq('track','PageView');`,
-              }}
-            />
-            <noscript>
-              <img height="1" width="1" style={{ display: "none" }} src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`} alt="" />
-            </noscript>
-          </>
+          <noscript>
+            <img height="1" width="1" style={{ display: "none" }} src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`} alt="" />
+          </noscript>
         )}
         <div className="flex min-h-screen flex-col">
           <PromoBar />
@@ -160,7 +165,9 @@ function RootComponent() {
           <main className="flex-1">
             <Outlet />
           </main>
-          <SiteFooter />
+          <Suspense fallback={null}>
+            <SiteFooter />
+          </Suspense>
         </div>
       </I18nProvider>
     </QueryClientProvider>

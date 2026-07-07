@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import { useI18n } from "@/lib/i18n";
-import { useShopifyProduct } from "@/hooks/useShopifyProducts";
+import { useShopifyProduct, productQueryOptions } from "@/hooks/useShopifyProducts";
 import { useCartStore } from "@/stores/cartStore";
 import { formatMoney } from "@/lib/shopify";
 import { MobileImageGallery } from "@/components/MobileImageGallery";
@@ -14,6 +14,9 @@ const numericId = (gid: string) => gid.split("/").pop() ?? gid;
 import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
 
 export const Route = createFileRoute("/produit/$slug")({
+  loader: async ({ context, params }) => {
+    return context.queryClient.ensureQueryData(productQueryOptions(params.slug));
+  },
   head: ({ params }) => ({
     meta: [
       { title: `${params.slug} — The Five A` },
@@ -26,7 +29,7 @@ export const Route = createFileRoute("/produit/$slug")({
 function ProductPage() {
   const { slug } = Route.useParams();
   const { tr } = useI18n();
-  const { data: product, isLoading } = useShopifyProduct(slug);
+  const { data: product } = useShopifyProduct(slug);
   const addItem = useCartStore((s) => s.addItem);
   const isCartLoading = useCartStore((s) => s.isLoading);
   const [variantId, setVariantId] = useState<string | null>(null);
@@ -63,9 +66,7 @@ function ProductPage() {
     });
   }, [product, selectedVariant]);
 
-  if (isLoading) {
-    return <div className="px-6 py-32 text-center text-muted-foreground">Chargement…</div>;
-  }
+
   if (!product) {
     return (
       <div className="px-6 py-32 text-center">

@@ -55,6 +55,7 @@ export const submitOrderFn = createServerFn({ method: "POST" })
       }
 
       console.log(`Successfully saved order ${orderId} to Supabase`);
+      console.log("[Order] Supabase insert success");
 
       // Backup: Send to Google Sheets (via Apps Script Webhook)
       const googleWebhookUrl = "https://script.google.com/macros/s/AKfycbzgry3EWQHvZLjudmmR_J7hkqO5fBLi4F3HqO3Iy1hGx28Gz3HchBKyI0xbVNCVtGeg/exec";
@@ -93,6 +94,11 @@ export const submitOrderFn = createServerFn({ method: "POST" })
         const pixelId = process.env.VITE_META_PIXEL_ID || process.env.META_PIXEL_ID;
         const accessToken = process.env.META_ACCESS_TOKEN;
         
+        console.log('[Meta CAPI] checking env and eventId');
+        console.log(`[Meta CAPI] pixelId exists: ${!!pixelId}`);
+        console.log(`[Meta CAPI] accessToken exists: ${!!accessToken}`);
+        console.log(`[Meta CAPI] eventId exists: ${!!data.eventId}`);
+
         if (pixelId && accessToken && data.eventId) {
           console.log(`[Meta CAPI] Pixel ID: ${pixelId}`);
           console.log(`[Meta CAPI] Event ID: ${data.eventId}`);
@@ -155,7 +161,7 @@ export const submitOrderFn = createServerFn({ method: "POST" })
             console.log('✅ Successfully sent Purchase event to Meta CAPI');
           }
         } else {
-          console.log(`[Meta CAPI] Skipped. Missing: pixelId=${!!pixelId}, accessToken=${!!accessToken}, eventId=${!!data.eventId}`);
+          console.log(`[Meta CAPI] skipped because: missing pixelId=${!pixelId}, accessToken=${!accessToken}, eventId=${!data.eventId}`);
         }
       } catch (capiError) {
         console.error('[Meta CAPI] Exception:', capiError);

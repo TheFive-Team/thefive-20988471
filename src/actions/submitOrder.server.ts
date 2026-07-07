@@ -151,9 +151,15 @@ export const submitOrderFn = createServerFn({ method: "POST" })
             body: JSON.stringify(payload)
           });
           
-          console.log(`[Meta CAPI] Meta response status: ${capiResponse.status} ${capiResponse.statusText}`);
+          console.log(`\n[Meta CAPI] Response Status: ${capiResponse.status}`);
           const responseBody = await capiResponse.text();
-          console.log(`[Meta CAPI] Meta response body: ${responseBody}`);
+          
+          try {
+            const parsedBody = JSON.parse(responseBody);
+            console.log(`\n[Meta CAPI] Response Body:\n${JSON.stringify(parsedBody, null, 2)}\n`);
+          } catch (e) {
+            console.log(`\n[Meta CAPI] Response Body:\n${responseBody}\n`);
+          }
           
           if (!capiResponse.ok) {
             console.error('[Meta CAPI] Error:', responseBody);

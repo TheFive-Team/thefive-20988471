@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { CheckCircle2, Truck, ShieldCheck, Clock, RefreshCw } from "lucide-react";
 import { submitOrderFn } from "@/actions/submitOrder.server";
 import { wilayas } from "@/lib/wilayas";
 import { communesByWilaya } from "@/lib/communes";
+import { trackInitiateCheckout, trackPurchase } from "@/lib/metaPixel";
 
 export function CodForm({ productPriceAmount, productName, variantTitle, requireSize, onSizeError }: { productPriceAmount?: string, productName?: string, variantTitle?: string, requireSize?: boolean, onSizeError?: () => void }) {
   const [submitted, setSubmitted] = useState(false);
@@ -16,6 +17,21 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
     commune: "",
     shippingMethod: "" as "" | "home" | "stopdesk"
   });
+
+  const checkoutInitiated = useRef(false);
+
+  // Meta Pixel - InitiateCheckout
+  const handleFormInteraction = () => {
+    if (!checkoutInitiated.current && productName) {
+      checkoutInitiated.current = true;
+      trackInitiateCheckout({
+        productName: productName,
+        productId: variantTitle,
+        price: Number(productPriceAmount || 0),
+        currency: 'DZD'
+      });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +81,8 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
       const selectedWilaya = wilayas.find(w => w.code === Number(form.wilaya));
       const wilayaName = selectedWilaya ? `${selectedWilaya.code} - ${selectedWilaya.nameAr}` : form.wilaya;
       const calculatedDeliveryFee = form.shippingMethod === 'home' ? selectedWilaya?.home : selectedWilaya?.stop;
+      
+      const eventId = crypto.randomUUID ? crypto.randomUUID() : `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
       const response = await submitOrderFn({
         data: {
@@ -76,13 +94,22 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
           deliveryFee: calculatedDeliveryFee,
           productPriceAmount,
           productName,
-          variantTitle
+          variantTitle,
+          eventId
         }
       });
       
       if (response.success) {
         localStorage.setItem("thefive_last_order", Date.now().toString());
         setSubmitted(true);
+        // Meta Pixel - Purchase
+        trackPurchase({
+          productName: productName || "Produit inconnu",
+          productId: variantTitle,
+          value: Number(productPriceAmount || 0) + (calculatedDeliveryFee || 0),
+          currency: 'DZD',
+          eventId
+        });
       } else {
         setFormError("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى");
       }
@@ -141,7 +168,7 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" onFocus={handleFormInteraction} onClick={handleFormInteraction}>
         
         {/* Input: Name */}
         <div>

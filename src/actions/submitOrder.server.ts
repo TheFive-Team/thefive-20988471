@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { supabase } from "@/lib/supabase";
 import crypto from 'crypto';
@@ -19,6 +18,8 @@ export const submitOrderFn = createServerFn({ method: "POST" })
       variantTitle: z.string().optional(),
       deliveryFee: z.number().optional(),
       eventId: z.string().optional(),
+      clientUserAgent: z.string().optional(),
+      eventSourceUrl: z.string().optional(),
     })
   )
   .handler(async ({ data }) => {
@@ -92,10 +93,8 @@ export const submitOrderFn = createServerFn({ method: "POST" })
         const accessToken = process.env.META_ACCESS_TOKEN;
         
         if (pixelId && accessToken && data.eventId) {
-          const req = getWebRequest();
-          const clientIp = req?.headers.get('x-forwarded-for') || req?.headers.get('x-real-ip') || '';
-          const clientUserAgent = req?.headers.get('user-agent') || '';
-          const eventSourceUrl = req?.headers.get('referer') || '';
+          const clientUserAgent = data.clientUserAgent || '';
+          const eventSourceUrl = data.eventSourceUrl || '';
 
           const hashData = (val: string) => {
             if (!val) return '';
@@ -117,7 +116,6 @@ export const submitOrderFn = createServerFn({ method: "POST" })
               action_source: 'website',
               event_source_url: eventSourceUrl,
               user_data: {
-                client_ip_address: clientIp,
                 client_user_agent: clientUserAgent,
                 ph: [hashData(phone)],
                 fn: [hashData(firstName)],

@@ -95,7 +95,9 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
           productPriceAmount,
           productName,
           variantTitle,
-          eventId
+          eventId,
+          clientUserAgent: navigator.userAgent,
+          eventSourceUrl: window.location.href
         }
       });
       

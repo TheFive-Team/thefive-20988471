@@ -89,10 +89,14 @@ export const submitOrderFn = createServerFn({ method: "POST" })
 
       // Meta Conversions API (CAPI) Tracking
       try {
+        console.log('--- Meta CAPI started ---');
         const pixelId = process.env.VITE_META_PIXEL_ID || process.env.META_PIXEL_ID;
         const accessToken = process.env.META_ACCESS_TOKEN;
         
         if (pixelId && accessToken && data.eventId) {
+          console.log(`[Meta CAPI] Pixel ID: ${pixelId}`);
+          console.log(`[Meta CAPI] Event ID: ${data.eventId}`);
+          console.log(`[Meta CAPI] Order ID: ${orderId}`);
           const clientUserAgent = data.clientUserAgent || '';
           const eventSourceUrl = data.eventSourceUrl || '';
 
@@ -132,20 +136,29 @@ export const submitOrderFn = createServerFn({ method: "POST" })
             }]
           };
 
-          const capiResponse = await fetch(`https://graph.facebook.com/v20.0/${pixelId}/events?access_token=${accessToken}`, {
+          const graphApiEndpoint = `https://graph.facebook.com/v20.0/${pixelId}/events`;
+          console.log(`[Meta CAPI] Graph API endpoint: ${graphApiEndpoint}`);
+
+          const capiResponse = await fetch(`${graphApiEndpoint}?access_token=${accessToken}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
           });
           
+          console.log(`[Meta CAPI] Meta response status: ${capiResponse.status} ${capiResponse.statusText}`);
+          const responseBody = await capiResponse.text();
+          console.log(`[Meta CAPI] Meta response body: ${responseBody}`);
+          
           if (!capiResponse.ok) {
-            console.warn('Meta CAPI error:', await capiResponse.text());
+            console.error('[Meta CAPI] Error:', responseBody);
           } else {
             console.log('✅ Successfully sent Purchase event to Meta CAPI');
           }
+        } else {
+          console.log(`[Meta CAPI] Skipped. Missing: pixelId=${!!pixelId}, accessToken=${!!accessToken}, eventId=${!!data.eventId}`);
         }
       } catch (capiError) {
-        console.error('Error sending CAPI event:', capiError);
+        console.error('[Meta CAPI] Exception:', capiError);
       }
 
       return {

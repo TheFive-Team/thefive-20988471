@@ -15,6 +15,16 @@
           "currencyCode": "DZD"
         }
       },
+      "compareAtPriceRange": {
+        "minVariantPrice": {
+          "amount": "6500",
+          "currencyCode": "DZD"
+        },
+        "maxVariantPrice": {
+          "amount": "6500",
+          "currencyCode": "DZD"
+        }
+      },
       "images": {
         "edges": [
           {
@@ -127,11 +137,16 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835305897110",
+              "id": "gid://shopify/ProductVariant/17835481543640",
               "title": "6",
               "availableForSale": true,
+              "quantityAvailable": 10,
               "price": {
                 "amount": "5900.0",
+                "currencyCode": "DZD"
+              },
+              "compareAtPrice": {
+                "amount": "6500",
                 "currencyCode": "DZD"
               },
               "selectedOptions": [
@@ -144,11 +159,16 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835305897111",
+              "id": "gid://shopify/ProductVariant/17835481543641",
               "title": "8",
               "availableForSale": true,
+              "quantityAvailable": 10,
               "price": {
                 "amount": "5900.0",
+                "currencyCode": "DZD"
+              },
+              "compareAtPrice": {
+                "amount": "6500",
                 "currencyCode": "DZD"
               },
               "selectedOptions": [
@@ -161,11 +181,16 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835305897112",
+              "id": "gid://shopify/ProductVariant/17835481543642",
               "title": "10",
               "availableForSale": true,
+              "quantityAvailable": 1,
               "price": {
                 "amount": "5900.0",
+                "currencyCode": "DZD"
+              },
+              "compareAtPrice": {
+                "amount": "6500",
                 "currencyCode": "DZD"
               },
               "selectedOptions": [
@@ -178,11 +203,16 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835305897113",
+              "id": "gid://shopify/ProductVariant/17835481543643",
               "title": "12",
               "availableForSale": true,
+              "quantityAvailable": 0,
               "price": {
                 "amount": "5900.0",
+                "currencyCode": "DZD"
+              },
+              "compareAtPrice": {
+                "amount": "6500",
                 "currencyCode": "DZD"
               },
               "selectedOptions": [

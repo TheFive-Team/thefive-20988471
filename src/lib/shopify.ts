@@ -30,11 +30,11 @@ export interface ShopifyProduct {
   };
 }
 
+import productsData from "../../public/data/products.json";
+
 export async function fetchProducts(query?: string, first = 50): Promise<ShopifyProduct[]> {
   try {
-    const res = await fetch("/data/products.json?v=" + Date.now());
-    if (!res.ok) return [];
-    const products: ShopifyProduct[] = await res.json();
+    const products = productsData as ShopifyProduct[];
     if (query) {
       return products.filter(p => p.node.title.toLowerCase().includes(query.toLowerCase()));
     }
@@ -47,9 +47,7 @@ export async function fetchProducts(query?: string, first = 50): Promise<Shopify
 
 export async function fetchProductByHandle(handle: string): Promise<ShopifyProduct | null> {
   try {
-    const res = await fetch("/data/products.json?v=" + Date.now());
-    if (!res.ok) return null;
-    const products: ShopifyProduct[] = await res.json();
+    const products = productsData as ShopifyProduct[];
     return products.find(p => p.node.handle === handle) || null;
   } catch (err) {
     console.error("Error fetching local product", err);

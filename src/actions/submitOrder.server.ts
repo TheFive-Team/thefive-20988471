@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/lib/supabase";
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 
 export const submitOrderFn = createServerFn({ method: "POST" })
   .validator(
@@ -33,7 +35,48 @@ export const submitOrderFn = createServerFn({ method: "POST" })
       const deliveryFee = data.deliveryFee !== undefined ? data.deliveryFee : (data.wilaya ? 600 : 0); 
       const totalAmount = productFee + deliveryFee;
 
-      // Insert into Supabase
+      // 1. Stock Deduction Logic
+      let productsData: any[] = [];
+      const productsFilePath = path.join(process.cwd(), "public", "data", "products.json");
+      let stockDeducted = false;
+      let targetProductIndex = -1;
+      let targetVariantIndex = -1;
+
+      try {
+        const fileContent = fs.readFileSync(productsFilePath, "utf-8");
+        productsData = JSON.parse(fileContent);
+
+        if (data.productName && data.variantTitle) {
+          targetProductIndex = productsData.findIndex((p: any) => p.node.title === data.productName);
+          if (targetProductIndex !== -1) {
+            const product = productsData[targetProductIndex];
+            targetVariantIndex = product.node.variants.edges.findIndex((v: any) => v.node.title === data.variantTitle);
+            
+            if (targetVariantIndex !== -1) {
+              const variant = product.node.variants.edges[targetVariantIndex].node;
+              if (variant.quantityAvailable !== undefined) {
+                if (variant.quantityAvailable <= 0) {
+                  return { success: false, message: "هذا المقاس غير متوفر حاليًا" };
+                }
+                // Deduct stock in memory
+                variant.quantityAvailable -= 1;
+                if (variant.quantityAvailable === 0) {
+                  variant.availableForSale = false;
+                }
+                
+                // Synchronously write back to prevent double orders
+                fs.writeFileSync(productsFilePath, JSON.stringify(productsData, null, 2), "utf-8");
+                stockDeducted = true;
+                console.log(`[Stock] Deducted 1 from ${data.productName} size ${data.variantTitle}. Remaining: ${variant.quantityAvailable}`);
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Error reading/updating stock:", e);
+      }
+
+      // 2. Insert into Supabase
       const { error } = await supabase.from('orders').insert({
         order_id: orderId,
         fullname: data.fullname,
@@ -51,6 +94,24 @@ export const submitOrderFn = createServerFn({ method: "POST" })
 
       if (error) {
         console.error("Supabase insert error:", error);
+        
+        // Rollback stock if Supabase failed
+        if (stockDeducted) {
+          try {
+            const fileContent = fs.readFileSync(productsFilePath, "utf-8");
+            const currentData = JSON.parse(fileContent);
+            const variant = currentData[targetProductIndex].node.variants.edges[targetVariantIndex].node;
+            variant.quantityAvailable += 1;
+            if (variant.quantityAvailable > 0) {
+              variant.availableForSale = true;
+            }
+            fs.writeFileSync(productsFilePath, JSON.stringify(currentData, null, 2), "utf-8");
+            console.log(`[Stock] Rolled back stock for ${data.productName} size ${data.variantTitle}`);
+          } catch (e) {
+            console.error("Failed to rollback stock:", e);
+          }
+        }
+        
         return { success: false, message: "Failed to save order to database." };
       }
 

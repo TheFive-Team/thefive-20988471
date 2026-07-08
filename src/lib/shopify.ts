@@ -9,6 +9,8 @@ export interface ShopifyVariant {
   id: string;
   title: string;
   price: ShopifyMoney;
+  compareAtPrice?: ShopifyMoney;
+  quantityAvailable?: number;
   availableForSale: boolean;
   selectedOptions: Array<{ name: string; value: string }>;
 }
@@ -24,6 +26,7 @@ export interface ShopifyProduct {
     productType: string;
     vendor: string;
     priceRange: { minVariantPrice: ShopifyMoney };
+    compareAtPriceRange?: { minVariantPrice: ShopifyMoney; maxVariantPrice: ShopifyMoney };
     images: { edges: Array<{ node: { url: string; altText: string | null } }> };
     detailImages?: { edges: Array<{ node: { url: string; altText: string | null } }> };
     reviewImages?: { edges: Array<{ node: { url: string; altText: string | null } }> };

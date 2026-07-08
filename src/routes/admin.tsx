@@ -1271,16 +1271,18 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
   const startEdit = (product: ShopifyProduct) => {
     setMode("edit");
     setEditingProductId(product.node.id);
-    
-    const sizeOption = product.node.options?.find(o => o.name.toLowerCase() === "size");
-    const sizes = sizeOption ? sizeOption.values.join(", ") : "";
+    const inventory = product.node.variants.edges.map(e => ({
+      size: e.node.selectedOptions.find(o => o.name.toLowerCase() === "size")?.value || e.node.title,
+      stock: e.node.quantityAvailable ?? 10 // Fallback to 10 for backward compatibility if undefined
+    }));
 
     setEditForm({
       title: product.node.title,
       handle: product.node.handle,
       descriptionHtml: (product.node.descriptionHtml || "").replace(/<br\s*\/?>/gi, '\n'),
       price: product.node.priceRange.minVariantPrice.amount,
-      sizes: sizes
+      comparePrice: product.node.compareAtPriceRange?.minVariantPrice?.amount || "",
+      inventory: inventory.length > 0 ? inventory : []
     });
     
     const allImages: ProductImageObj[] = [];
@@ -1308,7 +1310,8 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       handle: "",
       descriptionHtml: "",
       price: "",
-      sizes: ""
+      comparePrice: "",
+      inventory: []
     });
     setProductImages([]);
   };
@@ -1416,17 +1419,21 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
   };
 
   const generateShopifyNode = (form: any, galleryEdges: any[], detailEdges: any[], reviewEdges: any[], id: string) => {
-    const sizeValues = form.sizes ? form.sizes.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
-    const options = sizeValues.length > 0 ? [{ name: "size", values: sizeValues }] : [];
+    const inventory = form.inventory && form.inventory.length > 0 ? form.inventory : [];
+    const options = inventory.length > 0 ? [{ name: "size", values: inventory.map((i: any) => i.size) }] : [];
     
-    const variantsEdges = sizeValues.length > 0 
-      ? sizeValues.map((size: string, idx: number) => ({
+    const compareAtPrice = form.comparePrice ? { amount: form.comparePrice, currencyCode: "DZD" } : undefined;
+    
+    const variantsEdges = inventory.length > 0 
+      ? inventory.map((inv: any, idx: number) => ({
           node: {
             id: `gid://shopify/ProductVariant/${Date.now()}${idx}`,
-            title: size,
-            availableForSale: true,
+            title: inv.size,
+            availableForSale: true, // We still mark true for UI, stock handles disabled logic
+            quantityAvailable: inv.stock,
             price: { amount: form.price, currencyCode: "DZD" },
-            selectedOptions: [{ name: "size", value: size }]
+            ...(compareAtPrice && { compareAtPrice }),
+            selectedOptions: [{ name: "size", value: inv.size }]
           }
         }))
       : [{
@@ -1434,7 +1441,9 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
             id: `gid://shopify/ProductVariant/${Date.now()}`,
             title: "Default Title",
             availableForSale: true,
+            quantityAvailable: 10,
             price: { amount: form.price, currencyCode: "DZD" },
+            ...(compareAtPrice && { compareAtPrice }),
             selectedOptions: []
           }
         }];
@@ -1449,6 +1458,7 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       productType: "",
       vendor: "My Store",
       priceRange: { minVariantPrice: { amount: form.price, currencyCode: "DZD" } },
+      ...(compareAtPrice && { compareAtPriceRange: { minVariantPrice: compareAtPrice, maxVariantPrice: compareAtPrice } }),
       images: { edges: galleryEdges },
       detailImages: { edges: detailEdges },
       reviewImages: { edges: reviewEdges },
@@ -1570,13 +1580,73 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
               <input type="text" className="w-full border border-slate-300 p-3.5 rounded-xl outline-none focus:border-slate-800 font-mono text-left" dir="ltr" value={editForm.handle} onChange={e => setEditForm({...editForm, handle: e.target.value})} />
             </div>
             <div className="space-y-3">
-              <label className="font-bold text-slate-700 dark:text-slate-200 text-sm">السعر (Price in DZD)</label>
+              <label className="font-bold text-slate-700 dark:text-slate-200 text-sm">السعر بعد التخفيض (Price in DZD)</label>
               <input type="number" className="w-full border border-slate-300 p-3.5 rounded-xl outline-none focus:border-slate-800 text-left font-bold text-lg text-slate-900 dark:text-[#F9FAFB]" dir="ltr" value={editForm.price} onChange={e => setEditForm({...editForm, price: e.target.value})} />
             </div>
             <div className="space-y-3">
-              <label className="font-bold text-slate-700 dark:text-slate-200 text-sm">القياسات المتوفرة (Available Sizes)</label>
-              <input type="text" className="w-full border border-slate-300 p-3.5 rounded-xl outline-none focus:border-slate-800 text-left font-bold text-slate-900 dark:text-[#F9FAFB]" dir="ltr" value={editForm.sizes} onChange={e => setEditForm({...editForm, sizes: e.target.value})} placeholder="38, 40, 42, 44" />
-              <p className="text-xs text-slate-500 dark:text-[#9CA3AF]">افصل بين القياسات بفاصلة (مثال: S, M, L) / Separate sizes with commas</p>
+              <label className="font-bold text-slate-700 dark:text-slate-200 text-sm">السعر الأصلي (Compare Price - Optional)</label>
+              <input type="number" className="w-full border border-slate-300 p-3.5 rounded-xl outline-none focus:border-slate-800 text-left font-bold text-lg text-slate-900 dark:text-[#F9FAFB]" dir="ltr" value={editForm.comparePrice || ""} onChange={e => setEditForm({...editForm, comparePrice: e.target.value})} placeholder="مثال: 7900" />
+            </div>
+            <div className="space-y-4 md:col-span-2 border border-slate-200 dark:border-slate-700 p-5 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+              <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
+                <label className="font-bold text-slate-700 dark:text-slate-200 text-lg">المخزون والقياسات (Inventory & Sizes)</label>
+                <button 
+                  onClick={() => setEditForm({ ...editForm, inventory: [...(editForm.inventory || []), { size: "New Size", stock: 10 }] })} 
+                  className="bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-slate-800 transition-colors"
+                >
+                  <Plus size={16} /> إضافة قياس
+                </button>
+              </div>
+              
+              {(editForm.inventory || []).length === 0 ? (
+                <p className="text-center text-slate-500 py-4 text-sm font-medium">لا توجد قياسات مضافة. انقر على "إضافة قياس" للبدء.</p>
+              ) : (
+                <div className="grid gap-3">
+                  {(editForm.inventory || []).map((inv: any, idx: number) => (
+                    <div key={idx} className="flex items-center gap-3 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                      <div className="flex-1 space-y-1">
+                        <label className="text-xs font-bold text-slate-500">القياس (Size)</label>
+                        <input 
+                          type="text" 
+                          dir="ltr"
+                          value={inv.size} 
+                          onChange={(e) => {
+                            const newInv = [...editForm.inventory];
+                            newInv[idx].size = e.target.value;
+                            setEditForm({ ...editForm, inventory: newInv });
+                          }} 
+                          className="w-full border border-slate-200 dark:border-slate-700 p-2 rounded-md outline-none focus:border-slate-900 font-bold text-left bg-transparent" 
+                        />
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <label className="text-xs font-bold text-slate-500">الكمية (Stock)</label>
+                        <input 
+                          type="number" 
+                          dir="ltr"
+                          value={inv.stock} 
+                          onChange={(e) => {
+                            const newInv = [...editForm.inventory];
+                            newInv[idx].stock = parseInt(e.target.value) || 0;
+                            setEditForm({ ...editForm, inventory: newInv });
+                          }} 
+                          className="w-full border border-slate-200 dark:border-slate-700 p-2 rounded-md outline-none focus:border-slate-900 font-bold text-left bg-transparent" 
+                        />
+                      </div>
+                      <button 
+                        onClick={() => {
+                          const newInv = [...editForm.inventory];
+                          newInv.splice(idx, 1);
+                          setEditForm({ ...editForm, inventory: newInv });
+                        }}
+                        className="mt-5 p-2 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors"
+                        title="حذف القياس"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="space-y-6">
               <label className="font-bold text-slate-700 dark:text-slate-200 text-xl block mb-2 border-b pb-2">إدارة الصور (Image Manager)</label>

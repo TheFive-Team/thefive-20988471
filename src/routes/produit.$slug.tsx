@@ -164,9 +164,30 @@ function ProductPage() {
         <div>
           {p.productType && <p className="eyebrow text-accent">{p.productType}</p>}
           <h1 className="font-serif font-bold text-secondary text-3xl leading-tight sm:text-5xl">{p.title}</h1>
-          <p className="mt-1 text-2xl sm:text-3xl font-medium tracking-wide text-primary">
-            {selectedVariant ? formatMoney(selectedVariant.price) : formatMoney(p.priceRange.minVariantPrice)}
-          </p>
+          <div className="mt-1 flex items-center gap-3">
+            <p className="text-2xl sm:text-3xl font-medium tracking-wide text-primary">
+              {selectedVariant ? formatMoney(selectedVariant.price) : formatMoney(p.priceRange.minVariantPrice)}
+            </p>
+            {(() => {
+              const currentPrice = selectedVariant ? selectedVariant.price : p.priceRange.minVariantPrice;
+              const comparePrice = selectedVariant ? selectedVariant.compareAtPrice : p.compareAtPriceRange?.minVariantPrice;
+              
+              if (comparePrice && parseFloat(comparePrice.amount) > parseFloat(currentPrice.amount)) {
+                const discount = Math.round(((parseFloat(comparePrice.amount) - parseFloat(currentPrice.amount)) / parseFloat(comparePrice.amount)) * 100);
+                return (
+                  <>
+                    <p className="text-xl sm:text-2xl text-slate-400 line-through">
+                      {formatMoney(comparePrice)}
+                    </p>
+                    <span className="bg-red-100 text-red-700 text-sm font-bold px-2 py-1 rounded-md">
+                      -{discount}%
+                    </span>
+                  </>
+                );
+              }
+              return null;
+            })()}
+          </div>
           <div className="hairline my-6 w-16" />
 
 
@@ -176,19 +197,29 @@ function ProductPage() {
                 {tr("product.size")} {sizeError && <span className="text-red-500 normal-case font-bold text-sm ml-2 animate-pulse">* يرجى الاختيار / Required</span>}
               </p>
               <div className="flex flex-wrap gap-3">
-                {variants.map((v) => (
-                  <button
-                    key={v.node.id}
-                    onClick={() => setVariantId(v.node.id)}
-                    disabled={!v.node.availableForSale}
-                    className={`rounded-xl min-w-16 border-2 px-5 py-3 text-base uppercase tracking-wider transition-all disabled:opacity-40 font-bold ${
-                      selectedVariant?.id === v.node.id
-                        ? "border-primary bg-background shadow-md text-foreground scale-105"
-                        : "border-foreground/40 text-foreground/80 hover:border-foreground/60 hover:bg-accent/20 bg-background/50"
-                    }`}
-                  >{v.node.title}</button>
-                ))}
+                {variants.map((v) => {
+                  const outOfStock = v.node.quantityAvailable === 0 || !v.node.availableForSale;
+                  return (
+                    <button
+                      key={v.node.id}
+                      onClick={() => setVariantId(v.node.id)}
+                      disabled={outOfStock}
+                      className={`rounded-xl min-w-16 border-2 px-5 py-3 text-base uppercase tracking-wider transition-all font-bold ${
+                        outOfStock 
+                          ? "opacity-30 border-slate-300 bg-slate-100 text-slate-500 cursor-not-allowed line-through" 
+                          : selectedVariant?.id === v.node.id
+                            ? "border-primary bg-background shadow-md text-foreground scale-105"
+                            : "border-foreground/40 text-foreground/80 hover:border-foreground/60 hover:bg-accent/20 bg-background/50"
+                      }`}
+                    >{v.node.title}</button>
+                  );
+                })}
               </div>
+              {selectedVariant && selectedVariant.quantityAvailable !== undefined && selectedVariant.quantityAvailable > 0 && selectedVariant.quantityAvailable <= 2 && (
+                <p className="text-orange-600 text-sm font-bold mt-3 animate-pulse">
+                  تبقت قطع قليلة فقط! (Only a few left)
+                </p>
+              )}
             </div>
           )}
 

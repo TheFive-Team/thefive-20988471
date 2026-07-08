@@ -215,16 +215,16 @@ function ProductPage() {
         </section>
       )}
 
-      {/* Mobile Stacked Big Images (moved to bottom) */}
-      {images.length > 1 && (
-        <section className="block md:hidden w-full flex flex-col items-center justify-center mt-16 space-y-4">
-          {images.slice(1).map((img, idx) => (
+      {/* Middle Detail Images */}
+      {p.detailImages?.edges && p.detailImages.edges.length > 0 && (
+        <section className="w-full flex flex-col items-center justify-center mt-16 space-y-4">
+          {p.detailImages.edges.map((e, idx) => (
             <img 
               key={idx} 
-              src={getOptimizedShopifyImage(img.url, 800)} 
-              srcSet={getLocalSrcSet(img.url) || `${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
+              src={getOptimizedShopifyImage(e.node.url, 800)} 
+              srcSet={getLocalSrcSet(e.node.url) || `${getOptimizedShopifyImage(e.node.url, 400)} 400w, ${getOptimizedShopifyImage(e.node.url, 800)} 800w`}
               sizes="100vw"
-              alt={img.altText || `${p.title} detail view ${idx + 1}`} 
+              alt={e.node.altText || `${p.title} detail view ${idx + 1}`} 
               className="w-full max-w-2xl h-auto object-cover rounded-2xl shadow-md" 
               loading="lazy"
               decoding="async"
@@ -235,7 +235,7 @@ function ProductPage() {
       )}
 
       <Suspense fallback={<div className="h-32 w-full animate-pulse bg-secondary/30 mt-16 rounded-2xl" />}>
-        <Reviews />
+        <Reviews customImages={p.reviewImages?.edges.map(e => e.node) || []} />
       </Suspense>
 
       <Suspense fallback={null}>

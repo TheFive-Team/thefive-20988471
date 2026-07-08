@@ -1199,7 +1199,8 @@ type ProductImageObj = {
   base64_800?: string,
   base64_400?: string,
   base64_160?: string,
-  base64?: string // for legacy fallback if needed
+  base64?: string, // for legacy fallback if needed
+  group: 'gallery' | 'detail' | 'review'
 };
 
 function ProductsManager({ products, token, onRefresh, loading }: { products: ShopifyProduct[], token: string, onRefresh: () => void, loading: boolean }) {
@@ -1282,11 +1283,21 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       sizes: sizes
     });
     
-    const existingImages = product.node.images.edges.map((e, idx) => ({
-      id: `img-${Date.now()}-${idx}`,
-      url: e.node.url
-    }));
-    setProductImages(existingImages);
+    const allImages: ProductImageObj[] = [];
+    product.node.images.edges.forEach((e, idx) => {
+      allImages.push({ id: `img-gal-${Date.now()}-${idx}`, url: e.node.url, group: 'gallery' });
+    });
+    if (product.node.detailImages?.edges) {
+      product.node.detailImages.edges.forEach((e, idx) => {
+        allImages.push({ id: `img-det-${Date.now()}-${idx}`, url: e.node.url, group: 'detail' });
+      });
+    }
+    if (product.node.reviewImages?.edges) {
+      product.node.reviewImages.edges.forEach((e, idx) => {
+        allImages.push({ id: `img-rev-${Date.now()}-${idx}`, url: e.node.url, group: 'review' });
+      });
+    }
+    setProductImages(allImages);
   };
 
   const startCreate = () => {
@@ -1325,7 +1336,7 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
     });
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, group: 'gallery' | 'detail' | 'review') => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
     
@@ -1336,11 +1347,12 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       const base64_160 = await resizeImage(file, 160);
       
       setProductImages(prev => [...prev, {
-        id: `new-${Date.now()}-${i}`,
+        id: `new-${group}-${Date.now()}-${i}`,
         base64_800,
         base64_400,
         base64_160,
-        url: URL.createObjectURL(file) // For immediate preview
+        url: URL.createObjectURL(file), // For immediate preview
+        group
       }]);
     }
     
@@ -1364,7 +1376,8 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
           base64_800,
           base64_400,
           base64_160,
-          url: URL.createObjectURL(file) // For preview
+          url: URL.createObjectURL(file), // For preview
+          group: img.group
         };
       }
       return img;
@@ -1379,13 +1392,21 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
     if (replaceInputRef.current) replaceInputRef.current.click();
   };
 
-  const moveImage = (index: number, direction: -1 | 1) => {
+  const moveImage = (indexWithinGroup: number, direction: -1 | 1, group: 'gallery' | 'detail' | 'review') => {
     setProductImages(prev => {
       const newArray = [...prev];
-      if (index + direction < 0 || index + direction >= newArray.length) return newArray;
-      const temp = newArray[index];
-      newArray[index] = newArray[index + direction];
-      newArray[index + direction] = temp;
+      const groupItems = newArray.filter(i => i.group === group);
+      if (indexWithinGroup + direction < 0 || indexWithinGroup + direction >= groupItems.length) return newArray;
+      
+      const itemToMove = groupItems[indexWithinGroup];
+      const itemToSwapWith = groupItems[indexWithinGroup + direction];
+      
+      const idxA = newArray.findIndex(i => i.id === itemToMove.id);
+      const idxB = newArray.findIndex(i => i.id === itemToSwapWith.id);
+      
+      newArray[idxA] = itemToSwapWith;
+      newArray[idxB] = itemToMove;
+      
       return newArray;
     });
   };
@@ -1394,7 +1415,7 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
     setProductImages(prev => prev.filter(img => img.id !== id));
   };
 
-  const generateShopifyNode = (form: any, imageEdges: any[], id: string) => {
+  const generateShopifyNode = (form: any, galleryEdges: any[], detailEdges: any[], reviewEdges: any[], id: string) => {
     const sizeValues = form.sizes ? form.sizes.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
     const options = sizeValues.length > 0 ? [{ name: "size", values: sizeValues }] : [];
     
@@ -1428,7 +1449,9 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       productType: "",
       vendor: "My Store",
       priceRange: { minVariantPrice: { amount: form.price, currencyCode: "DZD" } },
-      images: { edges: imageEdges },
+      images: { edges: galleryEdges },
+      detailImages: { edges: detailEdges },
+      reviewImages: { edges: reviewEdges },
       variants: { edges: variantsEdges },
       options: options
     };
@@ -1442,25 +1465,34 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
     }
     setIsSaving(true);
     try {
-      const finalImageEdges: any[] = [];
+      const galleryEdges: any[] = [];
+      const detailEdges: any[] = [];
+      const reviewEdges: any[] = [];
       
       // Upload new images and preserve existing ones
       for (let i = 0; i < productImages.length; i++) {
         const img = productImages[i];
+        let finalUrl = img.url;
+        
         if (img.base64_800 && img.base64_400 && img.base64_160) {
-          const baseName = `product-${Date.now()}-${i}`;
+          const baseName = `product-${img.group}-${Date.now()}-${i}`;
           await commitFile(`public/images/${baseName}-800w.webp`, img.base64_800, `Upload 800w image for ${editForm.title}`, token, true);
           await commitFile(`public/images/${baseName}-400w.webp`, img.base64_400, `Upload 400w image for ${editForm.title}`, token, true);
           await commitFile(`public/images/${baseName}-160w.webp`, img.base64_160, `Upload 160w image for ${editForm.title}`, token, true);
-          finalImageEdges.push({ node: { url: `/images/${baseName}-800w.webp`, altText: null } });
+          finalUrl = `/images/${baseName}-800w.webp`;
         } else if (img.base64) {
           // Fallback for any legacy unoptimized upload logic
-          const fileName = `product-${Date.now()}-${i}.png`;
+          const fileName = `product-${img.group}-${Date.now()}-${i}.png`;
           const imagePath = `public/images/${fileName}`;
           await commitFile(imagePath, img.base64, `Upload image for ${editForm.title}`, token, true);
-          finalImageEdges.push({ node: { url: `/images/${fileName}`, altText: null } });
-        } else if (img.url) {
-          finalImageEdges.push({ node: { url: img.url, altText: null } });
+          finalUrl = `/images/${fileName}`;
+        }
+        
+        if (finalUrl) {
+          const edge = { node: { url: finalUrl, altText: null } };
+          if (img.group === 'gallery') galleryEdges.push(edge);
+          else if (img.group === 'detail') detailEdges.push(edge);
+          else if (img.group === 'review') reviewEdges.push(edge);
         }
       }
 
@@ -1468,12 +1500,12 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
 
       if (mode === "create") {
         const newId = `gid://shopify/Product/${Date.now()}`;
-        const newNode = generateShopifyNode(editForm, finalImageEdges, newId);
+        const newNode = generateShopifyNode(editForm, galleryEdges, detailEdges, reviewEdges, newId);
         updatedProducts.push({ node: newNode as any });
       } else if (mode === "edit" && editingProductId) {
         updatedProducts = products.map(p => {
           if (p.node.id === editingProductId) {
-            return { node: generateShopifyNode(editForm, finalImageEdges, editingProductId) as any };
+            return { node: generateShopifyNode(editForm, galleryEdges, detailEdges, reviewEdges, editingProductId) as any };
           }
           return p;
         });
@@ -1546,8 +1578,8 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
               <input type="text" className="w-full border border-slate-300 p-3.5 rounded-xl outline-none focus:border-slate-800 text-left font-bold text-slate-900 dark:text-[#F9FAFB]" dir="ltr" value={editForm.sizes} onChange={e => setEditForm({...editForm, sizes: e.target.value})} placeholder="38, 40, 42, 44" />
               <p className="text-xs text-slate-500 dark:text-[#9CA3AF]">افصل بين القياسات بفاصلة (مثال: S, M, L) / Separate sizes with commas</p>
             </div>
-            <div className="space-y-3">
-              <label className="font-bold text-slate-700 dark:text-slate-200 text-sm">إدارة الصور (Image Manager)</label>
+            <div className="space-y-6">
+              <label className="font-bold text-slate-700 dark:text-slate-200 text-xl block mb-2 border-b pb-2">إدارة الصور (Image Manager)</label>
               
               {productImages.some(img => img.url?.endsWith(".png") || img.url?.endsWith(".jpg")) && (
                 <div className="bg-amber-50 border border-amber-200 text-amber-700 p-3 rounded-xl flex items-start gap-3 mb-2">
@@ -1559,114 +1591,126 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
                 </div>
               )}
 
-              <div className="border border-slate-200 dark:border-[#374151] rounded-xl bg-slate-50 dark:bg-[#1f2937] overflow-hidden">
-                <input type="file" accept="image/*" className="hidden" ref={replaceInputRef} onChange={handleImageReplace} />
-                
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-right">
-                    <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">
-                      <tr>
-                        <th className="p-3">الصورة (Preview)</th>
-                        <th className="p-3">النوع (Role)</th>
-                        <th className="p-3">الرابط والتحذيرات (URL & Warnings)</th>
-                        <th className="p-3 text-center">ترتيب (Reorder)</th>
-                        <th className="p-3 text-left">إجراءات (Actions)</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                      {productImages.map((img, index) => {
-                        const isLegacy = img.url && (img.url.endsWith(".png") || img.url.endsWith(".jpg"));
-                        const isUnoptimized = img.url && !img.url.endsWith("-800w.webp") && !isLegacy;
-                        
-                        return (
-                          <tr key={img.id} className="hover:bg-white dark:hover:bg-slate-800/50 transition-colors">
-                            <td className="p-3">
-                              <div className="w-16 h-16 bg-white dark:bg-[#111827] rounded-lg border shadow-sm dark:shadow-none overflow-hidden">
-                                <img src={img.url || img.base64_160 || img.base64} className="w-full h-full object-cover" alt="product preview" />
-                              </div>
-                            </td>
-                            <td className="p-3">
-                              {index === 0 ? (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-md text-xs font-bold border border-emerald-200 dark:border-emerald-800/50">
-                                  صورة العرض (Hero)
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 rounded-md text-xs font-bold border border-blue-200 dark:border-blue-800/50">
-                                  المعرض (Gallery)
-                                </span>
-                              )}
-                            </td>
-                            <td className="p-3">
-                              <div className="font-mono text-xs text-slate-500 dark:text-slate-400 max-w-[200px] truncate" dir="ltr" title={img.url}>
-                                {img.url ? img.url.split('/').pop() : 'New Image'}
-                              </div>
-                              {isLegacy && (
-                                <div className="text-[10px] text-amber-600 font-bold mt-1">⚠️ صيغة قديمة (.png/.jpg)</div>
-                              )}
-                              {isUnoptimized && (
-                                <div className="text-[10px] text-orange-500 font-bold mt-1">⚠️ غير محول للصيغ المتعددة</div>
-                              )}
-                            </td>
-                            <td className="p-3 text-center">
-                              <div className="flex flex-col items-center justify-center gap-1">
-                                <button 
-                                  onClick={() => moveImage(index, -1)}
-                                  disabled={index === 0}
-                                  className="p-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 disabled:opacity-30 disabled:cursor-not-allowed"
-                                >
-                                  <ArrowUp size={14} />
-                                </button>
-                                <button 
-                                  onClick={() => moveImage(index, 1)}
-                                  disabled={index === productImages.length - 1}
-                                  className="p-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 disabled:opacity-30 disabled:cursor-not-allowed"
-                                >
-                                  <ArrowDown size={14} />
-                                </button>
-                              </div>
-                            </td>
-                            <td className="p-3 text-left space-x-2 space-x-reverse">
-                              <button 
-                                onClick={() => triggerReplace(img.id)}
-                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-100 font-bold text-xs shadow-sm transition-colors"
-                              >
-                                <Edit size={12} />
-                                استبدال (Replace)
-                              </button>
-                              <button 
-                                onClick={() => removeImage(img.id)}
-                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 font-bold text-xs shadow-sm transition-colors"
-                              >
-                                <Trash2 size={12} />
-                                حذف
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                      {productImages.length === 0 && (
-                        <tr>
-                          <td colSpan={5} className="p-8 text-center text-slate-500">
-                            <ImageIcon size={32} className="mx-auto mb-2 opacity-50" />
-                            لا توجد صور. يُرجى إضافة صور للمنتج.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+              <input type="file" accept="image/*" className="hidden" ref={replaceInputRef} onChange={handleImageReplace} />
 
-                <div className="p-4 bg-white dark:bg-[#111827] border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                  <div className="text-sm font-bold text-slate-600 dark:text-slate-300">
-                    إجمالي الصور: {productImages.length}
+              {[ 
+                { id: 'gallery', title: 'الصور العلوية (Top Slider & Hero)' },
+                { id: 'detail', title: 'صور التفاصيل (Middle Detail Images)' },
+                { id: 'review', title: 'صور التقييمات (Customer Reviews)' }
+              ].map(group => {
+                const groupImages = productImages.filter(img => img.group === group.id);
+                return (
+                  <div key={group.id} className="border border-slate-200 dark:border-[#374151] rounded-xl bg-slate-50 dark:bg-[#1f2937] overflow-hidden mb-6">
+                    <div className="bg-slate-100 dark:bg-slate-800 p-3 border-b border-slate-200 dark:border-slate-700 font-bold text-slate-700 dark:text-slate-200">
+                      {group.title}
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm text-right">
+                        <thead className="bg-slate-50 dark:bg-[#1f2937] text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">
+                          <tr>
+                            <th className="p-3">الصورة (Preview)</th>
+                            <th className="p-3">النوع (Role)</th>
+                            <th className="p-3">الرابط والتحذيرات (URL & Warnings)</th>
+                            <th className="p-3 text-center">ترتيب (Reorder)</th>
+                            <th className="p-3 text-left">إجراءات (Actions)</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                          {groupImages.map((img, indexWithinGroup) => {
+                            const isLegacy = img.url && (img.url.endsWith(".png") || img.url.endsWith(".jpg"));
+                            const isUnoptimized = img.url && !img.url.endsWith("-800w.webp") && !isLegacy;
+                            
+                            return (
+                              <tr key={img.id} className="hover:bg-white dark:hover:bg-slate-800/50 transition-colors">
+                                <td className="p-3">
+                                  <div className="w-16 h-16 bg-white dark:bg-[#111827] rounded-lg border shadow-sm dark:shadow-none overflow-hidden">
+                                    <img src={img.url || img.base64_160 || img.base64} className="w-full h-full object-cover" alt="product preview" />
+                                  </div>
+                                </td>
+                                <td className="p-3">
+                                  {group.id === 'gallery' && indexWithinGroup === 0 ? (
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-md text-xs font-bold border border-emerald-200 dark:border-emerald-800/50">
+                                      صورة العرض (Hero)
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 rounded-md text-xs font-bold border border-blue-200 dark:border-blue-800/50">
+                                      {group.id === 'detail' ? 'تفاصيل (Detail)' : group.id === 'review' ? 'تقييم (Review)' : 'المعرض (Gallery)'}
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="p-3">
+                                  <div className="font-mono text-xs text-slate-500 dark:text-slate-400 max-w-[200px] truncate" dir="ltr" title={img.url}>
+                                    {img.url ? img.url.split('/').pop() : 'New Image'}
+                                  </div>
+                                  {isLegacy && (
+                                    <div className="text-[10px] text-amber-600 font-bold mt-1">⚠️ صيغة قديمة (.png/.jpg)</div>
+                                  )}
+                                  {isUnoptimized && (
+                                    <div className="text-[10px] text-orange-500 font-bold mt-1">⚠️ غير محول للصيغ المتعددة</div>
+                                  )}
+                                </td>
+                                <td className="p-3 text-center">
+                                  <div className="flex flex-col items-center justify-center gap-1">
+                                    <button 
+                                      onClick={() => moveImage(indexWithinGroup, -1, group.id as any)}
+                                      disabled={indexWithinGroup === 0}
+                                      className="p-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                                    >
+                                      <ArrowUp size={14} />
+                                    </button>
+                                    <button 
+                                      onClick={() => moveImage(indexWithinGroup, 1, group.id as any)}
+                                      disabled={indexWithinGroup === groupImages.length - 1}
+                                      className="p-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                                    >
+                                      <ArrowDown size={14} />
+                                    </button>
+                                  </div>
+                                </td>
+                                <td className="p-3 text-left space-x-2 space-x-reverse">
+                                  <button 
+                                    onClick={() => triggerReplace(img.id)}
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-100 font-bold text-xs shadow-sm transition-colors"
+                                  >
+                                    <Edit size={12} />
+                                    استبدال (Replace)
+                                  </button>
+                                  <button 
+                                    onClick={() => removeImage(img.id)}
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 font-bold text-xs shadow-sm transition-colors"
+                                  >
+                                    <Trash2 size={12} />
+                                    حذف
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                          {groupImages.length === 0 && (
+                            <tr>
+                              <td colSpan={5} className="p-8 text-center text-slate-500">
+                                <ImageIcon size={32} className="mx-auto mb-2 opacity-50" />
+                                لا توجد صور في هذه المجموعة.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="p-4 bg-white dark:bg-[#111827] border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                      <div className="text-sm font-bold text-slate-600 dark:text-slate-300">
+                        العدد: {groupImages.length}
+                      </div>
+                      <label className="flex items-center gap-2 px-5 py-2.5 bg-[#1e293b] text-white dark:text-[#0B1120] rounded-lg font-bold hover:bg-slate-800 transition-colors shadow-md cursor-pointer text-sm">
+                        <Upload size={16} />
+                        إضافة صور
+                        <input type="file" multiple accept="image/*" onChange={(e) => handleImageUpload(e, group.id as any)} className="hidden" />
+                      </label>
+                    </div>
                   </div>
-                  <label className="flex items-center gap-2 px-5 py-2.5 bg-[#1e293b] text-white dark:text-[#0B1120] rounded-lg font-bold hover:bg-slate-800 transition-colors shadow-md cursor-pointer text-sm">
-                    <Upload size={16} />
-                    إضافة صور جديدة
-                    <input type="file" multiple accept="image/*" onChange={handleImageUpload} className="hidden" />
-                  </label>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
           

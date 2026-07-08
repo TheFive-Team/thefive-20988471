@@ -7,8 +7,10 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-export function Reviews() {
-  const reviewImages = [
+import { getOptimizedShopifyImage, getLocalSrcSet } from "@/lib/shopify";
+
+export function Reviews({ customImages }: { customImages?: Array<{ url: string; altText?: string | null }> }) {
+  const defaultReviewImages = [
     "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-9.webp",
     "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-10.webp",
     "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-11.webp",
@@ -18,6 +20,10 @@ export function Reviews() {
     "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-16.webp",
     "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-18.webp",
   ];
+
+  const reviewImages = customImages && customImages.length > 0 
+    ? customImages 
+    : defaultReviewImages.map(url => ({ url }));
 
   return (
     <section className="py-16 md:py-24 bg-transparent">
@@ -39,10 +45,18 @@ export function Reviews() {
             className="w-full"
           >
             <CarouselContent className="-ml-2 md:-ml-4">
-              {reviewImages.map((imgUrl, i) => (
+              {reviewImages.map((imgObj, i) => (
                 <CarouselItem key={i} className="pl-2 md:pl-4 basis-[90%] sm:basis-[80%] md:basis-1/2 lg:basis-[40%]">
                   <div className="w-full">
-                    <img src={imgUrl} alt={`Review ${i + 1}`} loading="lazy" decoding="async" className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500 rounded-2xl" />
+                    <img 
+                      src={getOptimizedShopifyImage(imgObj.url, 800)} 
+                      srcSet={getLocalSrcSet(imgObj.url) || `${getOptimizedShopifyImage(imgObj.url, 400)} 400w, ${getOptimizedShopifyImage(imgObj.url, 800)} 800w`}
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      alt={imgObj.altText || `Review ${i + 1}`} 
+                      loading="lazy" 
+                      decoding="async" 
+                      className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500 rounded-2xl" 
+                    />
                   </div>
                 </CarouselItem>
               ))}

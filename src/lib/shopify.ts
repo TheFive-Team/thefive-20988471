@@ -25,6 +25,8 @@ export interface ShopifyProduct {
     vendor: string;
     priceRange: { minVariantPrice: ShopifyMoney };
     images: { edges: Array<{ node: { url: string; altText: string | null } }> };
+    detailImages?: { edges: Array<{ node: { url: string; altText: string | null } }> };
+    reviewImages?: { edges: Array<{ node: { url: string; altText: string | null } }> };
     variants: { edges: Array<{ node: ShopifyVariant }> };
     options: Array<{ name: string; values: string[] }>;
   };

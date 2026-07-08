@@ -27,8 +27,14 @@ export const Route = createFileRoute("/produit/$slug")({
         { title: `${params.slug} — The Five A` },
         { property: "og:title", content: `${params.slug} — The Five A` },
       ],
-      links: optimizedUrl ? [
-        { rel: "preload", as: "image", href: optimizedUrl, fetchPriority: "high" }
+      links: mainImg ? [
+        { 
+          rel: "preload", 
+          as: "image", 
+          imagesrcset: `${getOptimizedShopifyImage(mainImg.url, 400)} 400w, ${getOptimizedShopifyImage(mainImg.url, 800)} 800w`,
+          imagesizes: "100vw",
+          fetchPriority: "high" 
+        }
       ] : []
     };
   },

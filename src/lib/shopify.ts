@@ -68,10 +68,8 @@ export function formatMoney(money: ShopifyMoney): string {
 export function getOptimizedShopifyImage(url: string, width: number): string {
   if (!url || !url.includes("cdn.shopify.com")) return url;
   try {
-    const parsedUrl = new URL(url);
-    parsedUrl.searchParams.set("width", width.toString());
-    parsedUrl.searchParams.set("format", "webp");
-    return parsedUrl.toString();
+    const encodedUrl = encodeURIComponent(url);
+    return `https://images.weserv.nl/?url=${encodedUrl}&w=${width}&output=webp`;
   } catch (e) {
     return url;
   }

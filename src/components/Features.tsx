@@ -26,7 +26,7 @@ export function Features() {
           {features.map((feat, i) => (
             <div key={i} className={`flex flex-col md:flex-row gap-8 md:gap-16 items-center ${i % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}>
               <div className="flex-1 w-full aspect-video md:aspect-[4/3] rounded-2xl overflow-hidden shadow-xl">
-                <img src={feat.img} alt={feat.title} className="w-full h-full object-cover" />
+                <img src={feat.img} alt={feat.title} className="w-full h-full object-cover" width={800} height={800} loading="lazy" decoding="async" />
               </div>
               <div className="flex-1 space-y-4">
                 <h3 className="text-2xl md:text-3xl font-bold text-zinc-900">{feat.title}</h3>

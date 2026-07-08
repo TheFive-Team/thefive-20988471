@@ -43,7 +43,9 @@ export function Reviews({ customImages }: { customImages?: Array<{ url: string; 
                       sizes="(max-width: 768px) 100vw, 50vw"
                       alt={imgObj.altText || `Review ${i + 1}`} 
                       loading="lazy" 
-                      decoding="async" 
+                      decoding="async"
+                      width={400}
+                      height={400} 
                       className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500 rounded-2xl" 
                     />
                   </div>

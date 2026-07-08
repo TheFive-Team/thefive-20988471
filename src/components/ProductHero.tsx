@@ -12,7 +12,11 @@ export function ProductHero() {
         <div className="relative rounded-2xl overflow-hidden bg-zinc-100 aspect-[4/5] shadow-lg group">
           <img 
             src="/lux-product.png" 
-            alt="Vetement Lux - Premium Black Jacket" 
+            alt="Vetement Lux - Premium Black Jacket"
+            width={800}
+            height={1000}
+            loading="eager"
+            fetchPriority="high"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
           <div className="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold uppercase tracking-wider py-1 px-3 rounded-full">

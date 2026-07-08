@@ -29,7 +29,7 @@ function Index() {
       {/* HERO */}
       <section className="relative">
         <div className="relative h-[68vh] min-h-[480px] w-full overflow-hidden sm:h-[78vh] sm:min-h-[560px]">
-          <img src={hero} alt="The Five A — collection enfants" width={1600} height={1100} className="h-full w-full object-cover" />
+          <img src={hero} alt="The Five A — collection enfants" width={1600} height={1100} loading="eager" fetchPriority="high" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-foreground/10 via-foreground/20 to-foreground/60" />
           <div className="absolute inset-0 flex flex-col items-center justify-end px-5 pb-12 text-center text-background sm:px-6 sm:pb-24">
             <p className="eyebrow text-background/85 text-[0.6rem] sm:text-[0.7rem]">{tr("hero.eyebrow")}</p>

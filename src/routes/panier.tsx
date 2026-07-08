@@ -64,7 +64,7 @@ function CartPage() {
             {items.map((l) => (
               <div key={l.variantId} className="grid grid-cols-[88px_1fr_auto] items-center gap-4 py-6 sm:grid-cols-[110px_1fr_auto] sm:gap-6">
                 <Link to="/produit/$slug" params={{ slug: l.productHandle }} className="block aspect-[4/5] overflow-hidden bg-secondary">
-                  {l.image && <img src={l.image} alt={l.productTitle} loading="lazy" className="h-full w-full object-cover" />}
+                  {l.image && <img src={l.image} alt={l.productTitle} loading="lazy" decoding="async" width={200} height={250} className="h-full w-full object-cover" />}
                 </Link>
                 <div className="min-w-0">
                   <Link to="/produit/$slug" params={{ slug: l.productHandle }} className="font-serif text-lg leading-tight hover:text-accent">

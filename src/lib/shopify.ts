@@ -66,6 +66,15 @@ export function formatMoney(money: ShopifyMoney): string {
 // End of local product client
 
 export function getOptimizedShopifyImage(url: string, width?: number): string {
-  // Direct Shopify URL. Proxy was too slow for LCP.
+  if (!url || !width) return url;
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.hostname.includes('cdn.shopify.com')) {
+      parsedUrl.searchParams.set('width', width.toString());
+      return parsedUrl.toString();
+    }
+  } catch {
+    // If it's a relative URL or invalid, just return as is
+  }
   return url;
 }

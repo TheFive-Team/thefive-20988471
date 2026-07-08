@@ -15,7 +15,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider, useI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/site-layout";
-const SiteFooter = lazy(() => import("@/components/site-layout").then(m => ({ default: m.SiteFooter })));
+const SiteFooter = lazy(() => import("@/components/SiteFooter").then(m => ({ default: m.SiteFooter })));
 import { useCartSync } from "@/hooks/useCartSync";
 
 function PromoBar() {

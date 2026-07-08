@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import { useI18n } from "@/lib/i18n";
-import { useShopifyProduct, productQueryOptions } from "@/hooks/useShopifyProducts";
+import { productQueryOptions } from "@/hooks/useShopifyProducts";
 import { useCartStore } from "@/stores/cartStore";
 import { formatMoney, getOptimizedShopifyImage } from "@/lib/shopify";
 import { MobileImageGallery } from "@/components/MobileImageGallery";
@@ -43,7 +43,7 @@ export const Route = createFileRoute("/produit/$slug")({
 function ProductPage() {
   const { slug } = Route.useParams();
   const { tr } = useI18n();
-  const { data: product } = useShopifyProduct(slug);
+  const product = Route.useLoaderData();
   const addItem = useCartStore((s) => s.addItem);
   const isCartLoading = useCartStore((s) => s.isLoading);
   const [variantId, setVariantId] = useState<string | null>(null);
@@ -130,7 +130,9 @@ function ProductPage() {
           <div className="bg-secondary rounded-2xl overflow-hidden shadow-xl shadow-secondary/5">
             {image && (
               <img 
-                src={image.url} 
+                src={getOptimizedShopifyImage(image.url, 800)} 
+                srcSet={`${getOptimizedShopifyImage(image.url, 400)} 400w, ${getOptimizedShopifyImage(image.url, 800)} 800w, ${getOptimizedShopifyImage(image.url, 1200)} 1200w`}
+                sizes="(max-width: 768px) 100vw, 50vw"
                 alt={image.altText ?? p.title} 
                 width={800} height={1000} 
                 className="h-full w-full object-cover" 
@@ -147,7 +149,7 @@ function ProductPage() {
                   className={`aspect-square rounded-xl overflow-hidden shadow-sm bg-secondary border ${i === activeImg ? "border-primary" : "border-transparent hover:border-accent"}`}
                 >
                   <img 
-                    src={img.url} 
+                    src={getOptimizedShopifyImage(img.url, 200)} 
                     alt={img.altText ?? `${p.title} ${i + 1}`} 
                     className="h-full w-full object-cover" 
                     loading="lazy" decoding="async" 
@@ -219,7 +221,9 @@ function ProductPage() {
           {images.slice(1).map((img, idx) => (
             <img 
               key={idx} 
-              src={img.url} 
+              src={getOptimizedShopifyImage(img.url, 800)} 
+              srcSet={`${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
+              sizes="100vw"
               alt={img.altText || `${p.title} detail view ${idx + 1}`} 
               className="w-full max-w-2xl h-auto object-cover rounded-2xl shadow-md" 
               loading="lazy"

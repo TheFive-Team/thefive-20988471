@@ -59,3 +59,56 @@ export async function commitFile(
   
   return await res.json();
 }
+
+/**
+ * Deletes a file from the GitHub repository.
+ */
+export async function deleteFile(
+  path: string,
+  message: string,
+  token: string
+) {
+  const sha = await getFileSha(path, token);
+  if (!sha) return; // File already doesn't exist
+  
+  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`;
+  const res = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github.v3+json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      message,
+      sha,
+      branch: GITHUB_BRANCH
+    })
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(`Failed to delete file: ${errorData.message || res.statusText}`);
+  }
+}
+
+/**
+ * Lists files in a specific directory.
+ */
+export async function listFiles(
+  path: string,
+  token: string
+): Promise<Array<{ name: string; path: string; url: string; sha: string }>> {
+  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`;
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github.v3+json"
+    }
+  });
+  if (!res.ok) {
+    if (res.status === 404) return [];
+    throw new Error(`GitHub API error: ${res.statusText}`);
+  }
+  return await res.json();
+}

@@ -2,12 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
-import { commitFile } from "@/lib/github";
+import { commitFile, deleteFile, listFiles } from "@/lib/github";
 import { 
   ShoppingBag, Hourglass, Truck, CheckCircle, Wallet, Calendar, 
   MapPin, Phone, User, Hash, Clock, Box, FileText, Settings, 
-  LogOut, AlertCircle, RefreshCw, Trash2, Plus, X, Download, Search, Filter, Copy, MessageCircle, Edit, ChevronDown
-, Sun, Moon, Menu } from "lucide-react";
+  LogOut, AlertCircle, RefreshCw, Trash2, Plus, X, Download, Search, Filter, Copy, MessageCircle, Edit, ChevronDown,
+  Sun, Moon, Menu, ArrowUp, ArrowDown, Image as ImageIcon, Upload
+} from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/lib/supabase";
 import { syncConfirmedOrdersFn } from "@/actions/syncZRExpress.server";
@@ -1206,7 +1207,65 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<any>({});
   const [isSaving, setIsSaving] = useState(false);
+  const [isCleaning, setIsCleaning] = useState(false);
   const [productImages, setProductImages] = useState<ProductImageObj[]>([]);
+  
+  // Ref for hidden file input for replacing an image
+  const replaceInputRef = useRef<HTMLInputElement>(null);
+  const [replaceTargetId, setReplaceTargetId] = useState<string | null>(null);
+
+  const cleanUnusedImages = async () => {
+    if (!token) return;
+    setIsCleaning(true);
+    try {
+      // 1. Fetch all files from public/images
+      const allFiles = await listFiles("public/images", token);
+      
+      // 2. Parse products.json to collect all used filenames
+      const usedUrls = new Set<string>();
+      products.forEach(p => {
+        p.node.images.edges.forEach(e => {
+          const url = e.node.url;
+          usedUrls.add(url);
+          // If it's a webp, also mark the other variants as used
+          if (url.endsWith("-800w.webp")) {
+            usedUrls.add(url.replace("-800w.webp", "-400w.webp"));
+            usedUrls.add(url.replace("-800w.webp", "-160w.webp"));
+          }
+        });
+      });
+
+      // 3. Find orphans
+      const orphans = allFiles.filter(f => {
+        // Only delete if it's not strictly referenced (checking filename ending)
+        return !Array.from(usedUrls).some(usedUrl => usedUrl.endsWith(f.name));
+      });
+
+      if (orphans.length === 0) {
+        alert("لا توجد صور غير مستخدمة / No unused images found");
+        setIsCleaning(false);
+        return;
+      }
+
+      if (!confirm(`تم العثور على ${orphans.length} صور غير مستخدمة. هل تريد حذفها نهائياً؟\nFound ${orphans.length} unused images. Delete them permanently?`)) {
+        setIsCleaning(false);
+        return;
+      }
+
+      // 4. Delete orphans sequentially
+      let deleted = 0;
+      for (const orphan of orphans) {
+        await deleteFile(`public/images/${orphan.name}`, `Clean unused image ${orphan.name}`, token);
+        deleted++;
+      }
+      
+      alert(`تم تنظيف ${deleted} صور بنجاح / Successfully cleaned ${deleted} images`);
+    } catch (err: any) {
+      alert("Error cleaning images: " + err.message);
+    } finally {
+      setIsCleaning(false);
+    }
+  };
 
   const startEdit = (product: ShopifyProduct) => {
     setMode("edit");
@@ -1287,6 +1346,48 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
     
     // Clear input so same file can be selected again if needed
     e.target.value = "";
+  };
+
+  const handleImageReplace = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !replaceTargetId) return;
+    
+    const file = files[0];
+    const base64_800 = await resizeImage(file, 800);
+    const base64_400 = await resizeImage(file, 400);
+    const base64_160 = await resizeImage(file, 160);
+    
+    setProductImages(prev => prev.map(img => {
+      if (img.id === replaceTargetId) {
+        return {
+          id: `new-${Date.now()}-replaced`,
+          base64_800,
+          base64_400,
+          base64_160,
+          url: URL.createObjectURL(file) // For preview
+        };
+      }
+      return img;
+    }));
+    
+    setReplaceTargetId(null);
+    e.target.value = "";
+  };
+
+  const triggerReplace = (id: string) => {
+    setReplaceTargetId(id);
+    if (replaceInputRef.current) replaceInputRef.current.click();
+  };
+
+  const moveImage = (index: number, direction: -1 | 1) => {
+    setProductImages(prev => {
+      const newArray = [...prev];
+      if (index + direction < 0 || index + direction >= newArray.length) return newArray;
+      const temp = newArray[index];
+      newArray[index] = newArray[index + direction];
+      newArray[index + direction] = temp;
+      return newArray;
+    });
   };
 
   const removeImage = (id: string) => {
@@ -1446,23 +1547,124 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
               <p className="text-xs text-slate-500 dark:text-[#9CA3AF]">افصل بين القياسات بفاصلة (مثال: S, M, L) / Separate sizes with commas</p>
             </div>
             <div className="space-y-3">
-              <label className="font-bold text-slate-700 dark:text-slate-200 text-sm">معرض الصور (Gallery)</label>
-              <div className="border border-slate-200 dark:border-[#374151] rounded-xl bg-slate-50 dark:bg-[#1f2937] p-4">
-                <div className="flex flex-wrap gap-4 mb-4">
-                  {productImages.map(img => (
-                    <div key={img.id} className="relative w-24 h-24 bg-white dark:bg-[#111827] rounded-lg border shadow-sm dark:shadow-none group">
-                      <img src={img.url} className="w-full h-full object-cover rounded-lg" alt="product" />
-                      <button 
-                        onClick={() => removeImage(img.id)}
-                        className="absolute -top-2 -right-2 bg-red-100 text-red-600 rounded-full p-1 shadow-sm dark:shadow-none opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-200"
-                      >
-                        <X size={14} strokeWidth={3} />
-                      </button>
-                    </div>
-                  ))}
+              <label className="font-bold text-slate-700 dark:text-slate-200 text-sm">إدارة الصور (Image Manager)</label>
+              
+              {productImages.some(img => img.url?.endsWith(".png") || img.url?.endsWith(".jpg")) && (
+                <div className="bg-amber-50 border border-amber-200 text-amber-700 p-3 rounded-xl flex items-start gap-3 mb-2">
+                  <AlertCircle size={20} className="shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-bold">تحذير: توجد صور غير محسنة (Warnings: Unoptimized Images Detected)</p>
+                    <p>بعض الصور تستخدم صيغة قديمة (.png أو .jpg). يُرجى استبدالها بصيغة WebP المحسنة لتحسين سرعة الموقع وتقييم Lighthouse.</p>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <input type="file" multiple accept="image/*" onChange={handleImageUpload} className="text-sm text-slate-500 dark:text-[#9CA3AF] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-white dark:bg-[#111827] file:text-slate-700 dark:text-slate-200 file:shadow-sm dark:shadow-none file:cursor-pointer hover:file:bg-slate-100 dark:bg-[#374151]" />
+              )}
+
+              <div className="border border-slate-200 dark:border-[#374151] rounded-xl bg-slate-50 dark:bg-[#1f2937] overflow-hidden">
+                <input type="file" accept="image/*" className="hidden" ref={replaceInputRef} onChange={handleImageReplace} />
+                
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-right">
+                    <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">
+                      <tr>
+                        <th className="p-3">الصورة (Preview)</th>
+                        <th className="p-3">النوع (Role)</th>
+                        <th className="p-3">الرابط والتحذيرات (URL & Warnings)</th>
+                        <th className="p-3 text-center">ترتيب (Reorder)</th>
+                        <th className="p-3 text-left">إجراءات (Actions)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                      {productImages.map((img, index) => {
+                        const isLegacy = img.url && (img.url.endsWith(".png") || img.url.endsWith(".jpg"));
+                        const isUnoptimized = img.url && !img.url.endsWith("-800w.webp") && !isLegacy;
+                        
+                        return (
+                          <tr key={img.id} className="hover:bg-white dark:hover:bg-slate-800/50 transition-colors">
+                            <td className="p-3">
+                              <div className="w-16 h-16 bg-white dark:bg-[#111827] rounded-lg border shadow-sm dark:shadow-none overflow-hidden">
+                                <img src={img.url || img.base64_160 || img.base64} className="w-full h-full object-cover" alt="product preview" />
+                              </div>
+                            </td>
+                            <td className="p-3">
+                              {index === 0 ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-md text-xs font-bold border border-emerald-200 dark:border-emerald-800/50">
+                                  صورة العرض (Hero)
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 rounded-md text-xs font-bold border border-blue-200 dark:border-blue-800/50">
+                                  المعرض (Gallery)
+                                </span>
+                              )}
+                            </td>
+                            <td className="p-3">
+                              <div className="font-mono text-xs text-slate-500 dark:text-slate-400 max-w-[200px] truncate" dir="ltr" title={img.url}>
+                                {img.url ? img.url.split('/').pop() : 'New Image'}
+                              </div>
+                              {isLegacy && (
+                                <div className="text-[10px] text-amber-600 font-bold mt-1">⚠️ صيغة قديمة (.png/.jpg)</div>
+                              )}
+                              {isUnoptimized && (
+                                <div className="text-[10px] text-orange-500 font-bold mt-1">⚠️ غير محول للصيغ المتعددة</div>
+                              )}
+                            </td>
+                            <td className="p-3 text-center">
+                              <div className="flex flex-col items-center justify-center gap-1">
+                                <button 
+                                  onClick={() => moveImage(index, -1)}
+                                  disabled={index === 0}
+                                  className="p-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                                >
+                                  <ArrowUp size={14} />
+                                </button>
+                                <button 
+                                  onClick={() => moveImage(index, 1)}
+                                  disabled={index === productImages.length - 1}
+                                  className="p-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                                >
+                                  <ArrowDown size={14} />
+                                </button>
+                              </div>
+                            </td>
+                            <td className="p-3 text-left space-x-2 space-x-reverse">
+                              <button 
+                                onClick={() => triggerReplace(img.id)}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-100 font-bold text-xs shadow-sm transition-colors"
+                              >
+                                <Edit size={12} />
+                                استبدال (Replace)
+                              </button>
+                              <button 
+                                onClick={() => removeImage(img.id)}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 font-bold text-xs shadow-sm transition-colors"
+                              >
+                                <Trash2 size={12} />
+                                حذف
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      {productImages.length === 0 && (
+                        <tr>
+                          <td colSpan={5} className="p-8 text-center text-slate-500">
+                            <ImageIcon size={32} className="mx-auto mb-2 opacity-50" />
+                            لا توجد صور. يُرجى إضافة صور للمنتج.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="p-4 bg-white dark:bg-[#111827] border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                  <div className="text-sm font-bold text-slate-600 dark:text-slate-300">
+                    إجمالي الصور: {productImages.length}
+                  </div>
+                  <label className="flex items-center gap-2 px-5 py-2.5 bg-[#1e293b] text-white dark:text-[#0B1120] rounded-lg font-bold hover:bg-slate-800 transition-colors shadow-md cursor-pointer text-sm">
+                    <Upload size={16} />
+                    إضافة صور جديدة
+                    <input type="file" multiple accept="image/*" onChange={handleImageUpload} className="hidden" />
+                  </label>
                 </div>
               </div>
             </div>
@@ -1492,6 +1694,14 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
           إدارة المنتجات المتاحة
         </h2>
         <div className="flex items-center gap-3">
+          <button 
+            onClick={cleanUnusedImages} 
+            disabled={loading || isSaving || isCleaning}
+            className="flex items-center gap-2 px-5 py-2.5 bg-rose-50 text-rose-600 border border-rose-200 rounded-lg font-bold hover:bg-rose-100 transition-colors shadow-sm dark:shadow-none disabled:opacity-50 text-sm"
+          >
+            <Trash2 size={16} className={isCleaning ? "animate-pulse" : ""} />
+            {isCleaning ? "جاري التنظيف..." : "تنظيف الصور غير المستخدمة"}
+          </button>
           <button 
             onClick={startCreate} 
             disabled={loading || isSaving}

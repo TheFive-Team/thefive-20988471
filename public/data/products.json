@@ -19,25 +19,25 @@
         "edges": [
           {
             "node": {
-              "url": "/images/product-1783527499636-0.png",
+              "url": "/images/product-1783528660745-0-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-1783527504319-1.png",
+              "url": "/images/product-1783528665463-1-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-1783527508139-2.png",
+              "url": "/images/product-1783528669720-2-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-1783527511876-3.png",
+              "url": "/images/product-1783528673905-3-800w.webp",
               "altText": null
             }
           }
@@ -47,7 +47,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835275160830",
+              "id": "gid://shopify/ProductVariant/17835286783840",
               "title": "6",
               "availableForSale": true,
               "price": {
@@ -64,7 +64,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835275160831",
+              "id": "gid://shopify/ProductVariant/17835286783841",
               "title": "8",
               "availableForSale": true,
               "price": {
@@ -81,7 +81,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835275160832",
+              "id": "gid://shopify/ProductVariant/17835286783842",
               "title": "10",
               "availableForSale": true,
               "price": {
@@ -98,7 +98,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835275160833",
+              "id": "gid://shopify/ProductVariant/17835286783843",
               "title": "12",
               "availableForSale": true,
               "price": {

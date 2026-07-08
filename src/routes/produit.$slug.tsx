@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useShopifyProduct, productQueryOptions } from "@/hooks/useShopifyProducts";
 import { useCartStore } from "@/stores/cartStore";
-import { formatMoney } from "@/lib/shopify";
+import { formatMoney, getOptimizedShopifyImage } from "@/lib/shopify";
 import { MobileImageGallery } from "@/components/MobileImageGallery";
 import { CodForm } from "@/components/CodForm";
 
@@ -17,12 +17,21 @@ export const Route = createFileRoute("/produit/$slug")({
   loader: async ({ context, params }) => {
     return context.queryClient.ensureQueryData(productQueryOptions(params.slug));
   },
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.slug} — The Five A` },
-      { property: "og:title", content: `${params.slug} — The Five A` },
-    ],
-  }),
+  head: ({ loaderData, params }) => {
+    const images = (loaderData as any)?.node?.images?.edges?.map((e: any) => e.node) ?? [];
+    const mainImg = images[0];
+    const optimizedUrl = mainImg ? getOptimizedShopifyImage(mainImg.url, 800) : undefined;
+
+    return {
+      meta: [
+        { title: `${params.slug} — The Five A` },
+        { property: "og:title", content: `${params.slug} — The Five A` },
+      ],
+      links: optimizedUrl ? [
+        { rel: "preload", as: "image", href: optimizedUrl, fetchPriority: "high" }
+      ] : []
+    };
+  },
   component: ProductPage,
 });
 
@@ -107,9 +116,6 @@ function ProductPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10 sm:py-24">
-      {images[0] && (
-        <link rel="preload" as="image" href={images[0].url} fetchPriority="high" />
-      )}
       <div className="grid gap-0 md:grid-cols-2 md:gap-10 lg:gap-12">
         <div className="block md:hidden -mx-6 sm:-mx-10">
           {/* Dynamic gallery from Shopify */}
@@ -117,7 +123,17 @@ function ProductPage() {
         </div>
         <div className="hidden md:block">
           <div className="bg-secondary rounded-2xl overflow-hidden shadow-xl shadow-secondary/5">
-            {image && <img src={image.url} alt={image.altText ?? p.title} width={800} height={1000} className="h-full w-full object-cover" fetchPriority="high" loading="eager" decoding="sync" />}
+            {image && (
+              <img 
+                src={getOptimizedShopifyImage(image.url, 800)} 
+                srcSet={`${getOptimizedShopifyImage(image.url, 400)} 400w, ${getOptimizedShopifyImage(image.url, 800)} 800w`}
+                sizes="(max-width: 768px) 100vw, 50vw"
+                alt={image.altText ?? p.title} 
+                width={800} height={1000} 
+                className="h-full w-full object-cover" 
+                fetchPriority="high" loading="eager" decoding="sync" 
+              />
+            )}
           </div>
           {images.length > 1 && (
             <div className="mt-4 grid grid-cols-5 gap-3">
@@ -127,7 +143,13 @@ function ProductPage() {
                   onClick={() => setActiveImg(i)}
                   className={`aspect-square rounded-xl overflow-hidden shadow-sm bg-secondary border ${i === activeImg ? "border-primary" : "border-transparent hover:border-accent"}`}
                 >
-                  <img src={img.url} alt={img.altText ?? `${p.title} ${i + 1}`} className="h-full w-full object-cover" loading="lazy" decoding="async" />
+                  <img 
+                    src={getOptimizedShopifyImage(img.url, 200)} 
+                    alt={img.altText ?? `${p.title} ${i + 1}`} 
+                    className="h-full w-full object-cover" 
+                    loading="lazy" decoding="async" 
+                    width={200} height={200}
+                  />
                 </button>
               ))}
             </div>
@@ -194,11 +216,14 @@ function ProductPage() {
           {images.slice(1).map((img, idx) => (
             <img 
               key={idx} 
-              src={img.url} 
+              src={getOptimizedShopifyImage(img.url, 800)} 
+              srcSet={`${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
+              sizes="100vw"
               alt={img.altText || `${p.title} detail view ${idx + 1}`} 
               className="w-full max-w-2xl h-auto object-cover rounded-2xl shadow-md" 
               loading="lazy"
               decoding="async"
+              width={800} height={1000}
             />
           ))}
         </section>

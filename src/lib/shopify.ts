@@ -64,3 +64,15 @@ export function formatMoney(money: ShopifyMoney): string {
 }
 
 // End of local product client
+
+export function getOptimizedShopifyImage(url: string, width: number): string {
+  if (!url || !url.includes("cdn.shopify.com")) return url;
+  try {
+    const parsedUrl = new URL(url);
+    parsedUrl.searchParams.set("width", width.toString());
+    parsedUrl.searchParams.set("format", "webp");
+    return parsedUrl.toString();
+  } catch (e) {
+    return url;
+  }
+}

@@ -65,12 +65,7 @@ export function formatMoney(money: ShopifyMoney): string {
 
 // End of local product client
 
-export function getOptimizedShopifyImage(url: string, width: number): string {
-  if (!url || !url.includes("cdn.shopify.com")) return url;
-  try {
-    const encodedUrl = encodeURIComponent(url);
-    return `https://images.weserv.nl/?url=${encodedUrl}&w=${width}&output=webp`;
-  } catch (e) {
-    return url;
-  }
+export function getOptimizedShopifyImage(url: string, width?: number): string {
+  // Direct Shopify URL. Proxy was too slow for LCP.
+  return url;
 }

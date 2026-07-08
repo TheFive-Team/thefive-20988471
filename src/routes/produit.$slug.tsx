@@ -31,8 +31,7 @@ export const Route = createFileRoute("/produit/$slug")({
         { 
           rel: "preload", 
           as: "image", 
-          imagesrcset: `${getOptimizedShopifyImage(mainImg.url, 400)} 400w, ${getOptimizedShopifyImage(mainImg.url, 800)} 800w`,
-          imagesizes: "100vw",
+          href: mainImg.url,
           fetchPriority: "high" 
         }
       ] : []
@@ -131,9 +130,7 @@ function ProductPage() {
           <div className="bg-secondary rounded-2xl overflow-hidden shadow-xl shadow-secondary/5">
             {image && (
               <img 
-                src={getOptimizedShopifyImage(image.url, 800)} 
-                srcSet={`${getOptimizedShopifyImage(image.url, 400)} 400w, ${getOptimizedShopifyImage(image.url, 800)} 800w`}
-                sizes="(max-width: 768px) 100vw, 50vw"
+                src={image.url} 
                 alt={image.altText ?? p.title} 
                 width={800} height={1000} 
                 className="h-full w-full object-cover" 
@@ -150,7 +147,7 @@ function ProductPage() {
                   className={`aspect-square rounded-xl overflow-hidden shadow-sm bg-secondary border ${i === activeImg ? "border-primary" : "border-transparent hover:border-accent"}`}
                 >
                   <img 
-                    src={getOptimizedShopifyImage(img.url, 200)} 
+                    src={img.url} 
                     alt={img.altText ?? `${p.title} ${i + 1}`} 
                     className="h-full w-full object-cover" 
                     loading="lazy" decoding="async" 
@@ -222,9 +219,7 @@ function ProductPage() {
           {images.slice(1).map((img, idx) => (
             <img 
               key={idx} 
-              src={getOptimizedShopifyImage(img.url, 800)} 
-              srcSet={`${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
-              sizes="100vw"
+              src={img.url} 
               alt={img.altText || `${p.title} detail view ${idx + 1}`} 
               className="w-full max-w-2xl h-auto object-cover rounded-2xl shadow-md" 
               loading="lazy"

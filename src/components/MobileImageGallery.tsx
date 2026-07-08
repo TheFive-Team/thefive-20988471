@@ -40,9 +40,7 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
             {images.map((img, idx) => (
               <div className="flex-[0_0_100%] min-w-0" key={idx}>
                 <img 
-                  src={getOptimizedShopifyImage(img.url, 800)} 
-                  srcSet={`${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
-                  sizes="100vw"
+                  src={img.url} 
                   alt={img.altText || `Product view ${idx + 1}`} 
                   className="w-full h-auto object-cover aspect-[4/5]" 
                   loading={idx === 0 ? "eager" : "lazy"}
@@ -67,7 +65,7 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
                   onClick={() => onThumbClick(idx)}
                 >
                   <img 
-                    src={getOptimizedShopifyImage(img.url, 200)} 
+                    src={img.url} 
                     alt={`Thumbnail ${idx + 1}`} 
                     className="w-full h-auto object-cover aspect-square" 
                     loading="lazy" 

@@ -19,25 +19,25 @@
         "edges": [
           {
             "node": {
-              "url": "/images/product-1783528660745-0-800w.webp",
+              "url": "/images/product-gallery-1783530546662-8-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-1783528665463-1-800w.webp",
+              "url": "/images/product-gallery-1783530552417-9-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-1783528669720-2-800w.webp",
+              "url": "/images/product-gallery-1783530557319-10-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-1783528673905-3-800w.webp",
+              "url": "/images/product-gallery-1783530563515-11-800w.webp",
               "altText": null
             }
           }
@@ -47,19 +47,25 @@
         "edges": [
           {
             "node": {
-              "url": "/images/product-1783528665463-1-800w.webp",
+              "url": "/images/product-detail-1783530569849-12-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-1783528669720-2-800w.webp",
+              "url": "/images/product-detail-1783530574448-13-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-1783528673905-3-800w.webp",
+              "url": "/images/product-detail-1783530579638-14-800w.webp",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "/images/product-detail-1783530584592-15-800w.webp",
               "altText": null
             }
           }
@@ -67,21 +73,61 @@
       },
       "reviewImages": {
         "edges": [
-          { "node": { "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-9.webp", "altText": null } },
-          { "node": { "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-10.webp", "altText": null } },
-          { "node": { "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-11.webp", "altText": null } },
-          { "node": { "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-12.webp", "altText": null } },
-          { "node": { "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-13.webp", "altText": null } },
-          { "node": { "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-14.webp", "altText": null } },
-          { "node": { "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-16.webp", "altText": null } },
-          { "node": { "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-18.webp", "altText": null } }
+          {
+            "node": {
+              "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-9.webp",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-10.webp",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-11.webp",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-12.webp",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-13.webp",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-14.webp",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-16.webp",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-18.webp",
+              "altText": null
+            }
+          }
         ]
       },
       "variants": {
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835286783840",
+              "id": "gid://shopify/ProductVariant/17835305897110",
               "title": "6",
               "availableForSale": true,
               "price": {
@@ -98,7 +144,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835286783841",
+              "id": "gid://shopify/ProductVariant/17835305897111",
               "title": "8",
               "availableForSale": true,
               "price": {
@@ -115,7 +161,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835286783842",
+              "id": "gid://shopify/ProductVariant/17835305897112",
               "title": "10",
               "availableForSale": true,
               "price": {
@@ -132,7 +178,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835286783843",
+              "id": "gid://shopify/ProductVariant/17835305897113",
               "title": "12",
               "availableForSale": true,
               "price": {

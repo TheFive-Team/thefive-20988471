@@ -19,25 +19,25 @@
         "edges": [
           {
             "node": {
-              "url": "/images/product-1783469214955-0.png",
+              "url": "/images/product-1783469289589-0.png",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-1783469216785-1.png",
+              "url": "/images/product-1783469291384-1.png",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-1783469218228-2.png",
+              "url": "/images/product-1783469293460-2.png",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-1783469219788-3.png",
+              "url": "/images/product-1783469295246-3.png",
               "altText": null
             }
           }
@@ -47,7 +47,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17834692217330",
+              "id": "gid://shopify/ProductVariant/17834692970710",
               "title": "6",
               "availableForSale": true,
               "price": {
@@ -64,7 +64,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17834692217331",
+              "id": "gid://shopify/ProductVariant/17834692970711",
               "title": "8",
               "availableForSale": true,
               "price": {
@@ -81,7 +81,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17834692217332",
+              "id": "gid://shopify/ProductVariant/17834692970712",
               "title": "10",
               "availableForSale": true,
               "price": {
@@ -98,7 +98,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17834692217333",
+              "id": "gid://shopify/ProductVariant/17834692970713",
               "title": "12",
               "availableForSale": true,
               "price": {

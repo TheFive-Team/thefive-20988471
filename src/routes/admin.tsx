@@ -1192,7 +1192,14 @@ function OrdersDashboard() {
 }
 
 // --- PRODUCTS MANAGER COMPONENT ---
-type ProductImageObj = { id: string, url?: string, base64?: string };
+type ProductImageObj = { 
+  id: string, 
+  url?: string, 
+  base64_800?: string,
+  base64_400?: string,
+  base64_160?: string,
+  base64?: string // for legacy fallback if needed
+};
 
 function ProductsManager({ products, token, onRefresh, loading }: { products: ShopifyProduct[], token: string, onRefresh: () => void, loading: boolean }) {
   const [mode, setMode] = useState<"list" | "edit" | "create">("list");
@@ -1236,22 +1243,47 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
     setProductImages([]);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const resizeImage = (file: File, maxWidth: number): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ratio = maxWidth / img.width;
+          const width = ratio < 1 ? img.width * ratio : img.width;
+          const height = ratio < 1 ? img.height * ratio : img.height;
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (ctx) ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL("image/webp", 0.85);
+          resolve(dataUrl.split(",")[1]);
+        };
+      };
+    });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
     
-    Array.from(files).forEach((file, idx) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = (reader.result as string).split(',')[1];
-        setProductImages(prev => [...prev, {
-          id: `new-${Date.now()}-${idx}`,
-          base64: base64String,
-          url: reader.result as string // For immediate preview
-        }]);
-      };
-      reader.readAsDataURL(file);
-    });
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const base64_800 = await resizeImage(file, 800);
+      const base64_400 = await resizeImage(file, 400);
+      const base64_160 = await resizeImage(file, 160);
+      
+      setProductImages(prev => [...prev, {
+        id: `new-${Date.now()}-${i}`,
+        base64_800,
+        base64_400,
+        base64_160,
+        url: URL.createObjectURL(file) // For immediate preview
+      }]);
+    }
     
     // Clear input so same file can be selected again if needed
     e.target.value = "";
@@ -1314,7 +1346,14 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       // Upload new images and preserve existing ones
       for (let i = 0; i < productImages.length; i++) {
         const img = productImages[i];
-        if (img.base64) {
+        if (img.base64_800 && img.base64_400 && img.base64_160) {
+          const baseName = `product-${Date.now()}-${i}`;
+          await commitFile(`public/images/${baseName}-800w.webp`, img.base64_800, `Upload 800w image for ${editForm.title}`, token, true);
+          await commitFile(`public/images/${baseName}-400w.webp`, img.base64_400, `Upload 400w image for ${editForm.title}`, token, true);
+          await commitFile(`public/images/${baseName}-160w.webp`, img.base64_160, `Upload 160w image for ${editForm.title}`, token, true);
+          finalImageEdges.push({ node: { url: `/images/${baseName}-800w.webp`, altText: null } });
+        } else if (img.base64) {
+          // Fallback for any legacy unoptimized upload logic
           const fileName = `product-${Date.now()}-${i}.png`;
           const imagePath = `public/images/${fileName}`;
           await commitFile(imagePath, img.base64, `Upload image for ${editForm.title}`, token, true);

@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { getOptimizedShopifyImage } from "@/lib/shopify";
+import { getOptimizedShopifyImage, getLocalSrcSet } from "@/lib/shopify";
 
 export function MobileImageGallery({ images }: { images: { url: string; altText?: string | null }[] }) {
   const [mainRef, mainApi] = useEmblaCarousel({ loop: true });
@@ -41,7 +41,7 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
               <div className="flex-[0_0_100%] min-w-0" key={idx}>
                 <img 
                   src={getOptimizedShopifyImage(img.url, 800)} 
-                  srcSet={`${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
+                  srcSet={getLocalSrcSet(img.url) || `${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
                   sizes="100vw"
                   alt={img.altText || `Product view ${idx + 1}`} 
                   className="w-full h-auto object-cover aspect-[4/5]" 
@@ -67,7 +67,7 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
                   onClick={() => onThumbClick(idx)}
                 >
                   <img 
-                    src={getOptimizedShopifyImage(img.url, 200)} 
+                    src={img.url.endsWith("-800w.webp") ? img.url.replace("-800w.webp", "-160w.webp") : getOptimizedShopifyImage(img.url, 200)} 
                     alt={`Thumbnail ${idx + 1}`} 
                     className="w-full h-auto object-cover aspect-square" 
                     loading="lazy" 

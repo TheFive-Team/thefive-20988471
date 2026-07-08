@@ -76,3 +76,12 @@ export function getOptimizedShopifyImage(url: string, width?: number): string {
   }
   return url;
 }
+
+export function getLocalSrcSet(url: string): string | undefined {
+  if (!url) return undefined;
+  if (url.endsWith("-800w.webp")) {
+    const base = url.replace("-800w.webp", "");
+    return `${base}-160w.webp 160w, ${base}-400w.webp 400w, ${url} 800w`;
+  }
+  return undefined;
+}

@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import { useI18n } from "@/lib/i18n";
 import { productQueryOptions } from "@/hooks/useShopifyProducts";
 import { useCartStore } from "@/stores/cartStore";
-import { formatMoney, getOptimizedShopifyImage } from "@/lib/shopify";
+import { formatMoney, getOptimizedShopifyImage, getLocalSrcSet } from "@/lib/shopify";
 import { MobileImageGallery } from "@/components/MobileImageGallery";
 import { CodForm } from "@/components/CodForm";
 
@@ -131,7 +131,7 @@ function ProductPage() {
             {image && (
               <img 
                 src={getOptimizedShopifyImage(image.url, 800)} 
-                srcSet={`${getOptimizedShopifyImage(image.url, 400)} 400w, ${getOptimizedShopifyImage(image.url, 800)} 800w, ${getOptimizedShopifyImage(image.url, 1200)} 1200w`}
+                srcSet={getLocalSrcSet(image.url) || `${getOptimizedShopifyImage(image.url, 400)} 400w, ${getOptimizedShopifyImage(image.url, 800)} 800w, ${getOptimizedShopifyImage(image.url, 1200)} 1200w`}
                 sizes="(max-width: 768px) 100vw, 50vw"
                 alt={image.altText ?? p.title} 
                 width={800} height={1000} 
@@ -149,7 +149,7 @@ function ProductPage() {
                   className={`aspect-square rounded-xl overflow-hidden shadow-sm bg-secondary border ${i === activeImg ? "border-primary" : "border-transparent hover:border-accent"}`}
                 >
                   <img 
-                    src={getOptimizedShopifyImage(img.url, 200)} 
+                    src={img.url.endsWith("-800w.webp") ? img.url.replace("-800w.webp", "-160w.webp") : getOptimizedShopifyImage(img.url, 200)} 
                     alt={img.altText ?? `${p.title} ${i + 1}`} 
                     className="h-full w-full object-cover" 
                     loading="lazy" decoding="async" 
@@ -222,7 +222,7 @@ function ProductPage() {
             <img 
               key={idx} 
               src={getOptimizedShopifyImage(img.url, 800)} 
-              srcSet={`${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
+              srcSet={getLocalSrcSet(img.url) || `${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
               sizes="100vw"
               alt={img.altText || `${p.title} detail view ${idx + 1}`} 
               className="w-full max-w-2xl h-auto object-cover rounded-2xl shadow-md" 

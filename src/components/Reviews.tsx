@@ -10,20 +10,9 @@ import {
 import { getOptimizedShopifyImage, getLocalSrcSet } from "@/lib/shopify";
 
 export function Reviews({ customImages }: { customImages?: Array<{ url: string; altText?: string | null }> }) {
-  const defaultReviewImages = [
-    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-9.webp",
-    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-10.webp",
-    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-11.webp",
-    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-12.webp",
-    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-13.webp",
-    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-14.webp",
-    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-16.webp",
-    "https://cdn.jsdelivr.net/gh/TheFive-Team/thefive-20988471@main/public/Instagram-post-18.webp",
-  ];
-
-  const reviewImages = customImages && customImages.length > 0 
-    ? customImages 
-    : defaultReviewImages.map(url => ({ url }));
+  if (!customImages || customImages.length === 0) return null;
+  
+  const reviewImages = customImages;
 
   return (
     <section className="py-16 md:py-24 bg-transparent">

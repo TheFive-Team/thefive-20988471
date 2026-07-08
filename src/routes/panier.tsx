@@ -76,11 +76,11 @@ function CartPage() {
                   <p className="mt-2 text-sm text-foreground/80">{formatMoney(l.price)}</p>
                   <div className="mt-3 flex items-center gap-3">
                     <div className="inline-flex items-center border border-border">
-                      <button disabled={isLoading} onClick={() => updateQuantity(l.variantId, l.quantity - 1)} className="px-3 py-1 text-foreground/70 hover:text-foreground disabled:opacity-50">−</button>
+                      <button aria-label={tr("cart.decrease", "إنقاص الكمية")} disabled={isLoading} onClick={() => updateQuantity(l.variantId, l.quantity - 1)} className="px-3 py-1 text-foreground/70 hover:text-foreground disabled:opacity-50">−</button>
                       <span className="w-8 text-center text-sm">{l.quantity}</span>
-                      <button disabled={isLoading} onClick={() => updateQuantity(l.variantId, l.quantity + 1)} className="px-3 py-1 text-foreground/70 hover:text-foreground disabled:opacity-50">+</button>
+                      <button aria-label={tr("cart.increase", "زيادة الكمية")} disabled={isLoading} onClick={() => updateQuantity(l.variantId, l.quantity + 1)} className="px-3 py-1 text-foreground/70 hover:text-foreground disabled:opacity-50">+</button>
                     </div>
-                    <button disabled={isLoading} onClick={() => removeItem(l.variantId)} className="text-[0.7rem] uppercase tracking-[0.2em] text-muted-foreground hover:text-destructive disabled:opacity-50">
+                    <button aria-label={tr("cart.remove", "حذف المنتج")} disabled={isLoading} onClick={() => removeItem(l.variantId)} className="text-[0.7rem] uppercase tracking-[0.2em] text-muted-foreground hover:text-destructive disabled:opacity-50">
                       {tr("cart.remove")}
                     </button>
                   </div>

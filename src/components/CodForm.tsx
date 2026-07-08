@@ -247,11 +247,11 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
           </label>
           <div className="grid grid-cols-2 gap-4 mt-2">
             <label className={`flex items-center justify-center gap-2 p-3 border-2 rounded-xl cursor-pointer transition-all font-bold ${form.shippingMethod === 'home' ? 'border-primary bg-primary/5 text-primary shadow-md scale-105' : 'border-foreground/30 text-foreground/80 hover:border-foreground/50 hover:bg-accent/20'}`}>
-              <input type="radio" name="shippingMethod" value="home" checked={form.shippingMethod === 'home'} onChange={(e) => { setForm({...form, shippingMethod: 'home'}); setShippingError(false); }} className="sr-only" />
+              <input aria-label="توصيل للمنزل" type="radio" name="shippingMethod" value="home" checked={form.shippingMethod === 'home'} onChange={(e) => { setForm({...form, shippingMethod: 'home'}); setShippingError(false); }} className="sr-only" />
               <span className="text-base mt-1">توصيل للمنزل</span>
             </label>
             <label className={`flex items-center justify-center gap-2 p-3 border-2 rounded-xl cursor-pointer transition-all font-bold ${form.shippingMethod === 'stopdesk' ? 'border-primary bg-primary/5 text-primary shadow-md scale-105' : 'border-foreground/30 text-foreground/80 hover:border-foreground/50 hover:bg-accent/20'}`}>
-              <input type="radio" name="shippingMethod" value="stopdesk" checked={form.shippingMethod === 'stopdesk'} onChange={(e) => { setForm({...form, shippingMethod: 'stopdesk'}); setShippingError(false); }} className="sr-only" />
+              <input aria-label="الاستلام من المكتب" type="radio" name="shippingMethod" value="stopdesk" checked={form.shippingMethod === 'stopdesk'} onChange={(e) => { setForm({...form, shippingMethod: 'stopdesk'}); setShippingError(false); }} className="sr-only" />
               <span className="text-base mt-1">الاستلام من المكتب</span>
             </label>
           </div>

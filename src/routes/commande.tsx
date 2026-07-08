@@ -98,16 +98,16 @@ function LeadFormPage() {
       </div>
 
       <form onSubmit={onSubmit} className="mt-12 space-y-5">
-        <input required value={form.fullname} onChange={(e) => setForm({ ...form, fullname: e.target.value })} placeholder={tr("checkout.fullname")} className={inputCls} />
-        <input required type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder={tr("checkout.phone")} className={inputCls} />
+        <input required aria-label={tr("checkout.fullname")} value={form.fullname} onChange={(e) => setForm({ ...form, fullname: e.target.value })} placeholder={tr("checkout.fullname")} className={inputCls} />
+        <input required aria-label={tr("checkout.phone")} type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder={tr("checkout.phone")} className={inputCls} />
         <div className="grid gap-5 sm:grid-cols-2">
-          <select required value={form.wilaya} onChange={(e) => setForm({ ...form, wilaya: e.target.value, commune: "" })} className={inputCls}>
+          <select required aria-label={tr("checkout.wilaya")} value={form.wilaya} onChange={(e) => setForm({ ...form, wilaya: e.target.value, commune: "" })} className={inputCls}>
             <option value="">{tr("checkout.wilaya")}</option>
             {wilayas.map((w) => (
               <option key={w.code} value={w.code}>{w.code} — {lang === "ar" ? w.nameAr : w.name}</option>
             ))}
           </select>
-          <select required disabled={!form.wilaya} value={form.commune} onChange={(e) => setForm({ ...form, commune: e.target.value })} className={inputCls}>
+          <select required aria-label={tr("checkout.commune")} disabled={!form.wilaya} value={form.commune} onChange={(e) => setForm({ ...form, commune: e.target.value })} className={inputCls}>
             <option value="">{tr("checkout.commune")}</option>
             {(communesByWilaya[Number(form.wilaya)] ?? []).map((c) => (
               <option key={c.fr} value={lang === "ar" ? c.ar : c.fr}>{lang === "ar" ? c.ar : c.fr}</option>
@@ -120,7 +120,7 @@ function LeadFormPage() {
           <div className="grid gap-3 sm:grid-cols-2">
             {(["home", "stop"] as const).map((m) => (
               <label key={m} className={`flex cursor-pointer items-center gap-3 border px-4 py-3 text-sm ${form.method === m ? "border-accent bg-accent/5" : "border-border"}`}>
-                <input type="radio" name="method" checked={form.method === m} onChange={() => setForm({ ...form, method: m })} className="accent-accent" />
+                <input aria-label={m} type="radio" name="method" checked={form.method === m} onChange={() => setForm({ ...form, method: m })} className="accent-accent" />
                 <span>{m === "home" ? tr("checkout.home") : tr("checkout.stop")}</span>
                 {wilayaObj && <span className="ms-auto text-xs text-muted-foreground">{wilayaObj[m === "home" ? "home" : "stop"]} DA</span>}
               </label>

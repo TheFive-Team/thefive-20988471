@@ -145,6 +145,7 @@ function ProductPage() {
               {images.map((img, i) => (
                 <button
                   key={img.url}
+                  aria-label={img.altText ?? `الصورة ${i + 1} لـ ${p.title}`}
                   onClick={() => setActiveImg(i)}
                   className={`aspect-square rounded-xl overflow-hidden shadow-sm bg-secondary border ${i === activeImg ? "border-primary" : "border-transparent hover:border-accent"}`}
                 >

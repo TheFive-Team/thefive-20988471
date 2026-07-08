@@ -45,12 +45,12 @@ function ContactPage() {
           </div>
         ) : (
           <form onSubmit={onSubmit} className="space-y-5">
-            <div className="grid gap-5 sm:grid-cols-2">
-              <input required placeholder={tr("checkout.fullname")} className={inputCls} />
-              <input required type="tel" placeholder={tr("checkout.phone")} className={inputCls} />
+            <div className="grid gap-4 md:grid-cols-2">
+              <input required aria-label={tr("checkout.fullname")} placeholder={tr("checkout.fullname")} className={inputCls} />
+              <input required type="tel" aria-label={tr("checkout.phone")} placeholder={tr("checkout.phone")} className={inputCls} />
             </div>
-            <input required placeholder={lang === "ar" ? "الموضوع" : "Sujet"} className={inputCls} />
-            <textarea required rows={6} placeholder={lang === "ar" ? "رسالتك…" : "Votre message…"} className={inputCls} />
+            <input required aria-label={lang === "ar" ? "الموضوع" : "Sujet"} placeholder={lang === "ar" ? "الموضوع" : "Sujet"} className={inputCls} />
+            <textarea required rows={6} aria-label={lang === "ar" ? "رسالتك…" : "Votre message…"} placeholder={lang === "ar" ? "رسالتك…" : "Votre message…"} className={inputCls} />
             <button className="bg-foreground px-8 py-4 text-xs uppercase tracking-[0.28em] text-background hover:bg-accent">
 
               {lang === "ar" ? "إرسال" : "Envoyer"}

@@ -19,25 +19,25 @@
         "edges": [
           {
             "node": {
-              "url": "https://cdn.shopify.com/s/files/1/0692/0863/7488/files/dc564e89-ec79-425e-8cee-543e153a2d31.png?v=1782761681",
+              "url": "/images/product-1783469150875-0.png",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "https://cdn.shopify.com/s/files/1/0692/0863/7488/files/85b1d44b-bae3-47b8-a440-6442076ea4d9.png?v=1782761707",
+              "url": "/images/product-1783469153014-1.png",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "https://cdn.shopify.com/s/files/1/0692/0863/7488/files/0c40ef4f-7885-4824-b0de-95ae0a1ba963.png?v=1782761721",
+              "url": "/images/product-1783469154859-2.png",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "https://cdn.shopify.com/s/files/1/0692/0863/7488/files/f4a79b56-6341-4c0c-b925-b4a992c0dd60.png?v=1782761734",
+              "url": "/images/product-1783469156875-3.png",
               "altText": null
             }
           }
@@ -47,7 +47,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17833716364210",
+              "id": "gid://shopify/ProductVariant/17834691588630",
               "title": "6",
               "availableForSale": true,
               "price": {
@@ -64,7 +64,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17833716364211",
+              "id": "gid://shopify/ProductVariant/17834691588631",
               "title": "8",
               "availableForSale": true,
               "price": {
@@ -81,7 +81,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17833716364212",
+              "id": "gid://shopify/ProductVariant/17834691588632",
               "title": "10",
               "availableForSale": true,
               "price": {
@@ -98,7 +98,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17833716364213",
+              "id": "gid://shopify/ProductVariant/17834691588633",
               "title": "12",
               "availableForSale": true,
               "price": {

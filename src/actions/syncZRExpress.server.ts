@@ -141,32 +141,47 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
 
         const targetStreet = isStopDesk && deskObj?.address ? deskObj.address : (order.address || order.commune || "");
 
-        const payload: any = {
-          customer: {
-            customerId: crypto.randomUUID(), // Generate a random UUID for the customer
-            name: order.fullname || "Client",
-            phone: {
-              number1: phoneStr
-            }
-          },
-          deliveryAddress: {
-            cityTerritoryId: wilayaUuid,
-            districtTerritoryId: communeUuid,
-            street: targetStreet
-          },
-          orderedProducts: [
-            {
-              productName: order.product_name || "Produit",
-              unitPrice: Number(order.total_amount) || 0,
-              quantity: 1,
-              stockType: "none"
-            }
-          ],
-          amount: Number(order.total_amount) || 0,
-          description: order.notes || order.product_name || "",
-          deliveryType: isStopDesk ? "pickup-point" : "home",
-          externalId: order.id // Link back to our DB ID
-        };
+          // Build the description based on the new offer system
+          let productDescription = order.product_name || "Produit";
+          if (order.selected_offer_title) {
+            productDescription += ` - ${order.selected_offer_title}`;
+          }
+          if (order.selected_sizes && Array.isArray(order.selected_sizes) && order.selected_sizes.length > 0) {
+            productDescription += ` - المقاسات: ${order.selected_sizes.join(', ')}`;
+          } else if (order.variant_title) {
+            productDescription += ` - ${order.variant_title}`;
+          }
+          
+          if (order.notes) {
+            productDescription += ` | ملاحظات: ${order.notes}`;
+          }
+
+          const payload: any = {
+            customer: {
+              customerId: crypto.randomUUID(), // Generate a random UUID for the customer
+              name: order.fullname || "Client",
+              phone: {
+                number1: phoneStr
+              }
+            },
+            deliveryAddress: {
+              cityTerritoryId: wilayaUuid,
+              districtTerritoryId: communeUuid,
+              street: targetStreet
+            },
+            orderedProducts: [
+              {
+                productName: order.product_name || "Produit",
+                unitPrice: Number(order.total_amount) || 0,
+                quantity: 1,
+                stockType: "none"
+              }
+            ],
+            amount: Number(order.total_amount) || 0,
+            description: productDescription,
+            deliveryType: isStopDesk ? "pickup-point" : "home",
+            externalId: order.id // Link back to our DB ID
+          };
 
         let finalHubId = deskObj?.id;
         if (isStopDesk && !finalHubId && deskObj?.name) {

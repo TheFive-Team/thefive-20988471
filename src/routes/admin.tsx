@@ -1296,7 +1296,8 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       descriptionHtml: (product.node.descriptionHtml || "").replace(/<br\s*\/?>/gi, '\n'),
       price: product.node.priceRange.minVariantPrice.amount,
       comparePrice: product.node.compareAtPriceRange?.minVariantPrice?.amount || "",
-      inventory: inventory.length > 0 ? inventory : []
+      inventory: inventory.length > 0 ? inventory : [],
+      offers: (product.node as any).offers || []
     });
     
     const allImages: ProductImageObj[] = [];
@@ -1325,7 +1326,8 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       descriptionHtml: "",
       price: "",
       comparePrice: "",
-      inventory: []
+      inventory: [],
+      offers: []
     });
     setProductImages([]);
   };
@@ -1477,7 +1479,8 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       detailImages: { edges: detailEdges },
       reviewImages: { edges: reviewEdges },
       variants: { edges: variantsEdges },
-      options: options
+      options: options,
+      offers: form.offers || []
     };
   };
 
@@ -1657,6 +1660,102 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
                       >
                         <Trash2 size={18} />
                       </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div className="space-y-4 md:col-span-2 border border-slate-200 dark:border-slate-700 p-5 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+              <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
+                <label className="font-bold text-slate-700 dark:text-slate-200 text-lg">العروض (Product Offers)</label>
+                <button 
+                  onClick={() => setEditForm({ ...editForm, offers: [...(editForm.offers || []), { id: `offer-${Date.now()}`, title: "عرض جديد", price: editForm.price, pieces: 1, active: true }] })} 
+                  className="bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-slate-800 transition-colors"
+                >
+                  <Plus size={16} /> إضافة عرض
+                </button>
+              </div>
+              
+              {(editForm.offers || []).length === 0 ? (
+                <p className="text-center text-slate-500 py-4 text-sm font-medium">لا توجد عروض. انقر على "إضافة عرض" للبدء.</p>
+              ) : (
+                <div className="grid gap-3">
+                  {(editForm.offers || []).map((offer: any, idx: number) => (
+                    <div key={offer.id} className="bg-white dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700 space-y-3">
+                      <div className="flex justify-between items-start">
+                        <h4 className="font-bold text-slate-800 dark:text-slate-200">عرض #{idx + 1}</h4>
+                        <div className="flex gap-2">
+                           <button 
+                             onClick={() => {
+                               const newOffers = [...editForm.offers];
+                               if (idx > 0) {
+                                 const temp = newOffers[idx];
+                                 newOffers[idx] = newOffers[idx - 1];
+                                 newOffers[idx - 1] = temp;
+                                 setEditForm({ ...editForm, offers: newOffers });
+                               }
+                             }}
+                             disabled={idx === 0}
+                             className="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-30 font-bold"
+                           >
+                             ↑
+                           </button>
+                           <button 
+                             onClick={() => {
+                               const newOffers = [...editForm.offers];
+                               if (idx < newOffers.length - 1) {
+                                 const temp = newOffers[idx];
+                                 newOffers[idx] = newOffers[idx + 1];
+                                 newOffers[idx + 1] = temp;
+                                 setEditForm({ ...editForm, offers: newOffers });
+                               }
+                             }}
+                             disabled={idx === (editForm.offers || []).length - 1}
+                             className="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-30 font-bold"
+                           >
+                             ↓
+                           </button>
+                           <button 
+                             onClick={() => {
+                               const newOffers = [...editForm.offers];
+                               newOffers.splice(idx, 1);
+                               setEditForm({ ...editForm, offers: newOffers });
+                             }}
+                             className="p-1 text-red-500 hover:bg-red-50 rounded"
+                           >
+                             <Trash2 size={16} />
+                           </button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-500">العنوان (Title)</label>
+                          <input type="text" value={offer.title || ""} onChange={e => { const no = [...editForm.offers]; no[idx].title = e.target.value; setEditForm({...editForm, offers: no}); }} className="w-full border border-slate-200 dark:border-slate-700 p-2 rounded outline-none focus:border-slate-900 bg-transparent text-sm" />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-500">السعر (Price)</label>
+                          <input type="number" dir="ltr" value={offer.price || ""} onChange={e => { const no = [...editForm.offers]; no[idx].price = Number(e.target.value); setEditForm({...editForm, offers: no}); }} className="w-full border border-slate-200 dark:border-slate-700 p-2 rounded outline-none focus:border-slate-900 bg-transparent text-sm" />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-500">السعر القديم (Compare Price)</label>
+                          <input type="number" dir="ltr" value={offer.comparePrice || ""} onChange={e => { const no = [...editForm.offers]; no[idx].comparePrice = Number(e.target.value); setEditForm({...editForm, offers: no}); }} className="w-full border border-slate-200 dark:border-slate-700 p-2 rounded outline-none focus:border-slate-900 bg-transparent text-sm" />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-500">عدد القطع (Pieces)</label>
+                          <input type="number" dir="ltr" min="1" value={offer.pieces || 1} onChange={e => { const no = [...editForm.offers]; no[idx].pieces = Number(e.target.value); setEditForm({...editForm, offers: no}); }} className="w-full border border-slate-200 dark:border-slate-700 p-2 rounded outline-none focus:border-slate-900 bg-transparent text-sm" />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-slate-500">شريط لاصق (Badge)</label>
+                          <input type="text" value={offer.badge || ""} onChange={e => { const no = [...editForm.offers]; no[idx].badge = e.target.value; setEditForm({...editForm, offers: no}); }} className="w-full border border-slate-200 dark:border-slate-700 p-2 rounded outline-none focus:border-slate-900 bg-transparent text-sm" placeholder="مثال: وفر 200 دج" />
+                        </div>
+                        <div className="space-y-1 flex items-end pb-1 gap-4">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" checked={offer.active !== false} onChange={e => { const no = [...editForm.offers]; no[idx].active = e.target.checked; setEditForm({...editForm, offers: no}); }} />
+                            <span className="text-xs font-bold text-slate-500">مفعل (Active)</span>
+                          </label>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>

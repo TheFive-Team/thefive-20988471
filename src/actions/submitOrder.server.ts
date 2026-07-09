@@ -14,10 +14,12 @@ export const submitOrderFn = createServerFn({ method: "POST" })
       commune: z.string(),
       address: z.string().optional(),
       deliveryType: z.string().optional(),
-      variantId: z.string().optional(),
-      productPriceAmount: z.string().optional(),
       productName: z.string().optional(),
-      variantTitle: z.string().optional(),
+      offerId: z.string().optional(),
+      offerTitle: z.string().optional(),
+      offerPieces: z.number().optional(),
+      offerPrice: z.union([z.string(), z.number()]).optional(),
+      selectedSizes: z.array(z.string()).optional(),
       deliveryFee: z.number().optional(),
       eventId: z.string().optional(),
       clientUserAgent: z.string().optional(),
@@ -30,7 +32,7 @@ export const submitOrderFn = createServerFn({ method: "POST" })
     try {
       const orderId = `ORD-${Date.now()}`;
       
-      const productFee = Number(data.productPriceAmount) || 0;
+      const productFee = Number(data.offerPrice) || 0;
       // Use exact delivery fee from frontend or fallback to 600 DZD
       const deliveryFee = data.deliveryFee !== undefined ? data.deliveryFee : (data.wilaya ? 600 : 0); 
       const totalAmount = productFee + deliveryFee;
@@ -38,38 +40,51 @@ export const submitOrderFn = createServerFn({ method: "POST" })
       // 1. Stock Deduction Logic
       let productsData: any[] = [];
       const productsFilePath = path.join(process.cwd(), "public", "data", "products.json");
-      let stockDeducted = false;
+      let deductedSizes: { variantIndex: number }[] = [];
       let targetProductIndex = -1;
-      let targetVariantIndex = -1;
 
       try {
         const fileContent = fs.readFileSync(productsFilePath, "utf-8");
         productsData = JSON.parse(fileContent);
 
-        if (data.productName && data.variantTitle) {
+        if (data.productName && data.selectedSizes && data.selectedSizes.length > 0) {
           targetProductIndex = productsData.findIndex((p: any) => p.node.title === data.productName);
           if (targetProductIndex !== -1) {
             const product = productsData[targetProductIndex];
-            targetVariantIndex = product.node.variants.edges.findIndex((v: any) => v.node.title === data.variantTitle);
+            let allAvailable = true;
             
-            if (targetVariantIndex !== -1) {
-              const variant = product.node.variants.edges[targetVariantIndex].node;
-              if (variant.quantityAvailable !== undefined) {
-                if (variant.quantityAvailable <= 0) {
-                  return { success: false, message: "هذا المقاس غير متوفر حاليًا" };
-                }
-                // Deduct stock in memory
-                variant.quantityAvailable -= 1;
-                if (variant.quantityAvailable === 0) {
-                  variant.availableForSale = false;
-                }
-                
-                // Synchronously write back to prevent double orders
-                fs.writeFileSync(productsFilePath, JSON.stringify(productsData, null, 2), "utf-8");
-                stockDeducted = true;
-                console.log(`[Stock] Deducted 1 from ${data.productName} size ${data.variantTitle}. Remaining: ${variant.quantityAvailable}`);
+            for (const size of data.selectedSizes) {
+              const variantIndex = product.node.variants.edges.findIndex((v: any) => v.node.title === size);
+              if (variantIndex === -1) {
+                allAvailable = false;
+                break;
               }
+              const variant = product.node.variants.edges[variantIndex].node;
+              
+              const alreadyDeductedCount = deductedSizes.filter(d => d.variantIndex === variantIndex).length;
+              
+              if (variant.quantityAvailable === undefined || variant.quantityAvailable - alreadyDeductedCount <= 0) {
+                allAvailable = false;
+                break;
+              }
+              
+              deductedSizes.push({ variantIndex });
             }
+            
+            if (!allAvailable) {
+              return { success: false, message: "عذراً، بعض المقاسات المختارة غير متوفرة حالياً بالكمية المطلوبة." };
+            }
+
+            for (const deduction of deductedSizes) {
+              const variant = product.node.variants.edges[deduction.variantIndex].node;
+              variant.quantityAvailable -= 1;
+              if (variant.quantityAvailable === 0) {
+                variant.availableForSale = false;
+              }
+              console.log(`[Stock] Deducted 1 from ${data.productName} size ${variant.title}. Remaining: ${variant.quantityAvailable}`);
+            }
+            
+            fs.writeFileSync(productsFilePath, JSON.stringify(productsData, null, 2), "utf-8");
           }
         }
       } catch (e) {
@@ -85,7 +100,12 @@ export const submitOrderFn = createServerFn({ method: "POST" })
         commune: data.commune,
         address: data.address || "",
         product_name: data.productName || "",
-        variant_title: data.variantTitle || "",
+        variant_title: data.selectedSizes ? data.selectedSizes.join(", ") : "",
+        selected_offer_id: data.offerId || null,
+        selected_offer_title: data.offerTitle || null,
+        selected_offer_pieces: data.offerPieces || 1,
+        selected_sizes: data.selectedSizes || [],
+        quantity: data.offerPieces || 1,
         total_amount: totalAmount,
         delivery_type: data.deliveryType || "توصيل للمنزل",
         delivery_fee: deliveryFee,
@@ -96,17 +116,20 @@ export const submitOrderFn = createServerFn({ method: "POST" })
         console.error("Supabase insert error:", error);
         
         // Rollback stock if Supabase failed
-        if (stockDeducted) {
+        if (deductedSizes.length > 0) {
           try {
             const fileContent = fs.readFileSync(productsFilePath, "utf-8");
             const currentData = JSON.parse(fileContent);
-            const variant = currentData[targetProductIndex].node.variants.edges[targetVariantIndex].node;
-            variant.quantityAvailable += 1;
-            if (variant.quantityAvailable > 0) {
-              variant.availableForSale = true;
+            const product = currentData[targetProductIndex];
+            for (const deduction of deductedSizes) {
+              const variant = product.node.variants.edges[deduction.variantIndex].node;
+              variant.quantityAvailable += 1;
+              if (variant.quantityAvailable > 0) {
+                variant.availableForSale = true;
+              }
+              console.log(`[Stock] Rolled back stock for ${data.productName} size ${variant.title}`);
             }
             fs.writeFileSync(productsFilePath, JSON.stringify(currentData, null, 2), "utf-8");
-            console.log(`[Stock] Rolled back stock for ${data.productName} size ${data.variantTitle}`);
           } catch (e) {
             console.error("Failed to rollback stock:", e);
           }
@@ -136,7 +159,8 @@ export const submitOrderFn = createServerFn({ method: "POST" })
             deliveryType: data.deliveryType || "توصيل للمنزل",
             productPriceAmount: totalAmount,
             productName: data.productName || "",
-            variantTitle: data.variantTitle || ""
+            variantTitle: data.selectedSizes ? data.selectedSizes.join(", ") : "",
+            offerTitle: data.offerTitle || ""
           }),
         });
         
@@ -197,8 +221,11 @@ export const submitOrderFn = createServerFn({ method: "POST" })
                 value: totalAmount,
                 order_id: orderId,
                 content_name: data.productName || '',
-                content_ids: data.variantTitle ? [data.variantTitle] : [],
-                contents: data.variantTitle ? [{ id: data.variantTitle, quantity: 1 }] : [],
+                content_ids: data.selectedSizes || [],
+                contents: (data.selectedSizes || []).map(size => ({
+                  id: size,
+                  quantity: 1
+                }))
               }
             }]
           };

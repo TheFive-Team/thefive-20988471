@@ -46,22 +46,53 @@ function ProductPage() {
   const product = Route.useLoaderData();
   const addItem = useCartStore((s) => s.addItem);
   const isCartLoading = useCartStore((s) => s.isLoading);
-  const [variantId, setVariantId] = useState<string | null>(null);
-  const [added, setAdded] = useState(false);
-  const [sizeError, setSizeError] = useState(false);
+  const p = product?.node;
+  const variants = p?.variants.edges ?? [];
+  
+  const rawOffers = (p as any)?.offers?.filter((o: any) => o.active !== false) || [];
+  
+  const offers = useMemo(() => {
+    if (rawOffers.length > 0) return rawOffers;
+    return [{
+      id: "default-1",
+      title: "قطعة واحدة",
+      price: p?.priceRange.minVariantPrice.amount,
+      comparePrice: p?.compareAtPriceRange?.minVariantPrice?.amount,
+      pieces: 1,
+      badge: ""
+    }];
+  }, [rawOffers, p]);
 
-  const variants = product?.node.variants.edges ?? [];
-  const selectedVariant = useMemo(
-    () => {
-      if (variants.length === 1) return variants[0]?.node;
-      return variants.find((v) => v.node.id === variantId)?.node;
-    },
-    [variantId, variants],
-  );
-
+  const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
+  const selectedOffer = useMemo(() => offers.find((o: any) => o.id === selectedOfferId) || offers[0], [selectedOfferId, offers]);
+  
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  
   useEffect(() => {
-    if (selectedVariant) setSizeError(false);
-  }, [selectedVariant]);
+    if (selectedOffer) {
+      setSelectedSizes(Array(selectedOffer.pieces).fill(""));
+      setSizeError(false);
+    }
+  }, [selectedOffer?.id, selectedOffer?.pieces]);
+
+  const setSizeForPiece = (index: number, variantId: string) => {
+    const newSizes = [...selectedSizes];
+    newSizes[index] = variantId;
+    setSelectedSizes(newSizes);
+    setSizeError(false);
+  };
+
+  const isVariantAvailable = (variant: any, pieceIndex: number) => {
+    const stock = variant.quantityAvailable ?? 0;
+    if (!variant.availableForSale || stock <= 0) return false;
+    
+    const selectedCount = selectedSizes.reduce((count, id, i) => {
+      if (i !== pieceIndex && id === variant.id) return count + 1;
+      return count;
+    }, 0);
+    
+    return stock > selectedCount;
+  };
 
   const images = product?.node.images.edges.map((e) => e.node) ?? [];
   const [activeImg, setActiveImg] = useState(0);
@@ -70,15 +101,13 @@ function ProductPage() {
   // Meta Pixel — ViewContent
   useEffect(() => {
     if (!product) return;
-    const variantForPixel = selectedVariant ?? product.node.variants.edges[0]?.node;
-    if (!variantForPixel) return;
     trackViewContent({
       productName: product.node.title,
-      productId: numericId(variantForPixel.id),
-      price: parseFloat(variantForPixel.price.amount),
-      currency: variantForPixel.price.currencyCode,
+      productId: product.node.id,
+      price: parseFloat(selectedOffer.price || 0),
+      currency: "DZD",
     });
-  }, [product, selectedVariant]);
+  }, [product, selectedOffer]);
 
 
   if (!product) {
@@ -92,27 +121,9 @@ function ProductPage() {
     );
   }
 
-  const p = product.node;
+
   const handleAdd = async () => {
-    if (!selectedVariant) return;
-    await addItem({
-      variantId: selectedVariant.id,
-      productHandle: p.handle,
-      productTitle: p.title,
-      variantTitle: selectedVariant.title,
-      image: image?.url ?? null,
-      price: selectedVariant.price,
-      quantity: 1,
-      selectedOptions: selectedVariant.selectedOptions,
-    });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1800);
-    trackAddToCart({
-      productName: p.title,
-      productId: numericId(selectedVariant.id),
-      price: parseFloat(selectedVariant.price.amount),
-      currency: selectedVariant.price.currencyCode,
-    });
+    // Legacy handleAdd, not fully used anymore with COD directly but kept for cart consistency
   };
 
   const scrollToCheckout = () => {
@@ -166,18 +177,18 @@ function ProductPage() {
           <h1 className="font-serif font-bold text-secondary text-3xl leading-tight sm:text-5xl">{p.title}</h1>
           <div className="mt-1 flex items-center gap-3">
             <p className="text-2xl sm:text-3xl font-medium tracking-wide text-primary">
-              {selectedVariant ? formatMoney(selectedVariant.price) : formatMoney(p.priceRange.minVariantPrice)}
+              {formatMoney({ amount: selectedOffer.price, currencyCode: "DZD" })}
             </p>
             {(() => {
-              const currentPrice = selectedVariant ? selectedVariant.price : p.priceRange.minVariantPrice;
-              const comparePrice = selectedVariant ? selectedVariant.compareAtPrice : p.compareAtPriceRange?.minVariantPrice;
+              const currentPrice = selectedOffer.price;
+              const comparePrice = selectedOffer.comparePrice;
               
-              if (comparePrice && parseFloat(comparePrice.amount) > parseFloat(currentPrice.amount)) {
-                const discount = Math.round(((parseFloat(comparePrice.amount) - parseFloat(currentPrice.amount)) / parseFloat(comparePrice.amount)) * 100);
+              if (comparePrice && parseFloat(comparePrice) > parseFloat(currentPrice)) {
+                const discount = Math.round(((parseFloat(comparePrice) - parseFloat(currentPrice)) / parseFloat(comparePrice)) * 100);
                 return (
                   <>
                     <p className="text-xl sm:text-2xl text-slate-400 line-through">
-                      {formatMoney(comparePrice)}
+                      {formatMoney({ amount: comparePrice, currencyCode: "DZD" })}
                     </p>
                     <span className="bg-red-100 text-red-700 text-sm font-bold px-2 py-1 rounded-md">
                       -{discount}%
@@ -190,46 +201,92 @@ function ProductPage() {
           </div>
           <div className="hairline my-6 w-16" />
 
-
-          {variants.length > 1 && (
-            <div id="size-selector" className="mt-6">
-              <p className={`font-bold text-lg mb-3 flex items-center gap-2 transition-colors ${sizeError ? 'text-red-600' : 'text-foreground'}`}>
-                {tr("product.size")} {sizeError && <span className="text-red-500 normal-case font-bold text-sm ml-2 animate-pulse">* يرجى الاختيار / Required</span>}
-              </p>
-              <div className="flex flex-wrap gap-3">
-                {variants.map((v) => {
-                  const outOfStock = v.node.quantityAvailable === 0 || !v.node.availableForSale;
+          {/* Offers Display */}
+          {rawOffers.length > 0 && (
+            <div className="mt-6 space-y-3">
+              <p className="font-bold text-lg mb-2 text-foreground">اختر العرض المناسب لك:</p>
+              <div className="grid gap-3">
+                {offers.map((offer: any) => {
+                  const isSelected = selectedOffer.id === offer.id;
                   return (
                     <button
-                      key={v.node.id}
-                      onClick={() => setVariantId(v.node.id)}
-                      disabled={outOfStock}
-                      className={`rounded-xl min-w-16 border-2 px-5 py-3 text-base uppercase tracking-wider transition-all font-bold ${
-                        outOfStock 
-                          ? "opacity-30 border-slate-300 bg-slate-100 text-slate-500 cursor-not-allowed line-through" 
-                          : selectedVariant?.id === v.node.id
-                            ? "border-primary bg-background shadow-md text-foreground scale-105"
-                            : "border-foreground/40 text-foreground/80 hover:border-foreground/60 hover:bg-accent/20 bg-background/50"
+                      key={offer.id}
+                      onClick={() => setSelectedOfferId(offer.id)}
+                      className={`relative flex items-center justify-between p-4 rounded-2xl border-2 transition-all text-right ${
+                        isSelected
+                          ? "border-primary bg-primary/5 shadow-md scale-[1.02]"
+                          : "border-slate-200 bg-white hover:border-slate-300"
                       }`}
-                    >{v.node.title}</button>
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${isSelected ? 'border-primary' : 'border-slate-300'}`}>
+                          {isSelected && <div className="w-3 h-3 rounded-full bg-primary" />}
+                        </div>
+                        <div>
+                          <p className={`font-bold text-lg ${isSelected ? 'text-primary' : 'text-slate-800'}`}>{offer.title}</p>
+                          <p className="text-sm font-bold text-slate-500 mt-0.5">{formatMoney({ amount: offer.price, currencyCode: "DZD" })}</p>
+                        </div>
+                      </div>
+                      {offer.badge && (
+                        <span className="bg-red-100 text-red-700 text-xs font-bold px-2.5 py-1 rounded-lg">
+                          {offer.badge}
+                        </span>
+                      )}
+                    </button>
                   );
                 })}
               </div>
-              {selectedVariant && selectedVariant.quantityAvailable !== undefined && selectedVariant.quantityAvailable > 0 && selectedVariant.quantityAvailable <= 2 && (
-                <p className="text-orange-600 text-sm font-bold mt-3 animate-pulse">
-                  تبقت قطع قليلة فقط! (Only a few left)
-                </p>
-              )}
+            </div>
+          )}
+
+          {/* Size Selectors (Dynamic based on pieces) */}
+          {variants.length > 1 && (
+            <div id="size-selector" className="mt-8 space-y-6 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+              <p className={`font-bold text-lg flex items-center gap-2 transition-colors ${sizeError ? 'text-red-600' : 'text-slate-800'}`}>
+                {selectedOffer.pieces === 1 ? tr("product.size") : 'اختر المقاسات:'}
+                {sizeError && <span className="text-red-500 normal-case font-bold text-sm ml-2 animate-pulse">* يرجى اختيار جميع المقاسات</span>}
+              </p>
+              
+              {Array.from({ length: selectedOffer.pieces }).map((_, pieceIndex) => (
+                <div key={pieceIndex} className="space-y-3">
+                  {selectedOffer.pieces > 1 && (
+                    <p className="font-bold text-sm text-slate-600">القطعة #{pieceIndex + 1}</p>
+                  )}
+                  <div className="flex flex-wrap gap-3">
+                    {variants.map((v: any) => {
+                      const isAvailable = isVariantAvailable(v.node, pieceIndex);
+                      const isSelected = selectedSizes[pieceIndex] === v.node.id;
+                      return (
+                        <button
+                          key={v.node.id}
+                          onClick={() => setSizeForPiece(pieceIndex, v.node.id)}
+                          disabled={!isAvailable && !isSelected}
+                          className={`rounded-xl min-w-16 border-2 px-5 py-3 text-base uppercase tracking-wider transition-all font-bold ${
+                            !isAvailable && !isSelected
+                              ? "opacity-30 border-slate-300 bg-slate-100 text-slate-500 cursor-not-allowed line-through" 
+                              : isSelected
+                                ? "border-primary bg-white shadow-md text-primary scale-105"
+                                : "border-slate-300 text-slate-600 hover:border-slate-400 bg-white"
+                          }`}
+                        >{v.node.title}</button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
           {/* COD Form Checkout Section Moved Here (Right after variants) */}
           <div id="checkout-form" className="mt-12 bg-transparent -mx-6 px-4 sm:mx-0 sm:px-0">
             <CodForm 
-              productPriceAmount={selectedVariant?.price?.amount ?? p.priceRange.minVariantPrice.amount} 
-              productName={p.title}
-              variantTitle={selectedVariant?.title}
-              requireSize={variants.length > 1 && !selectedVariant}
+              productName={p?.title}
+              offerId={selectedOffer.id}
+              offerTitle={selectedOffer.title}
+              offerPieces={selectedOffer.pieces}
+              offerPrice={selectedOffer.price}
+              selectedSizes={selectedSizes.map(id => variants.find((v: any) => v.node.id === id)?.node.title || "")}
+              requireSize={variants.length > 1 && selectedSizes.some(s => s === "")}
               onSizeError={() => setSizeError(true)}
             />
           </div>

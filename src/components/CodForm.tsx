@@ -5,7 +5,25 @@ import { wilayas } from "@/lib/wilayas";
 import { communesByWilaya } from "@/lib/communes";
 import { trackInitiateCheckout, trackPurchase } from "@/lib/metaPixel";
 
-export function CodForm({ productPriceAmount, productName, variantTitle, requireSize, onSizeError }: { productPriceAmount?: string, productName?: string, variantTitle?: string, requireSize?: boolean, onSizeError?: () => void }) {
+export function CodForm({ 
+  productName, 
+  offerId,
+  offerTitle,
+  offerPieces,
+  offerPrice,
+  selectedSizes,
+  requireSize, 
+  onSizeError 
+}: { 
+  productName?: string;
+  offerId?: string;
+  offerTitle?: string;
+  offerPieces?: number;
+  offerPrice?: string | number;
+  selectedSizes?: string[];
+  requireSize?: boolean;
+  onSizeError?: () => void;
+}) {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -26,8 +44,8 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
       checkoutInitiated.current = true;
       trackInitiateCheckout({
         productName: productName,
-        productId: variantTitle,
-        price: Number(productPriceAmount || 0),
+        productId: offerId,
+        price: Number(offerPrice || 0),
         currency: 'DZD'
       });
     }
@@ -92,9 +110,12 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
           commune: form.commune,
           deliveryType: form.shippingMethod === 'home' ? 'توصيل للمنزل' : 'استلام من المكتب (Stop Desk)',
           deliveryFee: calculatedDeliveryFee,
-          productPriceAmount,
           productName,
-          variantTitle,
+          offerId,
+          offerTitle,
+          offerPieces,
+          offerPrice,
+          selectedSizes,
           eventId,
           clientUserAgent: navigator.userAgent,
           eventSourceUrl: window.location.href
@@ -107,8 +128,8 @@ export function CodForm({ productPriceAmount, productName, variantTitle, require
         // Meta Pixel - Purchase
         trackPurchase({
           productName: productName || "Produit inconnu",
-          productId: variantTitle,
-          value: Number(productPriceAmount || 0) + (calculatedDeliveryFee || 0),
+          productId: offerId,
+          value: Number(offerPrice || 0) + (calculatedDeliveryFee || 0),
           currency: 'DZD',
           eventId
         });

@@ -47,6 +47,15 @@ export interface SupabaseOrder {
   selectedDeskAddress?: string | null;
   selectedDeskCP?: string | null;
   selectedDeskPhone?: string | null;
+  selectedDesk?: {
+    name?: string;
+    wilaya?: string;
+    commune?: string;
+    address?: string;
+    cp?: string;
+    phone?: string;
+    zrId?: string;
+  } | null;
 }
 
 function AdminDashboard() {
@@ -456,23 +465,25 @@ function OrdersDashboard() {
 
   const updateZROffice = async (id: string, office: any) => {
     const updates = office ? {
-      selectedDeskName: office.name,
-      selectedDeskWilaya: office.wilaya,
-      selectedDeskCommune: office.commune,
-      selectedDeskAddress: office.address,
-      selectedDeskCP: office.cp || "",
-      selectedDeskPhone: office.phone
+      selectedDesk: {
+        name: office.name,
+        wilaya: office.wilaya,
+        commune: office.commune,
+        address: office.address,
+        cp: office.cp || "",
+        phone: office.phone,
+        zrId: office.id || ""
+      }
     } : {
-      selectedDeskName: null,
-      selectedDeskWilaya: null,
-      selectedDeskCommune: null,
-      selectedDeskAddress: null,
-      selectedDeskCP: null,
-      selectedDeskPhone: null
+      selectedDesk: null
     };
 
     setOrders(prev => prev.map(o => o.id === id ? { ...o, ...updates } : o));
-    await supabase.from('orders').update(updates).eq('id', id);
+    const { error } = await supabase.from('orders').update(updates).eq('id', id);
+    if (error) {
+      console.error("Failed to save desk:", error);
+      alert("حدث خطأ أثناء حفظ المكتب، يرجى التأكد من إضافة عمود selectedDesk كـ JSONB في جدول orders.");
+    }
   };
 
   const updateDeliveryType = async (id: string, newType: string) => {
@@ -504,12 +515,7 @@ function OrdersDashboard() {
     };
 
     if (!newType.includes("مكتب") && !newType.toLowerCase().includes("stop desk")) {
-      updates.selectedDeskName = null;
-      updates.selectedDeskWilaya = null;
-      updates.selectedDeskCommune = null;
-      updates.selectedDeskAddress = null;
-      updates.selectedDeskCP = null;
-      updates.selectedDeskPhone = null;
+      updates.selectedDesk = null;
     }
 
     setOrders(prev => prev.map(o => o.id === id ? { ...o, ...updates } : o));
@@ -1079,7 +1085,14 @@ function OrdersDashboard() {
                       {(order.delivery_type?.includes("مكتب") || order.delivery_type?.toLowerCase().includes("stop desk") || order.delivery_type?.includes("استلام")) && (
                         <ZROfficeSelect 
                           wilaya={order.wilaya} 
-                          selectedOffice={order.selectedDeskName ? {
+                          selectedOffice={order.selectedDesk ? {
+                            name: order.selectedDesk.name,
+                            wilaya: order.selectedDesk.wilaya,
+                            commune: order.selectedDesk.commune,
+                            address: order.selectedDesk.address,
+                            phone: order.selectedDesk.phone,
+                            cp: order.selectedDesk.cp
+                          } : order.selectedDeskName ? {
                             name: order.selectedDeskName,
                             wilaya: order.selectedDeskWilaya,
                             commune: order.selectedDeskCommune,

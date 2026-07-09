@@ -78,7 +78,8 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
       for (const order of orders) {
         const deliveryTypeStr = (order.delivery_type || "").toLowerCase();
         const isStopDesk = /استلام|desk|pickup|office/i.test(deliveryTypeStr);
-        if (isStopDesk && !order.selectedDeskName) {
+        const deskObj = order.selectedDesk || (order.selectedDeskName ? { name: order.selectedDeskName } : null);
+        if (isStopDesk && !deskObj?.name) {
           return {
             success: false,
             message: `يرجى اختيار مكتب ZR قبل المزامنة للطلب ${order.id}`,
@@ -121,8 +122,9 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
         const deliveryTypeStr = (order.delivery_type || "").toLowerCase();
         const isStopDesk = /استلام|desk|pickup|office/i.test(deliveryTypeStr);
         const finalDeliveryType = isStopDesk ? "desk" : "home";
+        const deskObj = order.selectedDesk || (order.selectedDeskName ? { name: order.selectedDeskName } : null);
 
-        console.log(`[ZR Express] Order ${order.id} | DB Type: ${order.delivery_type} | Selected Desk: ${order.selectedDeskName || 'N/A'} | ZR deliveryType: ${finalDeliveryType}`);
+        console.log(`[ZR Express] Order ${order.id} | DB Type: ${order.delivery_type} | Selected Desk: ${deskObj?.name || 'N/A'} | ZR deliveryType: ${finalDeliveryType}`);
 
         const payload: any = {
           customer: {
@@ -151,8 +153,8 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
           externalId: order.id // Link back to our DB ID
         };
 
-        if (isStopDesk && order.selectedDeskName) {
-          payload.stopDesk = order.selectedDeskName;
+        if (isStopDesk && deskObj?.name) {
+          payload.stopDesk = deskObj.name;
         }
 
         // 4. Send POST request to ZR Express

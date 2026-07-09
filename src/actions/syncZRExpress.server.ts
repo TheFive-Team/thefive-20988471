@@ -164,7 +164,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
           ],
           amount: Number(order.total_amount) || 0,
           description: order.notes || order.product_name || "",
-          deliveryType: finalDeliveryType,
+          deliveryType: isStopDesk ? "pickup-point" : "home",
           externalId: order.id // Link back to our DB ID
         };
 
@@ -180,8 +180,10 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
         console.log(`- Selected Desk Commune: ${deskObj?.commune || 'N/A'}`);
         console.log(`- Final ZR Desk Sent: ${isStopDesk && deskObj ? deskObj.name : 'N/A'}`);
         console.log(`- Final Delivery Type Sent: ${finalDeliveryType}`);
-        console.log(`- Payload sent to ZR: ${JSON.stringify(payload, null, 2)}`);
         console.log(`===========================================\n`);
+
+        console.log("FINAL PAYLOAD:");
+        console.log(JSON.stringify(payload, null, 2));
 
         // 4. Send POST request to ZR Express
           const response = await fetch(`${API_BASE}/api/v1/parcels`, {

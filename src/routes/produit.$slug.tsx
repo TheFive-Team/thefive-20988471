@@ -47,7 +47,7 @@ function ProductPage() {
   const addItem = useCartStore((s) => s.addItem);
   const isCartLoading = useCartStore((s) => s.isLoading);
   const p = product?.node;
-  const variants = p?.variants.edges ?? [];
+  const variants = p?.variants?.edges ?? [];
   
   const rawOffers = (p as any)?.offers?.filter((o: any) => o.active !== false) || [];
   
@@ -67,6 +67,7 @@ function ProductPage() {
   const selectedOffer = useMemo(() => offers.find((o: any) => o.id === selectedOfferId) || offers[0], [selectedOfferId, offers]);
   
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [sizeError, setSizeError] = useState(false);
   
   useEffect(() => {
     if (selectedOffer) {
@@ -94,7 +95,7 @@ function ProductPage() {
     return stock > selectedCount;
   };
 
-  const images = product?.node.images.edges.map((e) => e.node) ?? [];
+  const images = product?.node?.images?.edges.map((e: any) => e.node) ?? [];
   const [activeImg, setActiveImg] = useState(0);
   const image = images[activeImg] ?? images[0];
 
@@ -110,7 +111,7 @@ function ProductPage() {
   }, [product, selectedOffer]);
 
 
-  if (!product) {
+  if (!product || !p) {
     return (
       <div className="px-6 py-32 text-center">
         <h1 className="font-serif text-3xl">Article introuvable</h1>

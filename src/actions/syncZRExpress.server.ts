@@ -101,7 +101,11 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
         
         const deliveryTypeStr = (order.delivery_type || "").toLowerCase();
         const isStopDesk = /استلام|desk|pickup|office/i.test(deliveryTypeStr);
-        const finalDeliveryType = isStopDesk ? "desk" : "home";
+        const finalDeliveryType = isStopDesk ? "pickup-point" : "home";
+
+        console.log(`DB deliveryType: ${order.delivery_type}`);
+        console.log(`ZR deliveryType: ${finalDeliveryType}`);
+
         const deskObj = order.selectedDesk || (order.selectedDeskName ? { 
           name: order.selectedDeskName, 
           wilaya: order.selectedDeskWilaya,

@@ -183,8 +183,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
         console.log(`- Payload sent to ZR: ${JSON.stringify(payload, null, 2)}`);
         console.log(`===========================================\n`);
 
-        try {
-          // 4. Send POST request to ZR Express
+        // 4. Send POST request to ZR Express
           const response = await fetch(`${API_BASE}/api/v1/parcels`, {
             method: 'POST',
             headers: {

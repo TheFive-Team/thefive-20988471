@@ -56,7 +56,7 @@ function ProductPage() {
     return [{
       id: "default-1",
       title: "قطعة واحدة",
-      price: p?.priceRange.minVariantPrice.amount,
+      price: p?.priceRange?.minVariantPrice?.amount,
       comparePrice: p?.compareAtPriceRange?.minVariantPrice?.amount,
       pieces: 1,
       badge: ""

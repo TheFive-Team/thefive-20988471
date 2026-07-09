@@ -78,7 +78,13 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
       for (const order of orders) {
         const deliveryTypeStr = (order.delivery_type || "").toLowerCase();
         const isStopDesk = /استلام|desk|pickup|office/i.test(deliveryTypeStr);
-        const deskObj = order.selectedDesk || (order.selectedDeskName ? { name: order.selectedDeskName } : null);
+        const deskObj = order.selectedDesk || (order.selectedDeskName ? { 
+          name: order.selectedDeskName, 
+          wilaya: order.selectedDeskWilaya,
+          commune: order.selectedDeskCommune,
+          address: order.selectedDeskAddress
+        } : null);
+
         if (isStopDesk && !deskObj?.name) {
           return {
             success: false,
@@ -93,20 +99,31 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
       try {
         console.log(`[ZR Express] Syncing order ${order.id}...`);
         
+        const deliveryTypeStr = (order.delivery_type || "").toLowerCase();
+        const isStopDesk = /استلام|desk|pickup|office/i.test(deliveryTypeStr);
+        const finalDeliveryType = isStopDesk ? "desk" : "home";
+        const deskObj = order.selectedDesk || (order.selectedDeskName ? { 
+          name: order.selectedDeskName, 
+          wilaya: order.selectedDeskWilaya,
+          commune: order.selectedDeskCommune,
+          address: order.selectedDeskAddress
+        } : null);
+
         // Fetch Wilaya UUID
-        let wilayaUuid = await searchTerritory(order.wilaya, "wilaya");
+        const targetWilaya = isStopDesk && deskObj?.wilaya ? deskObj.wilaya : order.wilaya;
+        let wilayaUuid = await searchTerritory(targetWilaya, "wilaya");
 
         // Fetch Commune UUID
-        let communeUuid = await searchTerritory(order.commune, "commune");
+        const targetCommune = isStopDesk && deskObj?.commune ? deskObj.commune : order.commune;
+        let communeUuid = await searchTerritory(targetCommune, "commune");
 
         // Fallbacks: if the API search didn't return a UUID, we generate a random one to pass validation format
-        // (If it's an invalid UUID in ZR's DB, their API will return an error message which we will display)
         if (!wilayaUuid) {
-          console.warn(`[ZR Express] Could not find UUID for wilaya: ${order.wilaya}. API may reject this.`);
+          console.warn(`[ZR Express] Could not find UUID for wilaya: ${targetWilaya}. API may reject this.`);
           wilayaUuid = crypto.randomUUID();
         }
         if (!communeUuid) {
-          console.warn(`[ZR Express] Could not find UUID for commune: ${order.commune}`);
+          console.warn(`[ZR Express] Could not find UUID for commune: ${targetCommune}`);
           communeUuid = crypto.randomUUID();
         }
 
@@ -118,11 +135,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
           phoneStr = '+213' + phoneStr;
         }
 
-        // 3. Construct Payload exactly as requested
-        const deliveryTypeStr = (order.delivery_type || "").toLowerCase();
-        const isStopDesk = /استلام|desk|pickup|office/i.test(deliveryTypeStr);
-        const finalDeliveryType = isStopDesk ? "desk" : "home";
-        const deskObj = order.selectedDesk || (order.selectedDeskName ? { name: order.selectedDeskName } : null);
+        const targetStreet = isStopDesk && deskObj?.address ? deskObj.address : (order.address || order.commune || "");
 
         const payload: any = {
           customer: {
@@ -135,7 +148,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
           deliveryAddress: {
             cityTerritoryId: wilayaUuid,
             districtTerritoryId: communeUuid,
-            street: order.address || order.commune || ""
+            street: targetStreet
           },
           orderedProducts: [
             {
@@ -157,10 +170,12 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
 
         console.log(`\n===========================================`);
         console.log(`[ZR Express] Preparing Order ID: ${order.id}`);
-        console.log(`- Delivery Mode: ${isStopDesk ? "Stop Desk" : "Home delivery"}`);
-        console.log(`- DB deliveryType: ${order.delivery_type}`);
-        console.log(`- Selected Desk: ${deskObj ? JSON.stringify(deskObj) : 'None'}`);
-        console.log(`- Desk Name Sent to ZR: ${isStopDesk && deskObj ? deskObj.name : 'N/A'}`);
+        console.log(`- Order Wilaya: ${order.wilaya}`);
+        console.log(`- Order Commune: ${order.commune}`);
+        console.log(`- Selected Desk Wilaya: ${deskObj?.wilaya || 'N/A'}`);
+        console.log(`- Selected Desk Commune: ${deskObj?.commune || 'N/A'}`);
+        console.log(`- Final ZR Desk Sent: ${isStopDesk && deskObj ? deskObj.name : 'N/A'}`);
+        console.log(`- Final Delivery Type Sent: ${finalDeliveryType}`);
         console.log(`- Payload sent to ZR: ${JSON.stringify(payload, null, 2)}`);
         console.log(`===========================================\n`);
 

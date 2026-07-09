@@ -168,8 +168,10 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
           externalId: order.id // Link back to our DB ID
         };
 
-        if (isStopDesk && deskObj?.name) {
-          payload.stopDesk = deskObj.name;
+        if (isStopDesk && deskObj?.id) {
+          payload.hubId = deskObj.id;
+        } else if (isStopDesk) {
+          console.warn(`[ZR Express] Warning: Missing hub ID for desk ${deskObj?.name || 'unknown'}`);
         }
 
         console.log(`\n===========================================`);

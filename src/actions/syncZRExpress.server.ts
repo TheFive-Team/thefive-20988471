@@ -124,8 +124,6 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
         const finalDeliveryType = isStopDesk ? "desk" : "home";
         const deskObj = order.selectedDesk || (order.selectedDeskName ? { name: order.selectedDeskName } : null);
 
-        console.log(`[ZR Express] Order ${order.id} | DB Type: ${order.delivery_type} | Selected Desk: ${deskObj?.name || 'N/A'} | ZR deliveryType: ${finalDeliveryType}`);
-
         const payload: any = {
           customer: {
             customerId: crypto.randomUUID(), // Generate a random UUID for the customer
@@ -157,25 +155,38 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
           payload.stopDesk = deskObj.name;
         }
 
-        // 4. Send POST request to ZR Express
-        const response = await fetch(`${API_BASE}/api/v1/parcels`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${API_KEY}`,
-            'X-Api-Key': API_KEY,
-            'X-Tenant': TENANT_ID,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
+        console.log(`\n===========================================`);
+        console.log(`[ZR Express] Preparing Order ID: ${order.id}`);
+        console.log(`- Delivery Mode: ${isStopDesk ? "Stop Desk" : "Home delivery"}`);
+        console.log(`- DB deliveryType: ${order.delivery_type}`);
+        console.log(`- Selected Desk: ${deskObj ? JSON.stringify(deskObj) : 'None'}`);
+        console.log(`- Desk Name Sent to ZR: ${isStopDesk && deskObj ? deskObj.name : 'N/A'}`);
+        console.log(`- Payload sent to ZR: ${JSON.stringify(payload, null, 2)}`);
+        console.log(`===========================================\n`);
 
-        if (!response.ok) {
-          const errText = await response.text();
-          console.error(`[ZR Express] Failed to create parcel for order ${order.id}:`, response.status, errText);
-          continue; // Skip to next order
-        }
+        try {
+          // 4. Send POST request to ZR Express
+          const response = await fetch(`${API_BASE}/api/v1/parcels`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${API_KEY}`,
+              'X-Api-Key': API_KEY,
+              'X-Tenant': TENANT_ID,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
 
-        const zrData = await response.json();
+          if (!response.ok) {
+            const errText = await response.text();
+            console.error(`\n[ZR ERROR]`);
+            console.error(`Status: ${response.status}`);
+            console.error(`Response: ${errText}`);
+            console.error(`Payload: ${JSON.stringify(payload, null, 2)}\n`);
+            continue; // Skip to next order
+          }
+
+          const zrData = await response.json();
         console.log(`[ZR Express] Success for order ${order.id}:`, zrData);
 
         // Extract Tracking Number and ZR Express ID from response
@@ -192,7 +203,10 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
         successCount++;
         
       } catch (err) {
-        console.error(`[ZR Express] Exception processing order ${order.id}:`, err);
+        console.error(`\n[ZR ERROR]`);
+        console.error(`Exception thrown for order ${order.id}:`);
+        console.error(err);
+        console.error(`\n`);
       }
     } // End of for loop
     

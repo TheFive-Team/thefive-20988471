@@ -74,6 +74,19 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
       const results = [];
       let successCount = 0;
 
+      // Pre-validation for Stop Desk
+      for (const order of orders) {
+        const deliveryTypeStr = (order.delivery_type || "").toLowerCase();
+        const isStopDesk = /استلام|desk|pickup|office/i.test(deliveryTypeStr);
+        if (isStopDesk && !order.selectedDeskName) {
+          return {
+            success: false,
+            message: `يرجى اختيار مكتب ZR قبل المزامنة للطلب ${order.id}`,
+            results: []
+          };
+        }
+      }
+
     // 2. Loop through orders and create parcels in ZR Express
     for (const order of orders) {
       try {
@@ -105,7 +118,13 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
         }
 
         // 3. Construct Payload exactly as requested
-        const payload = {
+        const deliveryTypeStr = (order.delivery_type || "").toLowerCase();
+        const isStopDesk = /استلام|desk|pickup|office/i.test(deliveryTypeStr);
+        const finalDeliveryType = isStopDesk ? "desk" : "home";
+
+        console.log(`[ZR Express] Order ${order.id} | DB Type: ${order.delivery_type} | Selected Desk: ${order.selectedDeskName || 'N/A'} | ZR deliveryType: ${finalDeliveryType}`);
+
+        const payload: any = {
           customer: {
             customerId: crypto.randomUUID(), // Generate a random UUID for the customer
             name: order.fullname || "Client",
@@ -128,9 +147,13 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
           ],
           amount: Number(order.total_amount) || 0,
           description: order.notes || order.product_name || "",
-          deliveryType: "home",
+          deliveryType: finalDeliveryType,
           externalId: order.id // Link back to our DB ID
         };
+
+        if (isStopDesk && order.selectedDeskName) {
+          payload.stopDesk = order.selectedDeskName;
+        }
 
         // 4. Send POST request to ZR Express
         const response = await fetch(`${API_BASE}/api/v1/parcels`, {

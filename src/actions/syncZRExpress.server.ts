@@ -192,18 +192,14 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
         }
 
         console.log(`\n===========================================`);
-        console.log(`[ZR Express] Preparing Order ID: ${order.id}`);
-        console.log(`- Order Wilaya: ${order.wilaya}`);
-        console.log(`- Order Commune: ${order.commune}`);
-        console.log(`- Selected Desk Wilaya: ${deskObj?.wilaya || 'N/A'}`);
-        console.log(`- Selected Desk Commune: ${deskObj?.commune || 'N/A'}`);
-        console.log(`- Final ZR Desk Sent: ${isStopDesk && deskObj ? deskObj.name : 'N/A'}`);
-        console.log(`- Final Delivery Type Sent: ${finalDeliveryType}`);
+        console.log(`Selected desk object:\n${JSON.stringify(deskObj, null, 2)}`);
+        
+        if (isStopDesk) {
+          console.log(`HubId sent:\n${finalHubId || 'N/A'}`);
+        }
+        
+        console.log(`Final payload:\n${JSON.stringify(payload, null, 2)}`);
         console.log(`===========================================\n`);
-
-        console.log("FINAL PAYLOAD:");
-        console.log(JSON.stringify(payload, null, 2));
-
         // 4. Send POST request to ZR Express
           const response = await fetch(`${API_BASE}/api/v1/parcels`, {
             method: 'POST',

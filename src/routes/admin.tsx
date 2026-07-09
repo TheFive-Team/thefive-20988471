@@ -263,7 +263,7 @@ const getOfficesForWilaya = (wilayaName: string) => {
 
   // Filter the JSON dataset where ville matches (we map id from name for React keys)
   return ZR_OFFICES.filter(office => normalizeStr(office.ville) === targetVille).map(o => ({
-    id: o.name,
+    id: (o as any).id || o.name,
     name: o.name,
     wilaya: o.ville,
     commune: o.commune,
@@ -466,6 +466,7 @@ function OrdersDashboard() {
   const updateZROffice = async (id: string, office: any) => {
     const updates = office ? {
       selectedDesk: {
+        id: office.id,
         name: office.name,
         wilaya: office.wilaya,
         commune: office.commune,

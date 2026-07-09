@@ -168,8 +168,25 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
           externalId: order.id // Link back to our DB ID
         };
 
-        if (isStopDesk && deskObj?.id) {
-          payload.hubId = deskObj.id;
+        let finalHubId = deskObj?.id;
+        if (isStopDesk && !finalHubId && deskObj?.name) {
+          try {
+            // Dynamically import offices if needed or rely on a top level import. We will read it directly using fs to be safe since it's a server fn.
+            const fs = await import('fs');
+            const path = await import('path');
+            const officesPath = path.resolve(process.cwd(), 'src/lib/zr_offices.json');
+            if (fs.existsSync(officesPath)) {
+              const offices = JSON.parse(fs.readFileSync(officesPath, 'utf8'));
+              const match = offices.find((o: any) => o.name === deskObj.name);
+              if (match?.id) finalHubId = match.id;
+            }
+          } catch (e) {
+            console.error('[ZR Express] Error loading zr_offices for dynamic hub lookup', e);
+          }
+        }
+
+        if (isStopDesk && finalHubId) {
+          payload.hubId = finalHubId;
         } else if (isStopDesk) {
           console.warn(`[ZR Express] Warning: Missing hub ID for desk ${deskObj?.name || 'unknown'}`);
         }

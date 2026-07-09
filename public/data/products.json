@@ -137,7 +137,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835508240500",
+              "id": "gid://shopify/ProductVariant/17836394615850",
               "title": "6",
               "availableForSale": true,
               "quantityAvailable": 1,
@@ -159,7 +159,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835508240501",
+              "id": "gid://shopify/ProductVariant/17836394615851",
               "title": "8",
               "availableForSale": true,
               "quantityAvailable": 2,
@@ -181,7 +181,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835508240502",
+              "id": "gid://shopify/ProductVariant/17836394615852",
               "title": "10",
               "availableForSale": true,
               "quantityAvailable": 1,
@@ -203,7 +203,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17835508240503",
+              "id": "gid://shopify/ProductVariant/17836394615853",
               "title": "12",
               "availableForSale": true,
               "quantityAvailable": 2,
@@ -234,6 +234,24 @@
             "10",
             "12"
           ]
+        }
+      ],
+      "offers": [
+        {
+          "id": "offer-1783639272397",
+          "title": "عرض جديد",
+          "price": "5900.0",
+          "pieces": 1,
+          "active": true
+        },
+        {
+          "id": "offer-1783639373287",
+          "title": "عرض جديد",
+          "price": 11000,
+          "pieces": 2,
+          "active": true,
+          "comparePrice": 11800,
+          "badge": "وفر 800دج"
         }
       ]
     }

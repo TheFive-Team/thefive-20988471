@@ -514,8 +514,8 @@ export function CodForm({
               <span className="text-[15px] font-bold tracking-wide">اطلب الآن · الدفع عند الاستلام</span>
             )}
           </button>
-          <div className="mt-4 flex flex-col items-center justify-center text-center space-y-1">
-             <span className="text-[11px] font-bold text-[#9A9A9A]">لن يتم الدفع الآن. سنقوم بالاتصال بك لتأكيد الطلب أولاً.</span>
+          <div className="mt-2.5 flex justify-center text-center">
+             <span className="text-[11.5px] font-medium text-[#7A7A7A]">🛡️ استبدال وإرجاع متاح لضمان تجربة تسوق مريحة.</span>
           </div>
         </div>
       </form>

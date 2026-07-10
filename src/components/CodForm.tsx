@@ -61,18 +61,10 @@ export function CodForm({
     phone: "",
     wilaya: "",
     commune: "",
-    address: "",
-    note: "",
-    zrDeskId: "",
     shippingMethod: "" as "" | "home" | "stopdesk"
   });
 
   const selectedWilayaObj = form.wilaya ? wilayas.find(w => w.code === Number(form.wilaya)) : null;
-  const availableDesks = useMemo(() => {
-    if (!selectedWilayaObj) return [];
-    const targetVille = normalizeStr(selectedWilayaObj.name);
-    return (ZR_OFFICES as any[]).filter((office: any) => normalizeStr(office.ville) === targetVille);
-  }, [selectedWilayaObj]);
 
   const checkoutInitiated = useRef(false);
 
@@ -127,11 +119,7 @@ export function CodForm({
       return;
     }
     
-    if (form.shippingMethod === 'stopdesk' && availableDesks.length > 0 && !form.zrDeskId) {
-       setFormError("يرجى اختيار مكتب التوصيل لتأكيد الطلب");
-       document.getElementById("zr-desk-selector")?.scrollIntoView({ behavior: "smooth", block: "center" });
-       return;
-    }
+
 
     setIsSubmitting(true);
     
@@ -141,17 +129,7 @@ export function CodForm({
       
       const eventId = crypto.randomUUID ? crypto.randomUUID() : `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-      const finalAddress = form.note ? `${form.address} | ملاحظة: ${form.note}` : form.address;
-      let finalDeliveryType = form.shippingMethod === 'home' ? 'توصيل للمنزل' : 'استلام من المكتب (Stop Desk)';
-      
-      if (form.shippingMethod === 'stopdesk' && form.zrDeskId) {
-         const desk = availableDesks.find((d: any) => d.id === form.zrDeskId || d.name === form.zrDeskId);
-         if (desk) {
-            finalDeliveryType = `${finalDeliveryType} - ${desk.name}`;
-         } else {
-            finalDeliveryType = `${finalDeliveryType} - ${form.zrDeskId}`;
-         }
-      }
+      const finalDeliveryType = form.shippingMethod === 'home' ? 'توصيل للمنزل' : 'استلام من المكتب (Stop Desk)';
 
       const response = await submitOrderFn({
         data: {
@@ -159,7 +137,7 @@ export function CodForm({
           phone: form.phone,
           wilaya: wilayaName,
           commune: form.commune,
-          address: finalAddress,
+          address: "",
           deliveryType: finalDeliveryType,
           deliveryFee: calculatedDeliveryFee,
           productName,
@@ -225,16 +203,16 @@ export function CodForm({
     );
   }
 
-  const inputClasses = "w-full px-4 py-4 bg-[#F8F9FA] border border-slate-200 rounded-2xl text-slate-800 text-base focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none";
-  const labelClasses = "block text-sm font-bold text-slate-700 mb-2 tracking-wide";
-  const sectionTitleClasses = "text-xl sm:text-2xl font-serif font-bold text-secondary mb-4 flex items-center gap-2";
+  const inputClasses = "w-full px-4 py-3 sm:py-4 bg-[#F8F9FA] border border-slate-200 rounded-xl sm:rounded-2xl text-slate-800 text-base focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none";
+  const labelClasses = "block text-sm font-bold text-slate-700 mb-1.5 sm:mb-2 tracking-wide";
+  const sectionTitleClasses = "text-lg sm:text-xl font-serif font-bold text-secondary mb-3 sm:mb-4 flex items-center gap-2";
 
   return (
-    <div className="bg-white rounded-[2rem] shadow-[0_8px_40px_-12px_rgba(0,0,0,0.1)] border border-slate-100 p-5 sm:p-8 font-arabic" id="checkout-form" dir="rtl">
+    <div className="bg-white rounded-[1.5rem] sm:rounded-[2rem] shadow-[0_8px_30px_-12px_rgba(0,0,0,0.1)] border border-slate-100 p-4 sm:p-8 font-arabic" id="checkout-form" dir="rtl">
       {/* Header */}
-      <div className="text-center mb-10 pb-6 border-b border-slate-100">
-        <h2 className="text-3xl sm:text-4xl font-bold text-secondary mb-3">أكمل طلبك الآن</h2>
-        <p className="text-base text-slate-500 tracking-wide">الرجاء اختيار العرض وإدخال معلوماتك الشخصية</p>
+      <div className="text-center mb-6 sm:mb-8 pb-4 sm:pb-6 border-b border-slate-100">
+        <h2 className="text-2xl sm:text-4xl font-bold text-secondary mb-2 sm:mb-3">أكمل طلبك الآن</h2>
+        <p className="text-sm sm:text-base text-slate-500 tracking-wide">الرجاء اختيار العرض وإدخال معلوماتك الشخصية</p>
       </div>
       
       {formError && (
@@ -244,16 +222,16 @@ export function CodForm({
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-10" onFocus={handleFormInteraction} onClick={handleFormInteraction}>
+      <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8" onFocus={handleFormInteraction} onClick={handleFormInteraction}>
         
         {/* Section 1: Offers */}
         {offers.length > 0 && (
           <section>
             <h3 className={sectionTitleClasses}>
-              <span className="bg-secondary text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+              <span className="bg-secondary text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm">1</span>
               اختر العرض
             </h3>
-            <div className="grid gap-4 mt-4">
+            <div className="grid gap-3 sm:gap-4 mt-3 sm:mt-4">
               {offers.map((offer: any) => {
                 const isSelected = selectedOffer?.id === offer.id;
                 return (
@@ -297,18 +275,18 @@ export function CodForm({
         {variants.length > 1 && selectedOffer && (
           <section id="size-selector">
             <h3 className={sectionTitleClasses}>
-              <span className="bg-secondary text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+              <span className="bg-secondary text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm">2</span>
               {selectedOffer.pieces === 1 ? 'اختر المقاس' : 'اختر المقاسات'}
-              {sizeError && <span className="text-red-500 normal-case font-bold text-sm ml-2 animate-pulse text-right w-full flex-1">* يرجى اختيار جميع المقاسات</span>}
+              {sizeError && <span className="text-red-500 normal-case font-bold text-xs sm:text-sm ml-2 animate-pulse text-right w-full flex-1">* يرجى اختيار جميع المقاسات</span>}
             </h3>
             
-            <div className="space-y-6 mt-4 p-6 bg-[#F8F9FA] rounded-3xl border border-slate-100">
+            <div className="space-y-4 sm:space-y-6 mt-3 sm:mt-4 p-4 sm:p-6 bg-[#F8F9FA] rounded-2xl sm:rounded-3xl border border-slate-100">
               {Array.from({ length: selectedOffer.pieces }).map((_, pieceIndex) => (
-                <div key={pieceIndex} className="space-y-3">
+                <div key={pieceIndex} className="space-y-2 sm:space-y-3">
                   {selectedOffer.pieces > 1 && (
-                    <p className="font-bold text-sm text-slate-600 bg-white inline-block px-3 py-1 rounded-lg border border-slate-100">القطعة #{pieceIndex + 1}</p>
+                    <p className="font-bold text-xs sm:text-sm text-slate-600 bg-white inline-block px-2 py-1 rounded-md sm:rounded-lg border border-slate-100">القطعة #{pieceIndex + 1}</p>
                   )}
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap gap-2 sm:gap-3">
                     {variants.map((v: any) => {
                       const isAvailable = isVariantAvailable(v.node, pieceIndex);
                       const isSelected = selectedSizes[pieceIndex] === v.node.id;
@@ -340,18 +318,18 @@ export function CodForm({
         {/* Section 3: Customer Info */}
         <section>
           <h3 className={sectionTitleClasses}>
-            <span className="bg-secondary text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
+            <span className="bg-secondary text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm">
                {variants.length > 1 ? '3' : '2'}
             </span>
             معلومات العميل
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-5 mt-3 sm:mt-4">
             <div>
               <label htmlFor="fullname" className={labelClasses}>الاسم الكامل</label>
               <input 
                 type="text" id="fullname" required
                 value={form.fullname} onChange={(e) => setForm({ ...form, fullname: e.target.value })}
-                className={inputClasses} placeholder="أدخل اسمك الكامل"
+                className={inputClasses} placeholder="الاسم واللقب"
               />
             </div>
             
@@ -369,7 +347,7 @@ export function CodForm({
               <div className="relative">
                  <select
                    id="wilaya" required
-                   value={form.wilaya} onChange={(e) => setForm({ ...form, wilaya: e.target.value, commune: "", zrDeskId: "" })}
+                   value={form.wilaya} onChange={(e) => setForm({ ...form, wilaya: e.target.value, commune: "" })}
                    className={`${inputClasses} appearance-none pr-10`}
                  >
                    <option value="" disabled>اختر الولاية</option>
@@ -401,15 +379,15 @@ export function CodForm({
         {/* Section 4: Delivery */}
         <section id="shipping-method">
           <h3 className={sectionTitleClasses}>
-            <span className="bg-secondary text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
+            <span className="bg-secondary text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm">
                {variants.length > 1 ? '4' : '3'}
             </span>
             طريقة التوصيل
-            {shippingError && <span className="text-red-500 normal-case font-bold text-sm ml-2 animate-pulse">* يرجى الاختيار</span>}
+            {shippingError && <span className="text-red-500 normal-case font-bold text-xs sm:text-sm ml-2 animate-pulse">* يرجى الاختيار</span>}
           </h3>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-            <label className={`relative flex items-center p-5 border-2 rounded-2xl cursor-pointer transition-all ${form.shippingMethod === 'home' ? 'border-[#D4AF37] bg-[#D4AF37]/5 shadow-md' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'}`}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-3 sm:mt-4">
+            <label className={`relative flex items-center p-4 sm:p-5 border-2 rounded-xl sm:rounded-2xl cursor-pointer transition-all ${form.shippingMethod === 'home' ? 'border-[#D4AF37] bg-[#D4AF37]/5 shadow-md' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'}`}>
               <input type="radio" name="shippingMethod" value="home" checked={form.shippingMethod === 'home'} onChange={() => { setForm({...form, shippingMethod: 'home'}); setShippingError(false); }} className="sr-only" />
               <div className="flex items-center gap-4">
                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${form.shippingMethod === 'home' ? 'border-[#D4AF37] bg-[#D4AF37]' : 'border-slate-300 bg-white'}`}>
@@ -442,54 +420,11 @@ export function CodForm({
             </label>
           </div>
 
-          {/* Conditional Delivery Inputs */}
-          {form.shippingMethod === 'home' && (
-             <div className="mt-5 animate-in fade-in slide-in-from-top-4 duration-300">
-               <label htmlFor="address" className={labelClasses}>العنوان بالتفصيل</label>
-               <div className="relative">
-                  <input 
-                    type="text" id="address"
-                    value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })}
-                    className={`${inputClasses} pr-12`} placeholder="اسم الحي، الشارع، أو أقرب مَعلَم (اختياري)"
-                  />
-                  <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-               </div>
-             </div>
-          )}
-
-          {form.shippingMethod === 'stopdesk' && availableDesks.length > 0 && (
-             <div className="mt-5 animate-in fade-in slide-in-from-top-4 duration-300" id="zr-desk-selector">
-               <label htmlFor="zrDesk" className={labelClasses}>اختر مكتب الاستلام (Yalidine / ZR Express)</label>
-               <div className="relative">
-                  <select 
-                    id="zrDesk"
-                    value={form.zrDeskId} onChange={(e) => setForm({ ...form, zrDeskId: e.target.value })}
-                    className={`${inputClasses} appearance-none pr-12`}
-                  >
-                    <option value="" disabled>يرجى تحديد المكتب الأقرب إليك</option>
-                    {availableDesks.map((desk: any, i: number) => (
-                      <option key={desk.id || i} value={desk.id || desk.name}>{desk.name} - {desk.address}</option>
-                    ))}
-                  </select>
-                  <Building2 className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-               </div>
-             </div>
-          )}
-
-          {/* Optional Note */}
-          <div className="mt-5">
-             <label htmlFor="note" className={labelClasses}>ملاحظة إضافية (اختياري)</label>
-             <textarea 
-               id="note" rows={2}
-               value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })}
-               className={`${inputClasses} resize-none`} placeholder="أي ملاحظات حول الطلب أو التوصيل..."
-             />
-          </div>
-        </section>
+          </section>
 
         {/* Section 5: Order Summary */}
         {selectedOffer && (
-          <section className="bg-slate-50 border border-slate-200 rounded-3xl p-6 sm:p-8 mt-8 shadow-sm">
+          <section className="bg-slate-50 border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 mt-6 shadow-sm">
             <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-4">ملخص الطلب</h3>
             
             <div className="space-y-4">
@@ -555,21 +490,18 @@ export function CodForm({
           <button 
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-[#1A2530] hover:bg-[#1A2530]/90 text-white py-5 px-6 rounded-[1.5rem] shadow-xl shadow-[#1A2530]/20 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed border-b-4 border-black/20 hover:translate-y-px hover:border-b-2 active:border-b-0 active:translate-y-1"
+            className="w-full bg-[#1A2530] hover:bg-[#1A2530]/90 text-white py-4 sm:py-5 px-6 rounded-xl sm:rounded-[1.5rem] shadow-xl shadow-[#1A2530]/20 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed border-b-4 border-black/20 hover:translate-y-px hover:border-b-2 active:border-b-0 active:translate-y-1"
           >
             {isSubmitting ? (
               <span className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></span>
             ) : (
-              <span className="text-xl font-bold tracking-widest uppercase text-[#D4AF37]">تأكيد الطلب الآن</span>
+              <span className="text-xl font-bold tracking-widest uppercase text-[#D4AF37]">اطلب الآن - الدفع عند الاستلام</span>
             )}
           </button>
-          <p className="text-center text-sm font-bold text-slate-500 mt-4 flex justify-center items-center gap-2">
-             <ShieldCheck className="w-4 h-4" /> الدفع يكون عند استلام المنتج
-          </p>
         </div>
         
         {/* Trust Badges */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-6 gap-x-2 py-6 text-slate-600 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm mt-4 px-4">
+        <div className="grid grid-cols-4 gap-y-4 gap-x-2 py-4 sm:py-5 text-slate-600 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm mt-2 px-2 sm:px-4">
           <div className="flex flex-col items-center gap-2 text-center">
             <Truck className="w-6 h-6 text-[#D4AF37]" strokeWidth={2} />
             <span className="text-xs font-bold tracking-wider">توصيل سريع</span>

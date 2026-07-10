@@ -35,7 +35,7 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
       
       {/* 1. MAIN GALLERY (Top Carousel + Thumbnails) */}
       <section className="w-full">
-        <div className="overflow-hidden" ref={mainRef}>
+        <div className="overflow-hidden rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 bg-[#FCFCFC]" ref={mainRef}>
           <div className="flex">
             {images.map((img, idx) => (
               <div className="flex-[0_0_100%] min-w-0" key={idx}>
@@ -58,22 +58,22 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
         
         {/* Thumbnails */}
         {images.length > 1 && (
-          <div className="mt-2 px-2 overflow-hidden" ref={thumbRef}>
-            <div className="flex gap-2">
+          <div className="mt-3 overflow-hidden px-1 py-1" ref={thumbRef}>
+            <div className="flex gap-2.5">
               {images.map((img, idx) => (
                 <div 
                   key={idx} 
-                  className={`flex-[0_0_22%] min-w-0 cursor-pointer rounded-xl overflow-hidden border-2 transition-all ${idx === selectedIndex ? 'border-primary opacity-100 shadow-sm' : 'border-transparent hover:border-accent opacity-60'}`}
+                  className={`flex-[0_0_22%] min-w-0 cursor-pointer rounded-xl overflow-hidden transition-all duration-300 ${idx === selectedIndex ? 'border-2 border-[#D4AF37] opacity-100 shadow-md scale-105' : 'border-2 border-transparent hover:border-slate-200 opacity-70 hover:opacity-100'}`}
                   onClick={() => onThumbClick(idx)}
                 >
                   <img 
                     src={img.url.endsWith("-800w.webp") ? img.url.replace("-800w.webp", "-160w.webp") : getOptimizedShopifyImage(img.url, 200)} 
                     alt={`Thumbnail ${idx + 1}`} 
-                    className="w-full h-auto object-cover aspect-square" 
+                    className="w-full h-auto object-cover aspect-[4/5]" 
                     loading="lazy" 
                     decoding="async" 
                     width={200}
-                    height={200}
+                    height={250}
                   />
                 </div>
               ))}

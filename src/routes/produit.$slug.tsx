@@ -115,14 +115,97 @@ function ProductPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10 sm:py-24">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-10 sm:py-24">
       <div className="grid gap-0 md:grid-cols-2 md:gap-10 lg:gap-12">
-        <div className="block md:hidden -mx-6 sm:-mx-10">
-          {/* Dynamic gallery from Shopify */}
-          <MobileImageGallery images={images} />
+        
+        {/* Mobile View: Text above gallery */}
+        <div className="block md:hidden mb-6">
+          <div className="flex flex-col items-center text-center animate-in fade-in duration-500">
+            {/* 1. Brand */}
+            <div className="mb-2">
+              <span className="text-[11px] sm:text-xs uppercase tracking-[0.25em] text-[#1A2530]/70 font-bold">
+                {p.vendor || "The Five A"}
+              </span>
+            </div>
+            
+            {/* 2. Rating */}
+            <div className="flex justify-center items-center gap-1.5 mb-4">
+              <div className="flex text-[#D4AF37] text-sm">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              </div>
+              <span className="text-[11px] font-bold text-[#1A2530]/60 mt-0.5">4.9</span>
+            </div>
+            
+            {/* 3. Collection Label */}
+            <div className="flex justify-center mb-3">
+              <span className="text-[10px] uppercase font-bold tracking-widest text-[#D4AF37] bg-[#D4AF37]/10 px-3 py-1 rounded-sm">
+                ✨ Nouvelle Collection
+              </span>
+            </div>
+            
+            {/* 4. Product Name */}
+            <h1 className="font-serif font-bold text-[#1A2530] text-2xl sm:text-3xl leading-[1.3] text-center mb-5 line-clamp-2 px-2 drop-shadow-sm">
+              {p.title}
+            </h1>
+            
+            {/* 5. Price */}
+            <div className="flex flex-col items-center justify-center mb-6 w-full">
+              {(() => {
+                const currentPrice = offers[0]?.price;
+                const compPrice = offers[0]?.comparePrice;
+                
+                if (compPrice && parseFloat(compPrice) > parseFloat(currentPrice)) {
+                  const discount = Math.round(((parseFloat(compPrice) - parseFloat(currentPrice)) / parseFloat(compPrice)) * 100);
+                  return (
+                    <div className="flex flex-col items-center w-full bg-[#FAF9F6]/50 py-3 rounded-xl border border-slate-100">
+                      <div className="flex items-center gap-2.5 mb-1">
+                        <span className="text-sm text-slate-400 line-through font-medium">
+                          {formatMoney({ amount: compPrice, currencyCode: "DZD" })}
+                        </span>
+                        <span className="bg-[#1A2530] text-[#D4AF37] text-[10px] font-bold px-2 py-0.5 rounded-sm tracking-wide">
+                          وفر {discount}%
+                        </span>
+                      </div>
+                      <span className="text-3xl font-bold tracking-tight text-[#1A2530] drop-shadow-sm">
+                        {formatMoney({ amount: currentPrice, currencyCode: "DZD" })}
+                      </span>
+                    </div>
+                  );
+                }
+                return (
+                  <span className="text-3xl font-bold tracking-tight text-[#1A2530] drop-shadow-sm">
+                    {formatMoney({ amount: currentPrice ?? 0, currencyCode: "DZD" })}
+                  </span>
+                );
+              })()}
+            </div>
+            
+            {/* 6. Trust Badges */}
+            <div className="flex flex-wrap justify-center gap-2 mb-6">
+              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-3.5 py-1.5 flex items-center shadow-sm">
+                <span className="text-[10.5px] font-bold text-[#1A2530]/80">💳 الدفع عند الاستلام</span>
+              </div>
+              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-3.5 py-1.5 flex items-center shadow-sm">
+                <span className="text-[10.5px] font-bold text-[#1A2530]/80">🚚 توصيل سريع لـ58 ولاية</span>
+              </div>
+              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-3.5 py-1.5 flex items-center shadow-sm">
+                <span className="text-[10.5px] font-bold text-[#1A2530]/80">🔄 استبدال وإرجاع</span>
+              </div>
+              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-3.5 py-1.5 flex items-center shadow-sm">
+                <span className="text-[10.5px] font-bold text-[#1A2530]/80">🌿 قماش عالي الجودة</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 7. Gallery (Mobile) */}
+          <div className="-mx-4 sm:-mx-6 mb-2">
+            <MobileImageGallery images={images} />
+          </div>
         </div>
+
+        {/* Desktop View Gallery */}
         <div className="hidden md:block">
-          <div className="bg-secondary rounded-2xl overflow-hidden shadow-xl shadow-secondary/5">
+          <div className="bg-[#FCFCFC] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
             {image && (
               <img 
                 src={getOptimizedShopifyImage(image.url, 800)} 
@@ -130,7 +213,7 @@ function ProductPage() {
                 sizes="(max-width: 768px) 100vw, 50vw"
                 alt={image.altText ?? p.title} 
                 width={800} height={1000} 
-                className="h-full w-full object-cover" 
+                className="h-full w-full object-cover aspect-[4/5]" 
                 fetchPriority="high" loading="eager" decoding="sync" 
               />
             )}
@@ -142,7 +225,7 @@ function ProductPage() {
                   key={img.url}
                   aria-label={img.altText ?? `الصورة ${i + 1} لـ ${p.title}`}
                   onClick={() => setActiveImg(i)}
-                  className={`aspect-square rounded-xl overflow-hidden shadow-sm bg-secondary border ${i === activeImg ? "border-primary" : "border-transparent hover:border-accent"}`}
+                  className={`aspect-square rounded-xl overflow-hidden transition-all duration-300 ${i === activeImg ? "border-2 border-[#D4AF37] shadow-sm scale-[1.02]" : "border-2 border-transparent hover:border-slate-200 opacity-70 hover:opacity-100"}`}
                 >
                   <img 
                     src={img.url.endsWith("-800w.webp") ? img.url.replace("-800w.webp", "-160w.webp") : getOptimizedShopifyImage(img.url, 200)} 
@@ -156,39 +239,81 @@ function ProductPage() {
             </div>
           )}
         </div>
-        <div>
-          {p.productType && <p className="eyebrow text-accent">{p.productType}</p>}
-          <h1 className="font-serif font-bold text-secondary text-3xl leading-tight sm:text-5xl">{p.title}</h1>
-          <div className="mt-1 flex items-center gap-3">
-            <p className="text-2xl sm:text-3xl font-medium tracking-wide text-primary">
-              {formatMoney({ amount: offers[0]?.price ?? 0, currencyCode: "DZD" })}
-            </p>
-            {(() => {
-              const currentPrice = offers[0]?.price;
-              const comparePrice = offers[0]?.comparePrice;
-              
-              if (comparePrice && parseFloat(comparePrice) > parseFloat(currentPrice)) {
-                const discount = Math.round(((parseFloat(comparePrice) - parseFloat(currentPrice)) / parseFloat(comparePrice)) * 100);
-                return (
-                  <>
-                    <p className="text-xl sm:text-2xl text-slate-400 line-through">
-                      {formatMoney({ amount: comparePrice, currencyCode: "DZD" })}
-                    </p>
-                    <span className="bg-red-100 text-red-700 text-sm font-bold px-2 py-1 rounded-md">
-                      -{discount}%
-                    </span>
-                  </>
-                );
-              }
-              return null;
-            })()}
+
+        {/* Desktop Details + COD Form */}
+        <div className="mt-2 md:mt-0">
+          
+          {/* Desktop Only Details (Hidden on Mobile) */}
+          <div className="hidden md:block mb-8">
+            <div className="mb-2">
+              <span className="text-xs uppercase tracking-[0.25em] text-[#1A2530]/70 font-bold">
+                {p.vendor || "The Five A"}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-1.5 mb-4">
+              <div className="flex text-[#D4AF37] text-sm">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              </div>
+              <span className="text-[11px] font-bold text-[#1A2530]/60 mt-0.5">4.9</span>
+            </div>
+
+            <div className="mb-4">
+              <span className="text-[10px] uppercase font-bold tracking-widest text-[#D4AF37] bg-[#D4AF37]/10 px-3 py-1 rounded-sm">
+                ✨ Nouvelle Collection
+              </span>
+            </div>
+
+            <h1 className="font-serif font-bold text-[#1A2530] text-4xl leading-tight mb-6 line-clamp-2">
+              {p.title}
+            </h1>
+            
+            <div className="flex items-center gap-4">
+              <span className="text-4xl font-bold tracking-tight text-[#1A2530]">
+                {formatMoney({ amount: offers[0]?.price ?? 0, currencyCode: "DZD" })}
+              </span>
+              {(() => {
+                const currentPrice = offers[0]?.price;
+                const comparePrice = offers[0]?.comparePrice;
+                
+                if (comparePrice && parseFloat(comparePrice) > parseFloat(currentPrice)) {
+                  const discount = Math.round(((parseFloat(comparePrice) - parseFloat(currentPrice)) / parseFloat(comparePrice)) * 100);
+                  return (
+                    <div className="flex flex-col">
+                      <span className="text-lg text-slate-400 line-through font-medium">
+                        {formatMoney({ amount: comparePrice, currencyCode: "DZD" })}
+                      </span>
+                      <span className="bg-[#1A2530] text-[#D4AF37] text-xs font-bold px-2 py-0.5 rounded-sm tracking-wide text-center mt-1">
+                        وفر {discount}%
+                      </span>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+            </div>
+            
+            <div className="h-px bg-slate-200 my-8 w-1/3" />
+            
+            {/* Desktop Trust Badges */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-4 py-2 flex items-center shadow-sm">
+                <span className="text-xs font-bold text-[#1A2530]/80">💳 الدفع عند الاستلام</span>
+              </div>
+              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-4 py-2 flex items-center shadow-sm">
+                <span className="text-xs font-bold text-[#1A2530]/80">🚚 توصيل سريع لـ58 ولاية</span>
+              </div>
+              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-4 py-2 flex items-center shadow-sm">
+                <span className="text-xs font-bold text-[#1A2530]/80">🔄 استبدال وإرجاع</span>
+              </div>
+              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-4 py-2 flex items-center shadow-sm">
+                <span className="text-xs font-bold text-[#1A2530]/80">🌿 قماش عالي الجودة</span>
+              </div>
+            </div>
           </div>
-          <div className="hairline my-6 w-16" />
 
-
-
-          {/* COD Form Checkout Section Moved Here (Right after variants) */}
-          <div id="checkout-form" className="mt-12 bg-transparent -mx-6 px-4 sm:mx-0 sm:px-0">
+          {/* 8 & 9: Size / Quantity / COD Form */}
+          <div id="checkout-form" className="bg-transparent -mx-4 px-4 sm:mx-0 sm:px-0">
             <CodForm 
               productName={p?.title}
               offers={offers}
@@ -198,7 +323,6 @@ function ProductPage() {
               comparePrice={comparePrice}
             />
           </div>
-
 
         </div>
       </div>

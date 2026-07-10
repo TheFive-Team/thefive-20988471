@@ -224,56 +224,56 @@ export function CodForm({
     );
   }
 
-  const inputClasses = "w-full px-4 py-3 sm:py-4 bg-[#F8F9FA] border border-slate-200 rounded-xl sm:rounded-2xl text-slate-800 text-base focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none";
-  const labelClasses = "block text-sm font-bold text-slate-700 mb-1.5 sm:mb-2 tracking-wide";
-  const sectionTitleClasses = "text-lg sm:text-xl font-serif font-bold text-secondary mb-3 sm:mb-4 flex items-center gap-2";
+  const inputClasses = "w-full px-3 py-2.5 sm:py-3 bg-white border border-slate-200 rounded-xl text-slate-800 text-sm focus:ring-1 focus:ring-[#D4AF37]/40 focus:border-[#D4AF37] transition-all outline-none shadow-sm";
+  const labelClasses = "block text-xs sm:text-sm font-bold text-slate-600 mb-1.5 tracking-wide";
+  const sectionTitleClasses = "text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2 mb-3";
 
   return (
-    <div className="bg-white rounded-[1.5rem] sm:rounded-[2rem] shadow-[0_8px_30px_-12px_rgba(0,0,0,0.1)] border border-slate-100 p-4 sm:p-8 font-arabic" id="checkout-form" dir="rtl">
+    <div className="bg-white rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100 p-4 sm:p-6 font-arabic" id="checkout-form" dir="rtl">
       {/* Header */}
-      <div className="text-center mb-6 sm:mb-8 pb-4 sm:pb-6 border-b border-slate-100">
-        <h2 className="text-2xl sm:text-4xl font-bold text-secondary mb-2 sm:mb-3">أكمل طلبك الآن</h2>
-        <p className="text-sm sm:text-base text-slate-500 tracking-wide">الرجاء اختيار العرض وإدخال معلوماتك الشخصية</p>
+      <div className="text-center mb-5 pb-4 border-b border-slate-100">
+        <h2 className="text-2xl font-bold text-[#1A2530] mb-1">أكمل طلبك الآن</h2>
+        <p className="text-xs sm:text-sm text-slate-500">الرجاء إدخال معلوماتك لتأكيد الطلب</p>
       </div>
       
       {formError && (
-        <div className="mb-8 p-5 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-3 text-red-600 text-sm font-bold animate-in fade-in">
-          <AlertCircle className="w-5 h-5 shrink-0" />
+        <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-2 text-red-600 text-xs sm:text-sm font-bold animate-in fade-in">
+          <AlertCircle className="w-4 h-4 shrink-0" />
           <p>{formError}</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8" onFocus={handleFormInteraction} onClick={handleFormInteraction}>
+      <form onSubmit={handleSubmit} className="space-y-5" onFocus={handleFormInteraction} onClick={handleFormInteraction}>
         
         {/* Section 1: Quantity */}
-        <section>
+        <section className="border-b border-slate-100 pb-5">
           <h3 className={sectionTitleClasses}>
-            <span className="bg-secondary text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm">1</span>
-            اختر الكمية
+            <span className="bg-[#1A2530] text-[#D4AF37] w-5 h-5 rounded-full flex items-center justify-center text-[10px]">1</span>
+            الكمية
           </h3>
-          <div className="flex items-center justify-center gap-6 mt-4 bg-slate-50 border border-slate-200 p-6 rounded-3xl shadow-sm">
-            <button type="button" onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-14 h-14 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-2xl font-bold text-slate-600 hover:bg-slate-100 transition-colors active:scale-95">-</button>
-            <span className="text-4xl font-bold text-slate-800 w-16 text-center">{quantity}</span>
-            <button type="button" onClick={() => setQuantity(q => Math.min(maxQty, q + 1))} className="w-14 h-14 rounded-full bg-[#1A2530] border border-[#1A2530] shadow-sm flex items-center justify-center text-2xl font-bold text-white hover:bg-[#1A2530]/90 transition-colors active:scale-95">+</button>
+          <div className="flex items-center gap-4 mt-2">
+            <button type="button" onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-xl font-bold text-slate-500 hover:bg-slate-50 transition-colors active:scale-95">-</button>
+            <span className="text-xl font-bold text-slate-800 w-8 text-center">{quantity}</span>
+            <button type="button" onClick={() => setQuantity(q => Math.min(maxQty, q + 1))} className="w-10 h-10 rounded-full bg-[#1A2530] text-[#D4AF37] flex items-center justify-center text-xl font-bold hover:bg-[#1A2530]/90 transition-colors active:scale-95">+</button>
           </div>
         </section>
 
         {/* Section 2: Sizes */}
         {variants.length > 1 && (
-          <section id="size-selector">
+          <section id="size-selector" className="border-b border-slate-100 pb-5">
             <h3 className={sectionTitleClasses}>
-              <span className="bg-secondary text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm">2</span>
-              {quantity === 1 ? 'اختر المقاس' : 'اختر المقاسات'}
-              {sizeError && <span className="text-red-500 normal-case font-bold text-xs sm:text-sm ml-2 animate-pulse text-right w-full flex-1">* يرجى اختيار جميع المقاسات</span>}
+              <span className="bg-[#1A2530] text-[#D4AF37] w-5 h-5 rounded-full flex items-center justify-center text-[10px]">2</span>
+              {quantity === 1 ? 'المقاس' : 'المقاسات'}
+              {sizeError && <span className="text-red-500 normal-case font-bold text-[10px] ml-2 animate-pulse text-right w-full flex-1">* يرجى الاختيار</span>}
             </h3>
             
-            <div className="space-y-4 sm:space-y-6 mt-3 sm:mt-4 p-4 sm:p-6 bg-[#F8F9FA] rounded-2xl sm:rounded-3xl border border-slate-100">
+            <div className="space-y-3 mt-2">
               {Array.from({ length: quantity }).map((_, pieceIndex) => (
-                <div key={pieceIndex} className="space-y-2 sm:space-y-3">
+                <div key={pieceIndex} className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4">
                   {quantity > 1 && (
-                    <p className="font-bold text-xs sm:text-sm text-slate-600 bg-white inline-block px-2 py-1 rounded-md sm:rounded-lg border border-slate-100">القطعة #{pieceIndex + 1}</p>
+                    <p className="font-bold text-xs text-slate-500 min-w-[3.5rem]">القطعة {pieceIndex + 1}</p>
                   )}
-                  <div className="flex flex-wrap gap-2 sm:gap-3">
+                  <div className="flex flex-wrap gap-2">
                     {variants.map((v: any) => {
                       const isAvailable = isVariantAvailable(v.node, pieceIndex);
                       const isSelected = selectedSizes[pieceIndex] === v.node.id;
@@ -283,12 +283,12 @@ export function CodForm({
                           key={v.node.id}
                           onClick={() => setSizeForPiece(pieceIndex, v.node.id)}
                           disabled={!isAvailable && !isSelected}
-                          className={`rounded-xl min-w-[4rem] border-2 px-5 py-3 text-base uppercase tracking-wider transition-all font-bold ${
+                          className={`rounded-lg min-w-[2.5rem] h-10 px-3 text-sm transition-all font-bold ${
                             !isAvailable && !isSelected
-                              ? "opacity-40 border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed line-through relative overflow-hidden" 
+                              ? "opacity-40 border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed line-through" 
                               : isSelected
-                                ? "border-primary bg-primary text-secondary shadow-md scale-105"
-                                : "border-slate-200 text-slate-600 hover:border-slate-400 bg-white"
+                                ? "bg-[#D4AF37] text-[#1A2530]"
+                                : "border border-slate-200 text-slate-600 hover:border-slate-300 bg-white"
                           }`}
                         >
                            {v.node.title}
@@ -303,14 +303,14 @@ export function CodForm({
         )}
 
         {/* Section 3: Customer Info */}
-        <section>
+        <section className="border-b border-slate-100 pb-5">
           <h3 className={sectionTitleClasses}>
-            <span className="bg-secondary text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm">
+            <span className="bg-[#1A2530] text-[#D4AF37] w-5 h-5 rounded-full flex items-center justify-center text-[10px]">
                {variants.length > 1 ? '3' : '2'}
             </span>
             معلومات العميل
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-5 mt-3 sm:mt-4">
+          <div className="grid grid-cols-2 gap-3 mt-2">
             <div>
               <label htmlFor="fullname" className={labelClasses}>الاسم الكامل</label>
               <input 
@@ -335,7 +335,7 @@ export function CodForm({
                  <select
                    id="wilaya" required
                    value={form.wilaya} onChange={(e) => setForm({ ...form, wilaya: e.target.value, commune: "" })}
-                   className={`${inputClasses} appearance-none pr-10`}
+                   className={`${inputClasses} appearance-none pr-8`}
                  >
                    <option value="" disabled>اختر الولاية</option>
                    {wilayas.map((w) => (
@@ -351,7 +351,7 @@ export function CodForm({
                  <select
                    id="commune" required disabled={!form.wilaya}
                    value={form.commune} onChange={(e) => setForm({ ...form, commune: e.target.value })}
-                   className={`${inputClasses} appearance-none pr-10 ${!form.wilaya ? 'bg-slate-100 opacity-60 cursor-not-allowed' : ''}`}
+                   className={`${inputClasses} appearance-none pr-8 ${!form.wilaya ? 'bg-slate-50 opacity-70 cursor-not-allowed' : ''}`}
                  >
                    <option value="" disabled>اختر البلدية</option>
                    {form.wilaya && (communesByWilaya[Number(form.wilaya)] ?? []).map((c, i) => (
@@ -364,75 +364,70 @@ export function CodForm({
         </section>
 
         {/* Section 4: Delivery */}
-        <section id="shipping-method">
+        <section id="shipping-method" className="pb-1">
           <h3 className={sectionTitleClasses}>
-            <span className="bg-secondary text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm">
+            <span className="bg-[#1A2530] text-[#D4AF37] w-5 h-5 rounded-full flex items-center justify-center text-[10px]">
                {variants.length > 1 ? '4' : '3'}
             </span>
-            طريقة التوصيل
-            {shippingError && <span className="text-red-500 normal-case font-bold text-xs sm:text-sm ml-2 animate-pulse">* يرجى الاختيار</span>}
+            التوصيل
+            {shippingError && <span className="text-red-500 normal-case font-bold text-[10px] ml-2 animate-pulse">* يرجى الاختيار</span>}
           </h3>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-3 sm:mt-4">
-            <label className={`relative flex items-center p-4 sm:p-5 border-2 rounded-xl sm:rounded-2xl cursor-pointer transition-all ${form.shippingMethod === 'home' ? 'border-[#D4AF37] bg-[#D4AF37]/5 shadow-md' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'}`}>
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            <label className={`relative flex items-center px-3 py-3 border rounded-xl cursor-pointer transition-all ${form.shippingMethod === 'home' ? 'border-[#D4AF37] bg-[#D4AF37]/5' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'}`}>
               <input type="radio" name="shippingMethod" value="home" checked={form.shippingMethod === 'home'} onChange={() => { setForm({...form, shippingMethod: 'home'}); setShippingError(false); }} className="sr-only" />
-              <div className="flex items-center gap-4">
-                 <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${form.shippingMethod === 'home' ? 'border-[#D4AF37] bg-[#D4AF37]' : 'border-slate-300 bg-white'}`}>
-                    {form.shippingMethod === 'home' && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
+              <div className="flex items-center gap-2.5">
+                 <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${form.shippingMethod === 'home' ? 'border-[#D4AF37] bg-[#D4AF37]' : 'border-slate-300 bg-white'}`}>
+                    {form.shippingMethod === 'home' && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
                  </div>
                  <div className="flex flex-col">
-                    <span className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                       <Truck className="w-5 h-5 text-slate-600" />
-                       توصيل للمنزل
+                    <span className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                       <Truck className="w-3.5 h-3.5 text-slate-500" />
+                       للمنزل
                     </span>
-                    {form.wilaya && <span className="text-sm font-bold text-slate-500 mt-1">{selectedWilayaObj?.home} د.ج</span>}
                  </div>
               </div>
             </label>
 
-            <label className={`relative flex items-center p-5 border-2 rounded-2xl cursor-pointer transition-all ${form.shippingMethod === 'stopdesk' ? 'border-[#D4AF37] bg-[#D4AF37]/5 shadow-md' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'}`}>
+            <label className={`relative flex items-center px-3 py-3 border rounded-xl cursor-pointer transition-all ${form.shippingMethod === 'stopdesk' ? 'border-[#D4AF37] bg-[#D4AF37]/5' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'}`}>
               <input type="radio" name="shippingMethod" value="stopdesk" checked={form.shippingMethod === 'stopdesk'} onChange={() => { setForm({...form, shippingMethod: 'stopdesk'}); setShippingError(false); }} className="sr-only" />
-              <div className="flex items-center gap-4">
-                 <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${form.shippingMethod === 'stopdesk' ? 'border-[#D4AF37] bg-[#D4AF37]' : 'border-slate-300 bg-white'}`}>
-                    {form.shippingMethod === 'stopdesk' && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
+              <div className="flex items-center gap-2.5">
+                 <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${form.shippingMethod === 'stopdesk' ? 'border-[#D4AF37] bg-[#D4AF37]' : 'border-slate-300 bg-white'}`}>
+                    {form.shippingMethod === 'stopdesk' && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
                  </div>
                  <div className="flex flex-col">
-                    <span className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                       <Building2 className="w-5 h-5 text-slate-600" />
-                       الاستلام من المكتب
+                    <span className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                       <Building2 className="w-3.5 h-3.5 text-slate-500" />
+                       للمكتب
                     </span>
-                    {form.wilaya && <span className="text-sm font-bold text-slate-500 mt-1">{selectedWilayaObj?.stop} د.ج</span>}
                  </div>
               </div>
             </label>
           </div>
-
-          </section>
+        </section>
 
         {/* Section 5: Order Summary */}
-        <section className="bg-slate-50 border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 mt-6 shadow-sm">
-          <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-4">ملخص الطلب</h3>
-          
-          <div className="space-y-4">
-             <div className="flex justify-between items-center text-base font-bold text-slate-700">
+        <section className="bg-[#FAF9F6] border border-slate-200 rounded-xl p-4 mt-2">
+          <div className="space-y-2.5 text-sm">
+             <div className="flex justify-between items-center font-bold text-slate-600">
                <span>الكمية</span>
-               <span className="text-primary">{quantity} {quantity === 1 ? 'قطعة' : 'قطع'}</span>
+               <span className="text-slate-800">{quantity}</span>
              </div>
              
              {variants.length > 1 && selectedSizes.some(s => s !== "") && (
-                <div className="flex justify-between items-center text-sm font-bold text-slate-600">
+                <div className="flex justify-between items-center font-bold text-slate-600">
                   <span>المقاسات</span>
-                  <span className="text-left dir-ltr">
+                  <span className="text-left dir-ltr text-slate-800">
                      {selectedSizes.map((id, index) => variants.find((v: any) => v.node.id === id)?.node.title || "").filter(Boolean).join("، ")}
                   </span>
                 </div>
              )}
 
-             <div className="flex justify-between items-center text-base font-bold text-slate-600">
-               <span>سعر المنتج</span>
-               <span className="font-sans tracking-tight dir-ltr">
+             <div className="flex justify-between items-center font-bold text-slate-600">
+               <span>سعر المنتجات</span>
+               <span className="font-sans tracking-tight dir-ltr text-slate-800">
                  {discountAmount > 0 ? (
-                   <span className="line-through text-slate-400 ml-2">{subtotal.toLocaleString()} د.ج</span>
+                   <span className="line-through text-slate-400 ml-1.5">{subtotal.toLocaleString()} د.ج</span>
                  ) : (
                    <span>{subtotal.toLocaleString()} د.ج</span>
                  )}
@@ -440,31 +435,31 @@ export function CodForm({
              </div>
 
              {discountAmount > 0 && (
-                <div className="flex justify-between items-center text-sm font-bold text-green-600 bg-green-50 p-2 rounded-lg">
-                  <span className="flex items-center gap-2">تخفيض الكمية {pricingConfig?.badgeText && <span className="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-md">{pricingConfig.badgeText}</span>}</span>
+                <div className="flex justify-between items-center font-bold text-green-600">
+                  <span className="flex items-center gap-1.5">التخفيض {pricingConfig?.badgeText && <span className="bg-red-100 text-red-700 text-[10px] px-1.5 py-0.5 rounded">{pricingConfig.badgeText}</span>}</span>
                   <span className="font-sans tracking-tight dir-ltr">-{discountAmount.toLocaleString()} د.ج</span>
                 </div>
              )}
 
-             <div className="flex justify-between items-center text-base font-bold text-slate-600">
+             <div className="flex justify-between items-center font-bold text-slate-600">
                <span>سعر التوصيل</span>
-               <span className="font-sans tracking-tight dir-ltr">
+               <span className="font-sans tracking-tight dir-ltr text-slate-800">
                  {form.wilaya ? (
                    form.shippingMethod ? (
-                     `+ ${(form.shippingMethod === 'home' ? selectedWilayaObj?.home : selectedWilayaObj?.stop)?.toLocaleString()} د.ج`
+                     `${(form.shippingMethod === 'home' ? selectedWilayaObj?.home : selectedWilayaObj?.stop)?.toLocaleString()} د.ج`
                    ) : (
                      "قيد الحساب"
                    )
                  ) : (
-                   "الرجاء اختيار الولاية"
+                   "اختر الولاية"
                  )}
                </span>
              </div>
              
-             <div className="h-px bg-slate-200 my-4"></div>
+             <div className="h-px bg-slate-200/80 my-3"></div>
              
-             <div className="flex justify-between items-center text-xl sm:text-2xl font-bold text-secondary">
-               <span>المجموع الكلي</span>
+             <div className="flex justify-between items-center text-lg sm:text-xl font-bold">
+               <span className="text-[#1A2530]">المجموع الكلي</span>
                <span className="font-sans font-bold tracking-tight dir-ltr text-[#D4AF37]">
                  {form.wilaya && form.shippingMethod ? (
                    `${(finalProductTotal + ((form.shippingMethod === 'home' ? selectedWilayaObj?.home : selectedWilayaObj?.stop) || 0)).toLocaleString()} د.ج`
@@ -477,37 +472,33 @@ export function CodForm({
         </section>
 
         {/* Submit Button */}
-        <div className="pt-2">
+        <div className="pt-1">
           <button 
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-[#1A2530] hover:bg-[#1A2530]/90 text-white py-4 sm:py-5 px-6 rounded-xl sm:rounded-[1.5rem] shadow-xl shadow-[#1A2530]/20 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed border-b-4 border-black/20 hover:translate-y-px hover:border-b-2 active:border-b-0 active:translate-y-1"
+            className="w-full bg-[#1A2530] hover:bg-[#1A2530]/90 text-[#D4AF37] h-[52px] sm:h-[54px] rounded-xl shadow-[0_4px_14px_0_rgba(26,37,48,0.2)] transition-all duration-300 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
-              <span className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></span>
+              <span className="w-5 h-5 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin"></span>
             ) : (
-              <span className="text-xl font-bold tracking-widest uppercase text-[#D4AF37]">اطلب الآن - الدفع عند الاستلام</span>
+              <span className="text-base sm:text-lg font-bold tracking-wide">اطلب الآن · الدفع عند الاستلام</span>
             )}
           </button>
         </div>
         
         {/* Trust Badges */}
-        <div className="grid grid-cols-4 gap-y-4 gap-x-2 py-4 sm:py-5 text-slate-600 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm mt-2 px-2 sm:px-4">
-          <div className="flex flex-col items-center gap-2 text-center">
-            <Truck className="w-6 h-6 text-[#D4AF37]" strokeWidth={2} />
-            <span className="text-xs font-bold tracking-wider">توصيل سريع</span>
+        <div className="flex justify-around items-center pt-2 text-slate-500 border-t border-slate-100 mt-2">
+          <div className="flex items-center gap-1.5">
+            <Truck className="w-3.5 h-3.5 text-[#D4AF37]" strokeWidth={2.5} />
+            <span className="text-[10px] sm:text-xs font-bold tracking-wide">توصيل سريع</span>
           </div>
-          <div className="flex flex-col items-center gap-2 text-center">
-            <ShieldCheck className="w-6 h-6 text-[#D4AF37]" strokeWidth={2} />
-            <span className="text-xs font-bold tracking-wider">دفع آمن</span>
+          <div className="flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" strokeWidth={2.5} />
+            <span className="text-[10px] sm:text-xs font-bold tracking-wide">دفع آمن</span>
           </div>
-          <div className="flex flex-col items-center gap-2 text-center">
-            <RefreshCw className="w-6 h-6 text-[#D4AF37]" strokeWidth={2} />
-            <span className="text-xs font-bold tracking-wider">استبدال واسترجاع</span>
-          </div>
-          <div className="flex flex-col items-center gap-2 text-center">
-            <Clock className="w-6 h-6 text-[#D4AF37]" strokeWidth={2} />
-            <span className="text-xs font-bold tracking-wider">خدمة 24/7</span>
+          <div className="flex items-center gap-1.5">
+            <RefreshCw className="w-3.5 h-3.5 text-[#D4AF37]" strokeWidth={2.5} />
+            <span className="text-[10px] sm:text-xs font-bold tracking-wide">استبدال مجاني</span>
           </div>
         </div>
       </form>

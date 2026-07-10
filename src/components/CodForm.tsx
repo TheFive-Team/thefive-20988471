@@ -224,17 +224,11 @@ export function CodForm({
     );
   }
 
-  const inputClasses = "w-full px-3 py-2.5 sm:py-3 bg-white border border-slate-200 rounded-xl text-slate-800 text-sm focus:ring-1 focus:ring-[#D4AF37]/40 focus:border-[#D4AF37] transition-all outline-none shadow-sm";
-  const labelClasses = "block text-xs sm:text-sm font-bold text-slate-600 mb-1.5 tracking-wide";
-  const sectionTitleClasses = "text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2 mb-3";
+  const inputClasses = "w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 text-sm focus:ring-1 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] transition-all duration-300 outline-none shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]";
+  const labelClasses = "block text-xs font-bold text-slate-600 mb-2 tracking-wide";
 
   return (
-    <div className="bg-white rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100 p-4 sm:p-6 font-arabic" id="checkout-form" dir="rtl">
-      {/* Header */}
-      <div className="text-center mb-5 pb-4 border-b border-slate-100">
-        <h2 className="text-2xl font-bold text-[#1A2530] mb-1">أكمل طلبك الآن</h2>
-        <p className="text-xs sm:text-sm text-slate-500">الرجاء إدخال معلوماتك لتأكيد الطلب</p>
-      </div>
+    <div className="bg-[#FCFCFC] rounded-2xl shadow-[0_4px_25px_-5px_rgba(0,0,0,0.05)] border border-slate-100/50 p-5 sm:p-8 font-arabic transition-all duration-500" id="checkout-form" dir="rtl">
       
       {formError && (
         <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-2 text-red-600 text-xs sm:text-sm font-bold animate-in fade-in">
@@ -243,37 +237,45 @@ export function CodForm({
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5" onFocus={handleFormInteraction} onClick={handleFormInteraction}>
+      <form onSubmit={handleSubmit} className="space-y-0" onFocus={handleFormInteraction} onClick={handleFormInteraction}>
         
         {/* Section 1: Quantity */}
-        <section className="border-b border-slate-100 pb-5">
-          <h3 className={sectionTitleClasses}>
-            <span className="bg-[#1A2530] text-[#D4AF37] w-5 h-5 rounded-full flex items-center justify-center text-[10px]">1</span>
-            الكمية
-          </h3>
-          <div className="flex items-center gap-4 mt-2">
-            <button type="button" onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-xl font-bold text-slate-500 hover:bg-slate-50 transition-colors active:scale-95">-</button>
-            <span className="text-xl font-bold text-slate-800 w-8 text-center">{quantity}</span>
-            <button type="button" onClick={() => setQuantity(q => Math.min(maxQty, q + 1))} className="w-10 h-10 rounded-full bg-[#1A2530] text-[#D4AF37] flex items-center justify-center text-xl font-bold hover:bg-[#1A2530]/90 transition-colors active:scale-95">+</button>
+        <section className="animate-in fade-in duration-500">
+          <div className="flex flex-col mb-4">
+            <h3 className="text-lg font-bold text-[#1A2530] flex items-center gap-2">
+              <span className="text-[#D4AF37] font-serif text-xl">①</span>
+              الكمية
+            </h3>
+            <p className="text-xs text-slate-500 mt-1 mr-7">اختر عدد القطع المطلوبة</p>
           </div>
+          
+          <div className="flex items-center justify-center gap-6 py-2">
+            <button type="button" onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-11 h-11 rounded-full bg-white border border-slate-200 flex items-center justify-center text-xl font-medium text-slate-500 hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 active:scale-[0.98] shadow-sm">-</button>
+            <span className="text-2xl font-bold text-[#1A2530] w-8 text-center">{quantity}</span>
+            <button type="button" onClick={() => setQuantity(q => Math.min(maxQty, q + 1))} className="w-11 h-11 rounded-full bg-[#1A2530] text-[#D4AF37] flex items-center justify-center text-xl font-medium hover:bg-[#1A2530]/90 transition-all duration-300 active:scale-[0.98] shadow-md">+</button>
+          </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-6"></div>
         </section>
 
         {/* Section 2: Sizes */}
         {variants.length > 1 && (
-          <section id="size-selector" className="border-b border-slate-100 pb-5">
-            <h3 className={sectionTitleClasses}>
-              <span className="bg-[#1A2530] text-[#D4AF37] w-5 h-5 rounded-full flex items-center justify-center text-[10px]">2</span>
-              {quantity === 1 ? 'المقاس' : 'المقاسات'}
-              {sizeError && <span className="text-red-500 normal-case font-bold text-[10px] ml-2 animate-pulse text-right w-full flex-1">* يرجى الاختيار</span>}
-            </h3>
+          <section id="size-selector" className="animate-in fade-in slide-in-from-top-4 duration-500">
+            <div className="flex flex-col mb-4">
+              <h3 className="text-lg font-bold text-[#1A2530] flex items-center gap-2">
+                <span className="text-[#D4AF37] font-serif text-xl">②</span>
+                {quantity === 1 ? 'المقاس' : 'المقاسات'}
+                {sizeError && <span className="text-red-500 normal-case font-bold text-[10px] ml-2 animate-pulse text-right flex-1">* يرجى الاختيار</span>}
+              </h3>
+              <p className="text-xs text-slate-500 mt-1 mr-7">اختر المقاس المناسب</p>
+            </div>
             
-            <div className="space-y-3 mt-2">
+            <div className="space-y-4 mt-2 pl-2">
               {Array.from({ length: quantity }).map((_, pieceIndex) => (
-                <div key={pieceIndex} className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4">
+                <div key={pieceIndex} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-5 animate-in fade-in duration-300">
                   {quantity > 1 && (
-                    <p className="font-bold text-xs text-slate-500 min-w-[3.5rem]">القطعة {pieceIndex + 1}</p>
+                    <p className="font-bold text-xs text-slate-500 min-w-[3.5rem] pt-1 sm:pt-0">القطعة {pieceIndex + 1}</p>
                   )}
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2.5">
                     {variants.map((v: any) => {
                       const isAvailable = isVariantAvailable(v.node, pieceIndex);
                       const isSelected = selectedSizes[pieceIndex] === v.node.id;
@@ -283,12 +285,12 @@ export function CodForm({
                           key={v.node.id}
                           onClick={() => setSizeForPiece(pieceIndex, v.node.id)}
                           disabled={!isAvailable && !isSelected}
-                          className={`rounded-lg min-w-[2.5rem] h-10 px-3 text-sm transition-all font-bold ${
+                          className={`rounded-full min-w-[3rem] h-10 px-4 text-sm transition-all duration-300 font-bold ${
                             !isAvailable && !isSelected
-                              ? "opacity-40 border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed line-through" 
+                              ? "opacity-50 border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed line-through" 
                               : isSelected
-                                ? "bg-[#D4AF37] text-[#1A2530]"
-                                : "border border-slate-200 text-slate-600 hover:border-slate-300 bg-white"
+                                ? "bg-[#D4AF37] text-[#1A2530] border-transparent shadow-md scale-105"
+                                : "border border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50 bg-white"
                           }`}
                         >
                            {v.node.title}
@@ -299,18 +301,23 @@ export function CodForm({
                 </div>
               ))}
             </div>
+            <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-6"></div>
           </section>
         )}
 
         {/* Section 3: Customer Info */}
-        <section className="border-b border-slate-100 pb-5">
-          <h3 className={sectionTitleClasses}>
-            <span className="bg-[#1A2530] text-[#D4AF37] w-5 h-5 rounded-full flex items-center justify-center text-[10px]">
-               {variants.length > 1 ? '3' : '2'}
-            </span>
-            معلومات العميل
-          </h3>
-          <div className="grid grid-cols-2 gap-3 mt-2">
+        <section className="animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="flex flex-col mb-5">
+            <h3 className="text-lg font-bold text-[#1A2530] flex items-center gap-2">
+              <span className="text-[#D4AF37] font-serif text-xl">
+                 {variants.length > 1 ? '③' : '②'}
+              </span>
+              معلومات العميل
+            </h3>
+            <p className="text-xs text-slate-500 mt-1 mr-7">سنستخدمها فقط لتأكيد الطلب</p>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="fullname" className={labelClasses}>الاسم الكامل</label>
               <input 
@@ -361,106 +368,101 @@ export function CodForm({
               </div>
             </div>
           </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-6"></div>
         </section>
 
         {/* Section 4: Delivery */}
-        <section id="shipping-method" className="pb-1">
-          <h3 className={sectionTitleClasses}>
-            <span className="bg-[#1A2530] text-[#D4AF37] w-5 h-5 rounded-full flex items-center justify-center text-[10px]">
-               {variants.length > 1 ? '4' : '3'}
-            </span>
-            التوصيل
-            {shippingError && <span className="text-red-500 normal-case font-bold text-[10px] ml-2 animate-pulse">* يرجى الاختيار</span>}
-          </h3>
+        <section id="shipping-method" className="animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="flex flex-col mb-5">
+            <h3 className="text-lg font-bold text-[#1A2530] flex items-center gap-2">
+              <span className="text-[#D4AF37] font-serif text-xl">
+                 {variants.length > 1 ? '④' : '③'}
+              </span>
+              طريقة التوصيل
+              {shippingError && <span className="text-red-500 normal-case font-bold text-[10px] ml-2 animate-pulse">* يرجى الاختيار</span>}
+            </h3>
+            <p className="text-xs text-slate-500 mt-1 mr-7">اختر الطريقة المناسبة</p>
+          </div>
           
-          <div className="grid grid-cols-2 gap-3 mt-2">
-            <label className={`relative flex items-center px-3 py-3 border rounded-xl cursor-pointer transition-all ${form.shippingMethod === 'home' ? 'border-[#D4AF37] bg-[#D4AF37]/5' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'}`}>
+          <div className="grid grid-cols-2 gap-4">
+            <label className={`relative flex items-center px-4 py-3.5 border rounded-xl cursor-pointer transition-all duration-300 ${form.shippingMethod === 'home' ? 'border-[#D4AF37] bg-[#D4AF37]/5 shadow-sm scale-[1.02]' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 bg-white shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]'}`}>
               <input type="radio" name="shippingMethod" value="home" checked={form.shippingMethod === 'home'} onChange={() => { setForm({...form, shippingMethod: 'home'}); setShippingError(false); }} className="sr-only" />
-              <div className="flex items-center gap-2.5">
-                 <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${form.shippingMethod === 'home' ? 'border-[#D4AF37] bg-[#D4AF37]' : 'border-slate-300 bg-white'}`}>
+              <div className="flex items-center gap-3">
+                 <div className={`w-4 h-4 rounded-full border transition-colors duration-300 flex items-center justify-center shrink-0 ${form.shippingMethod === 'home' ? 'border-[#D4AF37] bg-[#D4AF37]' : 'border-slate-300 bg-white'}`}>
                     {form.shippingMethod === 'home' && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
                  </div>
                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                       <Truck className="w-3.5 h-3.5 text-slate-500" />
+                    <span className={`text-sm font-bold flex items-center gap-1.5 transition-colors duration-300 ${form.shippingMethod === 'home' ? 'text-[#1A2530]' : 'text-slate-600'}`}>
                        للمنزل
                     </span>
                  </div>
               </div>
             </label>
 
-            <label className={`relative flex items-center px-3 py-3 border rounded-xl cursor-pointer transition-all ${form.shippingMethod === 'stopdesk' ? 'border-[#D4AF37] bg-[#D4AF37]/5' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'}`}>
+            <label className={`relative flex items-center px-4 py-3.5 border rounded-xl cursor-pointer transition-all duration-300 ${form.shippingMethod === 'stopdesk' ? 'border-[#D4AF37] bg-[#D4AF37]/5 shadow-sm scale-[1.02]' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 bg-white shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]'}`}>
               <input type="radio" name="shippingMethod" value="stopdesk" checked={form.shippingMethod === 'stopdesk'} onChange={() => { setForm({...form, shippingMethod: 'stopdesk'}); setShippingError(false); }} className="sr-only" />
-              <div className="flex items-center gap-2.5">
-                 <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${form.shippingMethod === 'stopdesk' ? 'border-[#D4AF37] bg-[#D4AF37]' : 'border-slate-300 bg-white'}`}>
+              <div className="flex items-center gap-3">
+                 <div className={`w-4 h-4 rounded-full border transition-colors duration-300 flex items-center justify-center shrink-0 ${form.shippingMethod === 'stopdesk' ? 'border-[#D4AF37] bg-[#D4AF37]' : 'border-slate-300 bg-white'}`}>
                     {form.shippingMethod === 'stopdesk' && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
                  </div>
                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                       <Building2 className="w-3.5 h-3.5 text-slate-500" />
+                    <span className={`text-sm font-bold flex items-center gap-1.5 transition-colors duration-300 ${form.shippingMethod === 'stopdesk' ? 'text-[#1A2530]' : 'text-slate-600'}`}>
                        للمكتب
                     </span>
                  </div>
               </div>
             </label>
           </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-6"></div>
         </section>
 
         {/* Section 5: Order Summary */}
-        <section className="bg-[#FAF9F6] border border-slate-200 rounded-xl p-4 mt-2">
-          <div className="space-y-2.5 text-sm">
-             <div className="flex justify-between items-center font-bold text-slate-600">
-               <span>الكمية</span>
-               <span className="text-slate-800">{quantity}</span>
-             </div>
-             
-             {variants.length > 1 && selectedSizes.some(s => s !== "") && (
-                <div className="flex justify-between items-center font-bold text-slate-600">
-                  <span>المقاسات</span>
-                  <span className="text-left dir-ltr text-slate-800">
-                     {selectedSizes.map((id, index) => variants.find((v: any) => v.node.id === id)?.node.title || "").filter(Boolean).join("، ")}
-                  </span>
-                </div>
-             )}
-
-             <div className="flex justify-between items-center font-bold text-slate-600">
-               <span>سعر المنتجات</span>
-               <span className="font-sans tracking-tight dir-ltr text-slate-800">
+        <section className="animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="flex flex-col mb-5">
+            <h3 className="text-lg font-bold text-[#1A2530] flex items-center gap-2">
+              <span className="text-[#D4AF37] font-serif text-xl">
+                 {variants.length > 1 ? '⑤' : '④'}
+              </span>
+              ملخص الطلب
+            </h3>
+            <p className="text-xs text-slate-500 mt-1 mr-7">راجع طلبك قبل الإرسال</p>
+          </div>
+          
+          <div className="space-y-4 px-2">
+             <div className="flex justify-between items-center text-sm font-medium text-slate-600">
+               <span>المنتجات {variants.length > 1 && selectedSizes.some(s => s !== "") ? `(${selectedSizes.map((id) => variants.find((v: any) => v.node.id === id)?.node.title || "").filter(Boolean).join("، ")})` : ''}</span>
+               <span className="font-sans tracking-tight dir-ltr text-[#1A2530] font-bold">
                  {discountAmount > 0 ? (
-                   <span className="line-through text-slate-400 ml-1.5">{subtotal.toLocaleString()} د.ج</span>
+                   <>
+                     <span className="line-through text-slate-400 ml-2 font-medium">{subtotal.toLocaleString()} د.ج</span>
+                     <span>{(subtotal - discountAmount).toLocaleString()} د.ج</span>
+                   </>
                  ) : (
                    <span>{subtotal.toLocaleString()} د.ج</span>
                  )}
                </span>
              </div>
 
-             {discountAmount > 0 && (
-                <div className="flex justify-between items-center font-bold text-green-600">
-                  <span className="flex items-center gap-1.5">التخفيض {pricingConfig?.badgeText && <span className="bg-red-100 text-red-700 text-[10px] px-1.5 py-0.5 rounded">{pricingConfig.badgeText}</span>}</span>
-                  <span className="font-sans tracking-tight dir-ltr">-{discountAmount.toLocaleString()} د.ج</span>
-                </div>
-             )}
-
-             <div className="flex justify-between items-center font-bold text-slate-600">
-               <span>سعر التوصيل</span>
-               <span className="font-sans tracking-tight dir-ltr text-slate-800">
+             <div className="flex justify-between items-center text-sm font-medium text-slate-600">
+               <span>التوصيل</span>
+               <span className="font-sans tracking-tight dir-ltr text-[#1A2530] font-bold">
                  {form.wilaya ? (
                    form.shippingMethod ? (
                      `${(form.shippingMethod === 'home' ? selectedWilayaObj?.home : selectedWilayaObj?.stop)?.toLocaleString()} د.ج`
                    ) : (
-                     "قيد الحساب"
+                     "يحدد لاحقاً"
                    )
                  ) : (
-                   "اختر الولاية"
+                   "يحدد لاحقاً"
                  )}
                </span>
              </div>
              
-             <div className="h-px bg-slate-200/80 my-3"></div>
+             <div className="h-px bg-slate-200 my-4"></div>
              
-             <div className="flex justify-between items-center text-lg sm:text-xl font-bold">
+             <div className="flex justify-between items-center text-xl font-bold">
                <span className="text-[#1A2530]">المجموع الكلي</span>
-               <span className="font-sans font-bold tracking-tight dir-ltr text-[#D4AF37]">
+               <span className="font-sans tracking-tight dir-ltr text-[#D4AF37] text-2xl drop-shadow-sm">
                  {form.wilaya && form.shippingMethod ? (
                    `${(finalProductTotal + ((form.shippingMethod === 'home' ? selectedWilayaObj?.home : selectedWilayaObj?.stop) || 0)).toLocaleString()} د.ج`
                  ) : (
@@ -471,35 +473,35 @@ export function CodForm({
           </div>
         </section>
 
+        {/* Trust Badges */}
+        <div className="flex flex-col gap-2.5 pt-8 pb-6 text-[#1A2530]/80 px-2">
+          <div className="flex items-center gap-2">
+            <Check className="w-4 h-4 text-[#D4AF37]" strokeWidth={2.5} />
+            <span className="text-xs font-medium tracking-wide">الدفع عند الاستلام</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="w-4 h-4 text-[#D4AF37]" strokeWidth={2.5} />
+            <span className="text-xs font-medium tracking-wide">توصيل سريع إلى 58 ولاية</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="w-4 h-4 text-[#D4AF37]" strokeWidth={2.5} />
+            <span className="text-xs font-medium tracking-wide">استبدال وإرجاع متاح</span>
+          </div>
+        </div>
+
         {/* Submit Button */}
-        <div className="pt-1">
+        <div>
           <button 
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-[#1A2530] hover:bg-[#1A2530]/90 text-[#D4AF37] h-[52px] sm:h-[54px] rounded-xl shadow-[0_4px_14px_0_rgba(26,37,48,0.2)] transition-all duration-300 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full bg-[#1A2530] hover:bg-[#1A2530]/90 text-[#D4AF37] h-[56px] rounded-xl shadow-[0_8px_20px_-6px_rgba(26,37,48,0.3)] transition-all duration-300 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.98]"
           >
             {isSubmitting ? (
               <span className="w-5 h-5 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin"></span>
             ) : (
-              <span className="text-base sm:text-lg font-bold tracking-wide">اطلب الآن · الدفع عند الاستلام</span>
+              <span className="text-lg font-bold tracking-wide">اطلب الآن · الدفع عند الاستلام</span>
             )}
           </button>
-        </div>
-        
-        {/* Trust Badges */}
-        <div className="flex justify-around items-center pt-2 text-slate-500 border-t border-slate-100 mt-2">
-          <div className="flex items-center gap-1.5">
-            <Truck className="w-3.5 h-3.5 text-[#D4AF37]" strokeWidth={2.5} />
-            <span className="text-[10px] sm:text-xs font-bold tracking-wide">توصيل سريع</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" strokeWidth={2.5} />
-            <span className="text-[10px] sm:text-xs font-bold tracking-wide">دفع آمن</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <RefreshCw className="w-3.5 h-3.5 text-[#D4AF37]" strokeWidth={2.5} />
-            <span className="text-[10px] sm:text-xs font-bold tracking-wide">استبدال مجاني</span>
-          </div>
         </div>
       </form>
     </div>

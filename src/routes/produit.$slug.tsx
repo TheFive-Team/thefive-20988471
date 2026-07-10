@@ -7,6 +7,7 @@ import { formatMoney, getOptimizedShopifyImage, getLocalSrcSet } from "@/lib/sho
 import { MobileImageGallery } from "@/components/MobileImageGallery";
 import { CodForm } from "@/components/CodForm";
 import { WhyChooseUs } from "@/components/WhyChooseUs";
+import { UrgencySignals } from "@/components/UrgencySignals";
 
 const Reviews = lazy(() => import("@/components/Reviews").then(m => ({ default: m.Reviews })));
 const StickyCheckoutBar = lazy(() => import("@/components/StickyCheckoutBar").then(m => ({ default: m.StickyCheckoutBar })));
@@ -49,6 +50,7 @@ function ProductPage() {
   const isCartLoading = useCartStore((s) => s.isLoading);
   const p = product?.node;
   const variants = p?.variants?.edges ?? [];
+  const totalStock = variants.reduce((sum: number, v: any) => sum + (v.node.quantityAvailable || 10), 0);
   
   const rawOffersList = Array.isArray((p as any)?.offers) ? (p as any).offers : [];
   const rawOffers = rawOffersList.filter((o: any) => o && o.active !== false);
@@ -179,6 +181,13 @@ function ProductPage() {
                 );
               })()}
             </div>
+            
+            <UrgencySignals 
+              scarcityConfig={(p as any).scarcityConfig} 
+              totalStock={totalStock} 
+              basePrice={basePrice} 
+              comparePrice={comparePrice} 
+            />
           </div>
         </div>
 
@@ -274,6 +283,13 @@ function ProductPage() {
                 );
               })()}
             </div>
+            
+            <UrgencySignals 
+              scarcityConfig={(p as any).scarcityConfig} 
+              totalStock={totalStock} 
+              basePrice={basePrice} 
+              comparePrice={comparePrice} 
+            />
           </div>
 
           {/* 8 & 9: Size / Quantity / COD Form */}
@@ -283,6 +299,7 @@ function ProductPage() {
               offers={offers}
               variants={variants}
               pricingConfig={pricingConfig}
+              scarcityConfig={(p as any).scarcityConfig}
               basePrice={basePrice}
               comparePrice={comparePrice}
             />

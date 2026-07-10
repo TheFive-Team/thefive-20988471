@@ -1305,6 +1305,14 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
         discountValue: 0,
         badgeText: "",
         maxQuantity: 10
+      },
+      scarcityConfig: (product.node as any).scarcityConfig || {
+        enableLowStockWarning: true,
+        enableDiscountMessage: true,
+        featuredLabelText: "",
+        enableFastShipping: true,
+        enableSizeScarcity: true,
+        sizeLowStockThreshold: 3
       }
     });
     
@@ -1343,6 +1351,14 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
         discountValue: 0,
         badgeText: "",
         maxQuantity: 10
+      },
+      scarcityConfig: {
+        enableLowStockWarning: true,
+        enableDiscountMessage: true,
+        featuredLabelText: "",
+        enableFastShipping: true,
+        enableSizeScarcity: true,
+        sizeLowStockThreshold: 3
       }
     });
     setProductImages([]);
@@ -1504,6 +1520,14 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
         discountValue: 0,
         badgeText: "",
         maxQuantity: 10
+      },
+      scarcityConfig: form.scarcityConfig || {
+        enableLowStockWarning: true,
+        enableDiscountMessage: true,
+        featuredLabelText: "",
+        enableFastShipping: true,
+        enableSizeScarcity: true,
+        sizeLowStockThreshold: 3
       }
     };
   };
@@ -1782,6 +1806,107 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
                     onChange={(e) => setEditForm({
                       ...editForm,
                       pricingConfig: { ...editForm.pricingConfig, maxQuantity: Number(e.target.value) }
+                    })}
+                    className="w-full border border-slate-200 dark:border-slate-700 p-2 rounded outline-none focus:border-slate-900 bg-white dark:bg-slate-900 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4 md:col-span-2 border border-slate-200 dark:border-slate-700 p-5 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+              <label className="font-bold text-slate-700 dark:text-slate-200 text-lg border-b border-slate-200 dark:border-slate-700 pb-3 block">إعدادات الندرة والثقة (Scarcity & Trust)</label>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                <div className="flex items-center gap-3 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <input
+                    type="checkbox"
+                    id="enableLowStockWarning"
+                    checked={editForm.scarcityConfig?.enableLowStockWarning ?? true}
+                    onChange={(e) => setEditForm({
+                      ...editForm,
+                      scarcityConfig: { ...editForm.scarcityConfig, enableLowStockWarning: e.target.checked }
+                    })}
+                    className="w-5 h-5 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                  />
+                  <label htmlFor="enableLowStockWarning" className="text-sm font-bold text-slate-700 select-none cursor-pointer">
+                    تفعيل تحذير انخفاض المخزون
+                  </label>
+                </div>
+                
+                <div className="flex items-center gap-3 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <input
+                    type="checkbox"
+                    id="enableDiscountMessage"
+                    checked={editForm.scarcityConfig?.enableDiscountMessage ?? true}
+                    onChange={(e) => setEditForm({
+                      ...editForm,
+                      scarcityConfig: { ...editForm.scarcityConfig, enableDiscountMessage: e.target.checked }
+                    })}
+                    className="w-5 h-5 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                  />
+                  <label htmlFor="enableDiscountMessage" className="text-sm font-bold text-slate-700 select-none cursor-pointer">
+                    تفعيل رسالة الخصم
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-3 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <input
+                    type="checkbox"
+                    id="enableFastShipping"
+                    checked={editForm.scarcityConfig?.enableFastShipping ?? true}
+                    onChange={(e) => setEditForm({
+                      ...editForm,
+                      scarcityConfig: { ...editForm.scarcityConfig, enableFastShipping: e.target.checked }
+                    })}
+                    className="w-5 h-5 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                  />
+                  <label htmlFor="enableFastShipping" className="text-sm font-bold text-slate-700 select-none cursor-pointer">
+                    تفعيل رسالة الشحن السريع
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-3 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <input
+                    type="checkbox"
+                    id="enableSizeScarcity"
+                    checked={editForm.scarcityConfig?.enableSizeScarcity ?? true}
+                    onChange={(e) => setEditForm({
+                      ...editForm,
+                      scarcityConfig: { ...editForm.scarcityConfig, enableSizeScarcity: e.target.checked }
+                    })}
+                    className="w-5 h-5 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                  />
+                  <label htmlFor="enableSizeScarcity" className="text-sm font-bold text-slate-700 select-none cursor-pointer">
+                    تفعيل ندرة المقاسات
+                  </label>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500">نص الشريط المميز (Featured Label)</label>
+                  <input
+                    type="text"
+                    placeholder="مثال: الأكثر طلبًا"
+                    value={editForm.scarcityConfig?.featuredLabelText || ""}
+                    onChange={(e) => setEditForm({
+                      ...editForm,
+                      scarcityConfig: { ...editForm.scarcityConfig, featuredLabelText: e.target.value }
+                    })}
+                    className="w-full border border-slate-200 dark:border-slate-700 p-2 rounded outline-none focus:border-slate-900 bg-white dark:bg-slate-900 text-sm"
+                  />
+                </div>
+                
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500">حد المخزون المنخفض للمقاسات (Size Low Stock Threshold)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    dir="ltr"
+                    value={editForm.scarcityConfig?.sizeLowStockThreshold || 3}
+                    onChange={(e) => setEditForm({
+                      ...editForm,
+                      scarcityConfig: { ...editForm.scarcityConfig, sizeLowStockThreshold: Number(e.target.value) }
                     })}
                     className="w-full border border-slate-200 dark:border-slate-700 p-2 rounded outline-none focus:border-slate-900 bg-white dark:bg-slate-900 text-sm"
                   />

@@ -14,6 +14,7 @@ export function CodForm({
   offers = [],
   variants = [],
   pricingConfig,
+  scarcityConfig,
   basePrice,
   comparePrice
 }: { 
@@ -21,6 +22,7 @@ export function CodForm({
   offers?: any[];
   variants?: any[];
   pricingConfig?: any;
+  scarcityConfig?: any;
   basePrice?: string;
   comparePrice?: string;
 }) {
@@ -282,22 +284,31 @@ export function CodForm({
                       {variants.map((v: any) => {
                         const isAvailable = isVariantAvailable(v.node, pieceIndex);
                         const isSelected = selectedSizes[pieceIndex] === v.node.id;
+                        const qty = v.node.quantityAvailable ?? 10;
+                        const showScarcity = scarcityConfig?.enableSizeScarcity && isAvailable && qty <= (scarcityConfig.sizeLowStockThreshold || 3) && qty > 0;
+                        
                         return (
-                          <button
-                            type="button"
-                            key={v.node.id}
-                            onClick={() => setSizeForPiece(pieceIndex, v.node.id)}
-                            disabled={!isAvailable && !isSelected}
-                            className={`rounded-[9px] min-w-[42px] h-[38px] px-3 text-[13px] transition-all duration-300 font-bold ${
-                              !isAvailable && !isSelected
-                                ? "opacity-35 border border-[#F2F2F2] bg-[#F2F2F2] text-[#A6A6A6] cursor-not-allowed line-through" 
-                                : isSelected
-                                  ? "bg-[#D7AE57] text-[#0B1F33] border border-[#D7AE57]"
-                                  : "border border-[#D9DEE5] text-[#243B53] hover:bg-[#FCFAF6] bg-[#FFFFFF] active:scale-[0.98]"
-                            }`}
-                          >
-                             {v.node.title}
-                          </button>
+                          <div key={v.node.id} className="flex flex-col items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => setSizeForPiece(pieceIndex, v.node.id)}
+                              disabled={!isAvailable && !isSelected}
+                              className={`rounded-[9px] min-w-[42px] h-[38px] px-3 text-[13px] transition-all duration-300 font-bold ${
+                                !isAvailable && !isSelected
+                                  ? "opacity-35 border border-[#F2F2F2] bg-[#F2F2F2] text-[#A6A6A6] cursor-not-allowed line-through" 
+                                  : isSelected
+                                    ? "bg-[#D7AE57] text-[#0B1F33] border border-[#D7AE57]"
+                                    : "border border-[#D9DEE5] text-[#243B53] hover:bg-[#FCFAF6] bg-[#FFFFFF] active:scale-[0.98]"
+                              }`}
+                            >
+                               {v.node.title}
+                            </button>
+                            {showScarcity && (
+                              <span className="text-[9px] font-bold text-[#D7AE57]">
+                                {qty === 1 ? "آخر قطعة" : `متبقي ${qty}`}
+                              </span>
+                            )}
+                          </div>
                         );
                       })}
                     </div>

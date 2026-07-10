@@ -1297,7 +1297,15 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       price: product.node.priceRange.minVariantPrice.amount,
       comparePrice: product.node.compareAtPriceRange?.minVariantPrice?.amount || "",
       inventory: inventory.length > 0 ? inventory : [],
-      offers: (product.node as any).offers || []
+      offers: (product.node as any).offers || [],
+      pricingConfig: (product.node as any).pricingConfig || {
+        enabled: false,
+        quantityRequired: 2,
+        discountType: "fixed",
+        discountValue: 0,
+        badgeText: "",
+        maxQuantity: 10
+      }
     });
     
     const allImages: ProductImageObj[] = [];
@@ -1327,7 +1335,15 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       price: "",
       comparePrice: "",
       inventory: [],
-      offers: []
+      offers: [],
+      pricingConfig: {
+        enabled: false,
+        quantityRequired: 2,
+        discountType: "fixed",
+        discountValue: 0,
+        badgeText: "",
+        maxQuantity: 10
+      }
     });
     setProductImages([]);
   };
@@ -1480,7 +1496,15 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       reviewImages: { edges: reviewEdges },
       variants: { edges: variantsEdges },
       options: options,
-      offers: form.offers || []
+      offers: form.offers || [],
+      pricingConfig: form.pricingConfig || {
+        enabled: false,
+        quantityRequired: 2,
+        discountType: "fixed",
+        discountValue: 0,
+        badgeText: "",
+        maxQuantity: 10
+      }
     };
   };
 
@@ -1666,6 +1690,105 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
               )}
             </div>
             
+            {/* Product Pricing Configuration */}
+            <div className="space-y-4 md:col-span-2 border border-slate-200 dark:border-slate-700 p-5 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+              <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
+                <label className="font-bold text-slate-700 dark:text-slate-200 text-lg">إعدادات التسعير (Product Pricing)</label>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="enableQuantityDiscount"
+                    checked={editForm.pricingConfig?.enabled || false}
+                    onChange={(e) => setEditForm({
+                      ...editForm,
+                      pricingConfig: { ...editForm.pricingConfig, enabled: e.target.checked }
+                    })}
+                    className="w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                  />
+                  <label htmlFor="enableQuantityDiscount" className="font-bold text-slate-700 dark:text-slate-200 text-sm">
+                    تفعيل تخفيض الكمية (Enable Quantity Discount)
+                  </label>
+                </div>
+
+                {editForm.pricingConfig?.enabled && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-500">الكمية المطلوبة للتخفيض (Quantity Required)</label>
+                      <input
+                        type="number"
+                        min="2"
+                        dir="ltr"
+                        value={editForm.pricingConfig?.quantityRequired || 2}
+                        onChange={(e) => setEditForm({
+                          ...editForm,
+                          pricingConfig: { ...editForm.pricingConfig, quantityRequired: Number(e.target.value) }
+                        })}
+                        className="w-full border border-slate-200 dark:border-slate-700 p-2 rounded outline-none focus:border-slate-900 bg-white dark:bg-slate-900 text-sm"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-500">نوع التخفيض (Discount Type)</label>
+                      <select
+                        value={editForm.pricingConfig?.discountType || "fixed"}
+                        onChange={(e) => setEditForm({
+                          ...editForm,
+                          pricingConfig: { ...editForm.pricingConfig, discountType: e.target.value }
+                        })}
+                        className="w-full border border-slate-200 dark:border-slate-700 p-2 rounded outline-none focus:border-slate-900 bg-white dark:bg-slate-900 text-sm"
+                      >
+                        <option value="fixed">مبلغ ثابت (Fixed Amount)</option>
+                        <option value="percentage">نسبة مئوية (Percentage)</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-500">قيمة التخفيض (Discount Value)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        dir="ltr"
+                        value={editForm.pricingConfig?.discountValue || 0}
+                        onChange={(e) => setEditForm({
+                          ...editForm,
+                          pricingConfig: { ...editForm.pricingConfig, discountValue: Number(e.target.value) }
+                        })}
+                        className="w-full border border-slate-200 dark:border-slate-700 p-2 rounded outline-none focus:border-slate-900 bg-white dark:bg-slate-900 text-sm"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-500">نص التخفيض (Badge Text)</label>
+                      <input
+                        type="text"
+                        placeholder="مثال: وفر 800 دج"
+                        value={editForm.pricingConfig?.badgeText || ""}
+                        onChange={(e) => setEditForm({
+                          ...editForm,
+                          pricingConfig: { ...editForm.pricingConfig, badgeText: e.target.value }
+                        })}
+                        className="w-full border border-slate-200 dark:border-slate-700 p-2 rounded outline-none focus:border-slate-900 bg-white dark:bg-slate-900 text-sm"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-1 max-w-xs mt-4">
+                  <label className="text-xs font-bold text-slate-500">أقصى كمية مسموحة للطلب (Max Quantity Allowed)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    dir="ltr"
+                    value={editForm.pricingConfig?.maxQuantity || 10}
+                    onChange={(e) => setEditForm({
+                      ...editForm,
+                      pricingConfig: { ...editForm.pricingConfig, maxQuantity: Number(e.target.value) }
+                    })}
+                    className="w-full border border-slate-200 dark:border-slate-700 p-2 rounded outline-none focus:border-slate-900 bg-white dark:bg-slate-900 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-4 md:col-span-2 border border-slate-200 dark:border-slate-700 p-5 rounded-xl bg-slate-50 dark:bg-slate-800/50">
               <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
                 <label className="font-bold text-slate-700 dark:text-slate-200 text-lg">العروض (Product Offers)</label>

@@ -19,6 +19,10 @@ export const submitOrderFn = createServerFn({ method: "POST" })
       offerTitle: z.string().optional(),
       offerPieces: z.number().optional(),
       offerPrice: z.union([z.string(), z.number()]).optional(),
+      quantity: z.number().optional(),
+      discountAmount: z.number().optional(),
+      finalProductTotal: z.number().optional(),
+      finalTotal: z.number().optional(),
       selectedSizes: z.array(z.string()).optional(),
       deliveryFee: z.number().optional(),
       eventId: z.string().optional(),
@@ -32,10 +36,10 @@ export const submitOrderFn = createServerFn({ method: "POST" })
     try {
       const orderId = `ORD-${Date.now()}`;
       
-      const productFee = Number(data.offerPrice) || 0;
+      const productFee = data.finalProductTotal !== undefined ? data.finalProductTotal : (Number(data.offerPrice) || 0);
       // Use exact delivery fee from frontend or fallback to 600 DZD
       const deliveryFee = data.deliveryFee !== undefined ? data.deliveryFee : (data.wilaya ? 600 : 0); 
-      const totalAmount = productFee + deliveryFee;
+      const totalAmount = data.finalTotal !== undefined ? data.finalTotal : (productFee + deliveryFee);
 
       // 1. Stock Deduction Logic
       let productsData: any[] = [];
@@ -103,9 +107,9 @@ export const submitOrderFn = createServerFn({ method: "POST" })
         variant_title: data.selectedSizes ? data.selectedSizes.join(", ") : "",
         selected_offer_id: data.offerId || null,
         selected_offer_title: data.offerTitle || null,
-        selected_offer_pieces: data.offerPieces || 1,
+        selected_offer_pieces: data.quantity || data.offerPieces || 1,
         selected_sizes: data.selectedSizes || [],
-        quantity: data.offerPieces || 1,
+        quantity: data.quantity || data.offerPieces || 1,
         total_amount: totalAmount,
         delivery_type: data.deliveryType || "توصيل للمنزل",
         delivery_fee: deliveryFee,

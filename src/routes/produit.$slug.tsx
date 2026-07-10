@@ -64,6 +64,18 @@ function ProductPage() {
     }];
   }, [rawOffers, p]);
 
+  const pricingConfig = (p as any)?.pricingConfig || {
+    enabled: false,
+    quantityRequired: 2,
+    discountType: "fixed",
+    discountValue: 0,
+    badgeText: "",
+    maxQuantity: 10
+  };
+  
+  const basePrice = p?.priceRange?.minVariantPrice?.amount ?? "0";
+  const comparePrice = p?.compareAtPriceRange?.minVariantPrice?.amount;
+
 
 
   const images = product?.node?.images?.edges.map((e: any) => e.node) ?? [];
@@ -181,6 +193,9 @@ function ProductPage() {
               productName={p?.title}
               offers={offers}
               variants={variants}
+              pricingConfig={pricingConfig}
+              basePrice={basePrice}
+              comparePrice={comparePrice}
             />
           </div>
 

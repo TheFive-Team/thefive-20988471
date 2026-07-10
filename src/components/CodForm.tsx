@@ -12,30 +12,47 @@ const normalizeStr = (str: string) => str ? str.toLowerCase().replace(/[^a-z0-9]
 export function CodForm({ 
   productName, 
   offers = [],
-  variants = []
+  variants = [],
+  pricingConfig,
+  basePrice,
+  comparePrice
 }: { 
   productName?: string;
   offers?: any[];
   variants?: any[];
+  pricingConfig?: any;
+  basePrice?: string;
+  comparePrice?: string;
 }) {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   
-  // 1. Offer State
-  const [selectedOfferId, setSelectedOfferId] = useState<string | null>(offers[0]?.id || null);
-  const selectedOffer = useMemo(() => offers.find((o: any) => o.id === selectedOfferId) || offers[0], [selectedOfferId, offers]);
+  // 1. Quantity State
+  const maxQty = pricingConfig?.maxQuantity || 10;
+  const [quantity, setQuantity] = useState(1);
 
   // 2. Size State
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([""]);
   const [sizeError, setSizeError] = useState(false);
   
   useEffect(() => {
-    if (selectedOffer) {
-      setSelectedSizes(Array(selectedOffer.pieces).fill(""));
-      setSizeError(false);
+    setSelectedSizes(Array(quantity).fill(""));
+    setSizeError(false);
+  }, [quantity]);
+
+  // Pricing Logic
+  const basePriceNum = Number(basePrice || 0);
+  const subtotal = basePriceNum * quantity;
+  let discountAmount = 0;
+  if (pricingConfig?.enabled && quantity >= pricingConfig.quantityRequired) {
+    if (pricingConfig.discountType === "fixed") {
+      discountAmount = Number(pricingConfig.discountValue || 0);
+    } else if (pricingConfig.discountType === "percentage") {
+      discountAmount = (subtotal * Number(pricingConfig.discountValue || 0)) / 100;
     }
-  }, [selectedOffer?.id, selectedOffer?.pieces]);
+  }
+  const finalProductTotal = subtotal - discountAmount;
 
   const setSizeForPiece = (index: number, variantId: string) => {
     const newSizes = [...selectedSizes];
@@ -70,12 +87,12 @@ export function CodForm({
 
   // Meta Pixel - InitiateCheckout
   const handleFormInteraction = () => {
-    if (!checkoutInitiated.current && productName && selectedOffer) {
+    if (!checkoutInitiated.current && productName) {
       checkoutInitiated.current = true;
       trackInitiateCheckout({
         productName: productName,
-        productId: selectedOffer.id,
-        price: Number(selectedOffer.price || 0),
+        productId: "default",
+        price: basePriceNum,
         currency: 'DZD'
       });
     }
@@ -141,10 +158,14 @@ export function CodForm({
           deliveryType: finalDeliveryType,
           deliveryFee: calculatedDeliveryFee,
           productName,
-          offerId: selectedOffer.id,
-          offerTitle: selectedOffer.title,
-          offerPieces: selectedOffer.pieces,
-          offerPrice: selectedOffer.price,
+          offerId: "quantity-selector",
+          offerTitle: `${quantity} ${quantity === 1 ? 'قطعة' : 'قطع'}`,
+          offerPieces: quantity,
+          offerPrice: finalProductTotal, // Send final product total as offerPrice for legacy compatibility
+          quantity: quantity,
+          discountAmount: discountAmount,
+          finalProductTotal: finalProductTotal,
+          finalTotal: finalProductTotal + (calculatedDeliveryFee || 0),
           selectedSizes: selectedSizes.map(id => variants.find((v: any) => v.node.id === id)?.node.title || ""),
           eventId,
           clientUserAgent: navigator.userAgent,
@@ -157,8 +178,8 @@ export function CodForm({
         setSubmitted(true);
         trackPurchase({
           productName: productName || "Produit inconnu",
-          productId: selectedOffer.id,
-          value: Number(selectedOffer.price || 0) + (calculatedDeliveryFee || 0),
+          productId: "default",
+          value: finalProductTotal + (calculatedDeliveryFee || 0),
           currency: 'DZD',
           eventId
         });
@@ -224,66 +245,32 @@ export function CodForm({
 
       <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8" onFocus={handleFormInteraction} onClick={handleFormInteraction}>
         
-        {/* Section 1: Offers */}
-        {offers.length > 0 && (
-          <section>
-            <h3 className={sectionTitleClasses}>
-              <span className="bg-secondary text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm">1</span>
-              اختر العرض
-            </h3>
-            <div className="grid gap-3 sm:gap-4 mt-3 sm:mt-4">
-              {offers.map((offer: any) => {
-                const isSelected = selectedOffer?.id === offer.id;
-                return (
-                  <button
-                    type="button"
-                    key={offer.id}
-                    onClick={() => setSelectedOfferId(offer.id)}
-                    className={`relative flex items-center justify-between p-5 rounded-2xl border-2 transition-all text-right ${
-                      isSelected
-                        ? "border-[#D4AF37] bg-[#D4AF37]/5 shadow-md scale-[1.01]"
-                        : "border-slate-100 bg-[#F8F9FA] hover:border-slate-300"
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${isSelected ? 'border-[#D4AF37] bg-[#D4AF37]' : 'border-slate-300 bg-white'}`}>
-                        {isSelected && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
-                      </div>
-                      <div>
-                        <p className={`font-bold text-lg ${isSelected ? 'text-[#D4AF37]' : 'text-slate-800'}`}>{offer.title}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <p className="text-base font-bold text-slate-700">{formatMoney({ amount: offer.price, currencyCode: "DZD" })}</p>
-                          {offer.comparePrice && parseFloat(offer.comparePrice) > parseFloat(offer.price) && (
-                             <p className="text-sm text-slate-400 line-through">{formatMoney({ amount: offer.comparePrice, currencyCode: "DZD" })}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    {offer.badge && (
-                      <span className="bg-red-100 text-red-700 text-xs font-bold px-3 py-1.5 rounded-xl shrink-0 whitespace-nowrap ml-2">
-                        {offer.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-        )}
+        {/* Section 1: Quantity */}
+        <section>
+          <h3 className={sectionTitleClasses}>
+            <span className="bg-secondary text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm">1</span>
+            اختر الكمية
+          </h3>
+          <div className="flex items-center justify-center gap-6 mt-4 bg-slate-50 border border-slate-200 p-6 rounded-3xl shadow-sm">
+            <button type="button" onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-14 h-14 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-2xl font-bold text-slate-600 hover:bg-slate-100 transition-colors active:scale-95">-</button>
+            <span className="text-4xl font-bold text-slate-800 w-16 text-center">{quantity}</span>
+            <button type="button" onClick={() => setQuantity(q => Math.min(maxQty, q + 1))} className="w-14 h-14 rounded-full bg-[#1A2530] border border-[#1A2530] shadow-sm flex items-center justify-center text-2xl font-bold text-white hover:bg-[#1A2530]/90 transition-colors active:scale-95">+</button>
+          </div>
+        </section>
 
         {/* Section 2: Sizes */}
-        {variants.length > 1 && selectedOffer && (
+        {variants.length > 1 && (
           <section id="size-selector">
             <h3 className={sectionTitleClasses}>
               <span className="bg-secondary text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm">2</span>
-              {selectedOffer.pieces === 1 ? 'اختر المقاس' : 'اختر المقاسات'}
+              {quantity === 1 ? 'اختر المقاس' : 'اختر المقاسات'}
               {sizeError && <span className="text-red-500 normal-case font-bold text-xs sm:text-sm ml-2 animate-pulse text-right w-full flex-1">* يرجى اختيار جميع المقاسات</span>}
             </h3>
             
             <div className="space-y-4 sm:space-y-6 mt-3 sm:mt-4 p-4 sm:p-6 bg-[#F8F9FA] rounded-2xl sm:rounded-3xl border border-slate-100">
-              {Array.from({ length: selectedOffer.pieces }).map((_, pieceIndex) => (
+              {Array.from({ length: quantity }).map((_, pieceIndex) => (
                 <div key={pieceIndex} className="space-y-2 sm:space-y-3">
-                  {selectedOffer.pieces > 1 && (
+                  {quantity > 1 && (
                     <p className="font-bold text-xs sm:text-sm text-slate-600 bg-white inline-block px-2 py-1 rounded-md sm:rounded-lg border border-slate-100">القطعة #{pieceIndex + 1}</p>
                   )}
                   <div className="flex flex-wrap gap-2 sm:gap-3">
@@ -423,67 +410,71 @@ export function CodForm({
           </section>
 
         {/* Section 5: Order Summary */}
-        {selectedOffer && (
-          <section className="bg-slate-50 border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 mt-6 shadow-sm">
-            <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-4">ملخص الطلب</h3>
-            
-            <div className="space-y-4">
-               <div className="flex justify-between items-center text-base font-bold text-slate-700">
-                 <span>العرض المحدد</span>
-                 <span className="text-primary">{selectedOffer.title} ({selectedOffer.pieces} {selectedOffer.pieces === 1 ? 'قطعة' : 'قطع'})</span>
-               </div>
-               
-               {variants.length > 1 && selectedSizes.some(s => s !== "") && (
-                  <div className="flex justify-between items-center text-sm font-bold text-slate-600">
-                    <span>المقاسات</span>
-                    <span className="text-left dir-ltr">
-                       {selectedSizes.map((id, index) => variants.find((v: any) => v.node.id === id)?.node.title || "").filter(Boolean).join("، ")}
-                    </span>
-                  </div>
-               )}
+        <section className="bg-slate-50 border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 mt-6 shadow-sm">
+          <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-4">ملخص الطلب</h3>
+          
+          <div className="space-y-4">
+             <div className="flex justify-between items-center text-base font-bold text-slate-700">
+               <span>الكمية</span>
+               <span className="text-primary">{quantity} {quantity === 1 ? 'قطعة' : 'قطع'}</span>
+             </div>
+             
+             {variants.length > 1 && selectedSizes.some(s => s !== "") && (
+                <div className="flex justify-between items-center text-sm font-bold text-slate-600">
+                  <span>المقاسات</span>
+                  <span className="text-left dir-ltr">
+                     {selectedSizes.map((id, index) => variants.find((v: any) => v.node.id === id)?.node.title || "").filter(Boolean).join("، ")}
+                  </span>
+                </div>
+             )}
 
-               <div className="flex justify-between items-center text-base font-bold text-slate-600">
-                 <span>سعر المنتج</span>
-                 <span className="font-sans tracking-tight dir-ltr">{Number(selectedOffer.price).toLocaleString()} د.ج</span>
-               </div>
+             <div className="flex justify-between items-center text-base font-bold text-slate-600">
+               <span>سعر المنتج</span>
+               <span className="font-sans tracking-tight dir-ltr">
+                 {discountAmount > 0 ? (
+                   <span className="line-through text-slate-400 ml-2">{subtotal.toLocaleString()} د.ج</span>
+                 ) : (
+                   <span>{subtotal.toLocaleString()} د.ج</span>
+                 )}
+               </span>
+             </div>
 
-               {selectedOffer.comparePrice && parseFloat(selectedOffer.comparePrice) > parseFloat(selectedOffer.price) && (
-                  <div className="flex justify-between items-center text-sm font-bold text-green-600 bg-green-50 p-2 rounded-lg">
-                    <span>التخفيض</span>
-                    <span className="font-sans tracking-tight dir-ltr">-{(parseFloat(selectedOffer.comparePrice) - parseFloat(selectedOffer.price)).toLocaleString()} د.ج</span>
-                  </div>
-               )}
+             {discountAmount > 0 && (
+                <div className="flex justify-between items-center text-sm font-bold text-green-600 bg-green-50 p-2 rounded-lg">
+                  <span className="flex items-center gap-2">تخفيض الكمية {pricingConfig?.badgeText && <span className="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-md">{pricingConfig.badgeText}</span>}</span>
+                  <span className="font-sans tracking-tight dir-ltr">-{discountAmount.toLocaleString()} د.ج</span>
+                </div>
+             )}
 
-               <div className="flex justify-between items-center text-base font-bold text-slate-600">
-                 <span>سعر التوصيل</span>
-                 <span className="font-sans tracking-tight dir-ltr">
-                   {form.wilaya ? (
-                     form.shippingMethod ? (
-                       `+ ${(form.shippingMethod === 'home' ? selectedWilayaObj?.home : selectedWilayaObj?.stop)?.toLocaleString()} د.ج`
-                     ) : (
-                       "اختر التوصيل"
-                     )
+             <div className="flex justify-between items-center text-base font-bold text-slate-600">
+               <span>سعر التوصيل</span>
+               <span className="font-sans tracking-tight dir-ltr">
+                 {form.wilaya ? (
+                   form.shippingMethod ? (
+                     `+ ${(form.shippingMethod === 'home' ? selectedWilayaObj?.home : selectedWilayaObj?.stop)?.toLocaleString()} د.ج`
                    ) : (
-                     "اختر الولاية"
-                   )}
-                 </span>
-               </div>
-               
-               <div className="h-px bg-slate-200 my-4"></div>
-               
-               <div className="flex justify-between items-center text-xl sm:text-2xl font-bold text-secondary">
-                 <span>المجموع الكلي</span>
-                 <span className="font-sans font-bold tracking-tight dir-ltr text-[#D4AF37]">
-                   {form.wilaya && form.shippingMethod ? (
-                     `${(Number(selectedOffer.price) + ((form.shippingMethod === 'home' ? selectedWilayaObj?.home : selectedWilayaObj?.stop) || 0)).toLocaleString()} د.ج`
-                   ) : (
-                     `${Number(selectedOffer.price).toLocaleString()} د.ج`
-                   )}
-                 </span>
-               </div>
-            </div>
-          </section>
-        )}
+                     "قيد الحساب"
+                   )
+                 ) : (
+                   "الرجاء اختيار الولاية"
+                 )}
+               </span>
+             </div>
+             
+             <div className="h-px bg-slate-200 my-4"></div>
+             
+             <div className="flex justify-between items-center text-xl sm:text-2xl font-bold text-secondary">
+               <span>المجموع الكلي</span>
+               <span className="font-sans font-bold tracking-tight dir-ltr text-[#D4AF37]">
+                 {form.wilaya && form.shippingMethod ? (
+                   `${(finalProductTotal + ((form.shippingMethod === 'home' ? selectedWilayaObj?.home : selectedWilayaObj?.stop) || 0)).toLocaleString()} د.ج`
+                 ) : (
+                   `${finalProductTotal.toLocaleString()} د.ج`
+                 )}
+               </span>
+             </div>
+          </div>
+        </section>
 
         {/* Submit Button */}
         <div className="pt-2">

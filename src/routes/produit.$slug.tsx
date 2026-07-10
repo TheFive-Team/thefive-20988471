@@ -129,25 +129,21 @@ function ProductPage() {
           {/* 2. Text Details below gallery */}
           <div className="flex flex-col items-center text-center animate-in fade-in duration-500">
             
-            {/* Rating */}
-            <div className="flex justify-center items-center gap-1.5 mb-4">
-              <div className="flex text-[#D4AF37] text-sm">
-                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            {/* Title & Rating Row */}
+            <div className="flex w-full items-center justify-between gap-4 mb-5 px-1 mt-1">
+              {/* Left: Rating */}
+              <div className="flex flex-col items-start shrink-0 text-left pt-1">
+                <div className="flex text-[#D4AF37] text-[10px] sm:text-[11px] tracking-widest">
+                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                </div>
+                <span className="text-[9px] sm:text-[10px] font-medium text-[#1A2530]/40 mt-1">4.9</span>
               </div>
-              <span className="text-[11px] font-bold text-[#1A2530]/60 mt-0.5">4.9</span>
+              
+              {/* Right: Title */}
+              <h1 className="font-serif font-bold text-[#1A2530] text-[22px] sm:text-2xl leading-[1.25] text-right line-clamp-2 drop-shadow-sm flex-1" dir="rtl">
+                {p.title}
+              </h1>
             </div>
-            
-            {/* Collection Label */}
-            <div className="flex justify-center mb-3">
-              <span className="text-[10px] uppercase font-bold tracking-widest text-[#D4AF37] bg-[#D4AF37]/10 px-3 py-1 rounded-sm">
-                ✨ Nouvelle Collection
-              </span>
-            </div>
-            
-            {/* Product Name */}
-            <h1 className="font-serif font-bold text-[#1A2530] text-2xl sm:text-3xl leading-[1.3] text-center mb-5 line-clamp-2 px-2 drop-shadow-sm">
-              {p.title}
-            </h1>
             
             {/* Price */}
             <div className="flex flex-col items-center justify-center mb-6 w-full">
@@ -241,22 +237,21 @@ function ProductPage() {
           
           {/* Desktop Only Details (Hidden on Mobile) */}
           <div className="hidden md:block mb-8">
-            <div className="flex items-center gap-1.5 mb-4">
-              <div className="flex text-[#D4AF37] text-sm">
-                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            {/* Title & Rating Row */}
+            <div className="flex w-full items-center justify-between gap-6 mb-8 mt-2">
+              {/* Left: Rating */}
+              <div className="flex flex-col items-start shrink-0 text-left pt-1">
+                <div className="flex text-[#D4AF37] text-xs tracking-widest">
+                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                </div>
+                <span className="text-[10px] font-medium text-[#1A2530]/40 mt-1">4.9</span>
               </div>
-              <span className="text-[11px] font-bold text-[#1A2530]/60 mt-0.5">4.9</span>
+              
+              {/* Right: Title */}
+              <h1 className="font-serif font-bold text-[#1A2530] text-3xl md:text-4xl leading-[1.2] text-right line-clamp-2 drop-shadow-sm flex-1" dir="rtl">
+                {p.title}
+              </h1>
             </div>
-
-            <div className="mb-4">
-              <span className="text-[10px] uppercase font-bold tracking-widest text-[#D4AF37] bg-[#D4AF37]/10 px-3 py-1 rounded-sm">
-                ✨ Nouvelle Collection
-              </span>
-            </div>
-
-            <h1 className="font-serif font-bold text-[#1A2530] text-4xl leading-tight mb-6 line-clamp-2">
-              {p.title}
-            </h1>
             
             <div className="flex items-center gap-4">
               <span className="text-4xl font-bold tracking-tight text-[#1A2530]">

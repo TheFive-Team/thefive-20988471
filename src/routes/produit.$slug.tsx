@@ -6,6 +6,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { formatMoney, getOptimizedShopifyImage, getLocalSrcSet } from "@/lib/shopify";
 import { MobileImageGallery } from "@/components/MobileImageGallery";
 import { CodForm } from "@/components/CodForm";
+import { WhyChooseUs } from "@/components/WhyChooseUs";
 
 const Reviews = lazy(() => import("@/components/Reviews").then(m => ({ default: m.Reviews })));
 const StickyCheckoutBar = lazy(() => import("@/components/StickyCheckoutBar").then(m => ({ default: m.StickyCheckoutBar })));
@@ -317,6 +318,10 @@ function ProductPage() {
           ))}
         </section>
       )}
+
+      <div className="mt-8 mb-4">
+        <WhyChooseUs />
+      </div>
 
       <Suspense fallback={<div className="h-32 w-full animate-pulse bg-secondary/30 mt-16 rounded-2xl" />}>
         <Reviews customImages={p.reviewImages?.edges.map(e => e.node) || []} />

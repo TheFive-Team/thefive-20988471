@@ -64,37 +64,7 @@ function ProductPage() {
     }];
   }, [rawOffers, p]);
 
-  const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
-  const selectedOffer = useMemo(() => offers.find((o: any) => o.id === selectedOfferId) || offers[0], [selectedOfferId, offers]);
-  
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [sizeError, setSizeError] = useState(false);
-  
-  useEffect(() => {
-    if (selectedOffer) {
-      setSelectedSizes(Array(selectedOffer.pieces).fill(""));
-      setSizeError(false);
-    }
-  }, [selectedOffer?.id, selectedOffer?.pieces]);
 
-  const setSizeForPiece = (index: number, variantId: string) => {
-    const newSizes = [...selectedSizes];
-    newSizes[index] = variantId;
-    setSelectedSizes(newSizes);
-    setSizeError(false);
-  };
-
-  const isVariantAvailable = (variant: any, pieceIndex: number) => {
-    const stock = variant.quantityAvailable ?? 0;
-    if (!variant.availableForSale || stock <= 0) return false;
-    
-    const selectedCount = selectedSizes.reduce((count, id, i) => {
-      if (i !== pieceIndex && id === variant.id) return count + 1;
-      return count;
-    }, 0);
-    
-    return stock > selectedCount;
-  };
 
   const images = product?.node?.images?.edges.map((e: any) => e.node) ?? [];
   const [activeImg, setActiveImg] = useState(0);
@@ -102,14 +72,14 @@ function ProductPage() {
 
   // Meta Pixel — ViewContent
   useEffect(() => {
-    if (!product) return;
+    if (!product || offers.length === 0) return;
     trackViewContent({
       productName: product.node.title,
       productId: product.node.id,
-      price: parseFloat(selectedOffer.price || 0),
+      price: parseFloat(offers[0].price || 0),
       currency: "DZD",
     });
-  }, [product, selectedOffer]);
+  }, [product, offers]);
 
 
   if (!product || !p) {
@@ -179,11 +149,11 @@ function ProductPage() {
           <h1 className="font-serif font-bold text-secondary text-3xl leading-tight sm:text-5xl">{p.title}</h1>
           <div className="mt-1 flex items-center gap-3">
             <p className="text-2xl sm:text-3xl font-medium tracking-wide text-primary">
-              {formatMoney({ amount: selectedOffer.price, currencyCode: "DZD" })}
+              {formatMoney({ amount: offers[0]?.price ?? 0, currencyCode: "DZD" })}
             </p>
             {(() => {
-              const currentPrice = selectedOffer.price;
-              const comparePrice = selectedOffer.comparePrice;
+              const currentPrice = offers[0]?.price;
+              const comparePrice = offers[0]?.comparePrice;
               
               if (comparePrice && parseFloat(comparePrice) > parseFloat(currentPrice)) {
                 const discount = Math.round(((parseFloat(comparePrice) - parseFloat(currentPrice)) / parseFloat(comparePrice)) * 100);
@@ -203,93 +173,14 @@ function ProductPage() {
           </div>
           <div className="hairline my-6 w-16" />
 
-          {/* Offers Display */}
-          {rawOffers.length > 0 && (
-            <div className="mt-6 space-y-3">
-              <p className="font-bold text-lg mb-2 text-foreground">اختر العرض المناسب لك:</p>
-              <div className="grid gap-3">
-                {offers.map((offer: any) => {
-                  const isSelected = selectedOffer.id === offer.id;
-                  return (
-                    <button
-                      key={offer.id}
-                      onClick={() => setSelectedOfferId(offer.id)}
-                      className={`relative flex items-center justify-between p-4 rounded-2xl border-2 transition-all text-right ${
-                        isSelected
-                          ? "border-primary bg-primary/5 shadow-md scale-[1.02]"
-                          : "border-slate-200 bg-white hover:border-slate-300"
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${isSelected ? 'border-primary' : 'border-slate-300'}`}>
-                          {isSelected && <div className="w-3 h-3 rounded-full bg-primary" />}
-                        </div>
-                        <div>
-                          <p className={`font-bold text-lg ${isSelected ? 'text-primary' : 'text-slate-800'}`}>{offer.title}</p>
-                          <p className="text-sm font-bold text-slate-500 mt-0.5">{formatMoney({ amount: offer.price, currencyCode: "DZD" })}</p>
-                        </div>
-                      </div>
-                      {offer.badge && (
-                        <span className="bg-red-100 text-red-700 text-xs font-bold px-2.5 py-1 rounded-lg">
-                          {offer.badge}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
 
-          {/* Size Selectors (Dynamic based on pieces) */}
-          {variants.length > 1 && (
-            <div id="size-selector" className="mt-8 space-y-6 bg-slate-50 p-5 rounded-2xl border border-slate-100">
-              <p className={`font-bold text-lg flex items-center gap-2 transition-colors ${sizeError ? 'text-red-600' : 'text-slate-800'}`}>
-                {selectedOffer.pieces === 1 ? tr("product.size") : 'اختر المقاسات:'}
-                {sizeError && <span className="text-red-500 normal-case font-bold text-sm ml-2 animate-pulse">* يرجى اختيار جميع المقاسات</span>}
-              </p>
-              
-              {Array.from({ length: selectedOffer.pieces }).map((_, pieceIndex) => (
-                <div key={pieceIndex} className="space-y-3">
-                  {selectedOffer.pieces > 1 && (
-                    <p className="font-bold text-sm text-slate-600">القطعة #{pieceIndex + 1}</p>
-                  )}
-                  <div className="flex flex-wrap gap-3">
-                    {variants.map((v: any) => {
-                      const isAvailable = isVariantAvailable(v.node, pieceIndex);
-                      const isSelected = selectedSizes[pieceIndex] === v.node.id;
-                      return (
-                        <button
-                          key={v.node.id}
-                          onClick={() => setSizeForPiece(pieceIndex, v.node.id)}
-                          disabled={!isAvailable && !isSelected}
-                          className={`rounded-xl min-w-16 border-2 px-5 py-3 text-base uppercase tracking-wider transition-all font-bold ${
-                            !isAvailable && !isSelected
-                              ? "opacity-30 border-slate-300 bg-slate-100 text-slate-500 cursor-not-allowed line-through" 
-                              : isSelected
-                                ? "border-primary bg-white shadow-md text-primary scale-105"
-                                : "border-slate-300 text-slate-600 hover:border-slate-400 bg-white"
-                          }`}
-                        >{v.node.title}</button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
 
           {/* COD Form Checkout Section Moved Here (Right after variants) */}
           <div id="checkout-form" className="mt-12 bg-transparent -mx-6 px-4 sm:mx-0 sm:px-0">
             <CodForm 
               productName={p?.title}
-              offerId={selectedOffer.id}
-              offerTitle={selectedOffer.title}
-              offerPieces={selectedOffer.pieces}
-              offerPrice={selectedOffer.price}
-              selectedSizes={selectedSizes.map(id => variants.find((v: any) => v.node.id === id)?.node.title || "")}
-              requireSize={variants.length > 1 && selectedSizes.some(s => s === "")}
-              onSizeError={() => setSizeError(true)}
+              offers={offers}
+              variants={variants}
             />
           </div>
 

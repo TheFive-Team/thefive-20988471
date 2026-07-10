@@ -78,12 +78,17 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
       for (const order of orders) {
         const deliveryTypeStr = (order.delivery_type || "").toLowerCase();
         const isStopDesk = /استلام|desk|pickup|office/i.test(deliveryTypeStr);
+        let deskNameFromType = "";
+        if (isStopDesk && order.delivery_type && order.delivery_type.includes(" - ")) {
+          deskNameFromType = order.delivery_type.split(" - ").slice(1).join(" - ").trim();
+        }
+        
         const deskObj = order.selectedDesk || (order.selectedDeskName ? { 
           name: order.selectedDeskName, 
           wilaya: order.selectedDeskWilaya,
           commune: order.selectedDeskCommune,
           address: order.selectedDeskAddress
-        } : null);
+        } : deskNameFromType ? { name: deskNameFromType } : null);
 
         if (isStopDesk && !deskObj?.name) {
           return {
@@ -106,12 +111,17 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
         console.log(`DB deliveryType: ${order.delivery_type}`);
         console.log(`ZR deliveryType: ${finalDeliveryType}`);
 
+        let deskNameFromType = "";
+        if (isStopDesk && order.delivery_type && order.delivery_type.includes(" - ")) {
+          deskNameFromType = order.delivery_type.split(" - ").slice(1).join(" - ").trim();
+        }
+
         const deskObj = order.selectedDesk || (order.selectedDeskName ? { 
           name: order.selectedDeskName, 
           wilaya: order.selectedDeskWilaya,
           commune: order.selectedDeskCommune,
           address: order.selectedDeskAddress
-        } : null);
+        } : deskNameFromType ? { name: deskNameFromType } : null);
 
         // Fetch Wilaya UUID
         const targetWilaya = isStopDesk && deskObj?.wilaya ? deskObj.wilaya : order.wilaya;

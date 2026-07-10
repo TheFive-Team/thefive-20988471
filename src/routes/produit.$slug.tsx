@@ -118,17 +118,18 @@ function ProductPage() {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-10 sm:py-24">
       <div className="grid gap-0 md:grid-cols-2 md:gap-10 lg:gap-12">
         
-        {/* Mobile View: Text above gallery */}
+        {/* Mobile View: Gallery first, then Text */}
         <div className="block md:hidden mb-6">
+          
+          {/* 1. Gallery (Mobile) */}
+          <div className="-mx-4 sm:-mx-6 mb-5">
+            <MobileImageGallery images={images} />
+          </div>
+
+          {/* 2. Text Details below gallery */}
           <div className="flex flex-col items-center text-center animate-in fade-in duration-500">
-            {/* 1. Brand */}
-            <div className="mb-2">
-              <span className="text-[11px] sm:text-xs uppercase tracking-[0.25em] text-[#1A2530]/70 font-bold">
-                {p.vendor || "The Five A"}
-              </span>
-            </div>
             
-            {/* 2. Rating */}
+            {/* Rating */}
             <div className="flex justify-center items-center gap-1.5 mb-4">
               <div className="flex text-[#D4AF37] text-sm">
                 <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
@@ -136,19 +137,19 @@ function ProductPage() {
               <span className="text-[11px] font-bold text-[#1A2530]/60 mt-0.5">4.9</span>
             </div>
             
-            {/* 3. Collection Label */}
+            {/* Collection Label */}
             <div className="flex justify-center mb-3">
               <span className="text-[10px] uppercase font-bold tracking-widest text-[#D4AF37] bg-[#D4AF37]/10 px-3 py-1 rounded-sm">
                 ✨ Nouvelle Collection
               </span>
             </div>
             
-            {/* 4. Product Name */}
+            {/* Product Name */}
             <h1 className="font-serif font-bold text-[#1A2530] text-2xl sm:text-3xl leading-[1.3] text-center mb-5 line-clamp-2 px-2 drop-shadow-sm">
               {p.title}
             </h1>
             
-            {/* 5. Price */}
+            {/* Price */}
             <div className="flex flex-col items-center justify-center mb-6 w-full">
               {(() => {
                 const currentPrice = offers[0]?.price;
@@ -180,7 +181,7 @@ function ProductPage() {
               })()}
             </div>
             
-            {/* 6. Trust Badges */}
+            {/* Trust Badges */}
             <div className="flex flex-wrap justify-center gap-2 mb-6">
               <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-3.5 py-1.5 flex items-center shadow-sm">
                 <span className="text-[10.5px] font-bold text-[#1A2530]/80">💳 الدفع عند الاستلام</span>
@@ -195,11 +196,6 @@ function ProductPage() {
                 <span className="text-[10.5px] font-bold text-[#1A2530]/80">🌿 قماش عالي الجودة</span>
               </div>
             </div>
-          </div>
-
-          {/* 7. Gallery (Mobile) */}
-          <div className="-mx-4 sm:-mx-6 mb-2">
-            <MobileImageGallery images={images} />
           </div>
         </div>
 
@@ -245,12 +241,6 @@ function ProductPage() {
           
           {/* Desktop Only Details (Hidden on Mobile) */}
           <div className="hidden md:block mb-8">
-            <div className="mb-2">
-              <span className="text-xs uppercase tracking-[0.25em] text-[#1A2530]/70 font-bold">
-                {p.vendor || "The Five A"}
-              </span>
-            </div>
-            
             <div className="flex items-center gap-1.5 mb-4">
               <div className="flex text-[#D4AF37] text-sm">
                 <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>

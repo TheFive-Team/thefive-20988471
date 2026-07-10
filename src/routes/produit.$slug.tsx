@@ -127,7 +127,7 @@ function ProductPage() {
           </div>
 
           {/* 2. Text Details below gallery */}
-          <div className="flex flex-col items-start text-left animate-in fade-in duration-500 bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 w-full mb-4">
+          <div className="flex flex-col items-start text-left animate-in fade-in duration-500 bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 w-full mb-3">
             
             {/* Collection Label */}
             <div className="mb-2">
@@ -150,7 +150,7 @@ function ProductPage() {
             </div>
             
             {/* Price Row */}
-            <div className="flex items-center mb-6 w-full">
+            <div className="flex items-center w-full">
               {(() => {
                 const currentPrice = offers[0]?.price;
                 const compPrice = offers[0]?.comparePrice;
@@ -177,22 +177,6 @@ function ProductPage() {
                   </span>
                 );
               })()}
-            </div>
-            
-            {/* Trust Badges */}
-            <div className="grid grid-cols-2 gap-2 w-full" dir="ltr">
-              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-2.5 py-2 flex items-center shadow-sm w-full">
-                <span className="text-[10px] font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">💳 الدفع عند الاستلام</span>
-              </div>
-              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-2.5 py-2 flex items-center shadow-sm w-full">
-                <span className="text-[10px] font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">🚚 توصيل 58 ولاية</span>
-              </div>
-              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-2.5 py-2 flex items-center shadow-sm w-full">
-                <span className="text-[10px] font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">🔄 استبدال وإرجاع</span>
-              </div>
-              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-2.5 py-2 flex items-center shadow-sm w-full">
-                <span className="text-[10px] font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">🌿 قماش عالي الجودة</span>
-              </div>
             </div>
           </div>
         </div>
@@ -238,7 +222,7 @@ function ProductPage() {
         <div className="mt-2 md:mt-0">
           
           {/* Desktop Only Details (Hidden on Mobile) */}
-          <div className="hidden md:block mb-6 bg-[#FCFCFC] rounded-[22px] p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80">
+          <div className="hidden md:block mb-4 bg-[#FCFCFC] rounded-[22px] p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80">
             
             {/* Collection Label */}
             <div className="mb-2">
@@ -261,7 +245,7 @@ function ProductPage() {
             </div>
             
             {/* Price Row */}
-            <div className="flex items-center mb-8 w-full">
+            <div className="flex items-center w-full">
               {(() => {
                 const currentPrice = offers[0]?.price;
                 const comparePrice = offers[0]?.comparePrice;
@@ -288,22 +272,6 @@ function ProductPage() {
                   </span>
                 );
               })()}
-            </div>
-            
-            {/* Desktop Trust Badges */}
-            <div className="grid grid-cols-2 gap-3 w-full" dir="ltr">
-              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-4 py-2.5 flex items-center shadow-sm w-full">
-                <span className="text-xs font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">💳 الدفع عند الاستلام</span>
-              </div>
-              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-4 py-2.5 flex items-center shadow-sm w-full">
-                <span className="text-xs font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">🚚 توصيل 58 ولاية</span>
-              </div>
-              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-4 py-2.5 flex items-center shadow-sm w-full">
-                <span className="text-xs font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">🔄 استبدال وإرجاع</span>
-              </div>
-              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-4 py-2.5 flex items-center shadow-sm w-full">
-                <span className="text-xs font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">🌿 قماش عالي الجودة</span>
-              </div>
             </div>
           </div>
 

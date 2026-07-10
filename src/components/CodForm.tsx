@@ -279,11 +279,11 @@ export function CodForm({
         </div>
 
         {/* Price Breakdown */}
-        {productPriceAmount && (
+        {offerPrice !== undefined && (
           <div className="bg-background border border-border/50 rounded-xl p-5 mt-4 space-y-3 shadow-sm">
             <div className="flex justify-between items-center text-base text-foreground/80">
               <span>سعر المنتج</span>
-              <span className="font-sans font-semibold tracking-tight dir-ltr text-lg">{Number(productPriceAmount).toLocaleString()} د.ج</span>
+              <span className="font-sans font-semibold tracking-tight dir-ltr text-lg">{Number(offerPrice).toLocaleString()} د.ج</span>
             </div>
             <div className="flex justify-between items-center text-base text-foreground/80">
               <span>سعر التوصيل</span>
@@ -304,9 +304,9 @@ export function CodForm({
               <span>المجموع الكلي</span>
               <span className="font-sans font-bold tracking-tight dir-ltr text-2xl text-primary">
                 {form.wilaya && form.shippingMethod ? (
-                  `${(Number(productPriceAmount) + ((form.shippingMethod === 'home' ? wilayas.find(w => w.code === Number(form.wilaya))?.home : wilayas.find(w => w.code === Number(form.wilaya))?.stop) || 0)).toLocaleString()} د.ج`
+                  `${(Number(offerPrice) + ((form.shippingMethod === 'home' ? wilayas.find(w => w.code === Number(form.wilaya))?.home : wilayas.find(w => w.code === Number(form.wilaya))?.stop) || 0)).toLocaleString()} د.ج`
                 ) : (
-                  `${Number(productPriceAmount).toLocaleString()} د.ج`
+                  `${Number(offerPrice).toLocaleString()} د.ج`
                 )}
               </span>
             </div>

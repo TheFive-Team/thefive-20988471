@@ -49,14 +49,15 @@ function ProductPage() {
   const p = product?.node;
   const variants = p?.variants?.edges ?? [];
   
-  const rawOffers = (p as any)?.offers?.filter((o: any) => o.active !== false) || [];
+  const rawOffersList = Array.isArray((p as any)?.offers) ? (p as any).offers : [];
+  const rawOffers = rawOffersList.filter((o: any) => o && o.active !== false);
   
   const offers = useMemo(() => {
     if (rawOffers.length > 0) return rawOffers;
     return [{
       id: "default-1",
       title: "قطعة واحدة",
-      price: p?.priceRange?.minVariantPrice?.amount,
+      price: p?.priceRange?.minVariantPrice?.amount ?? "0",
       comparePrice: p?.compareAtPriceRange?.minVariantPrice?.amount,
       pieces: 1,
       badge: ""
@@ -329,7 +330,7 @@ function ProductPage() {
       </Suspense>
 
       <Suspense fallback={null}>
-        <StickyCheckoutBar price={selectedVariant?.price ?? p.priceRange.minVariantPrice} />
+        <StickyCheckoutBar price={p?.priceRange?.minVariantPrice} />
       </Suspense>
     </div>
   );

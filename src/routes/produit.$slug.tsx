@@ -127,26 +127,30 @@ function ProductPage() {
           </div>
 
           {/* 2. Text Details below gallery */}
-          <div className="flex flex-col items-center text-center animate-in fade-in duration-500">
+          <div className="flex flex-col items-start text-left animate-in fade-in duration-500 bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 w-full mb-4">
             
-            {/* Title & Rating Row */}
-            <div className="flex w-full items-center justify-between gap-4 mb-5 px-1 mt-1">
-              {/* Left: Rating */}
-              <div className="flex flex-col items-start shrink-0 text-left pt-1">
-                <div className="flex text-[#D4AF37] text-[10px] sm:text-[11px] tracking-widest">
-                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                </div>
-                <span className="text-[9px] sm:text-[10px] font-medium text-[#1A2530]/40 mt-1">4.9</span>
-              </div>
-              
-              {/* Right: Title */}
-              <h1 className="font-serif font-bold text-[#1A2530] text-[22px] sm:text-2xl leading-[1.25] text-right line-clamp-2 drop-shadow-sm flex-1" dir="rtl">
-                {p.title}
-              </h1>
+            {/* Collection Label */}
+            <div className="mb-2">
+              <span className="text-[10px] uppercase font-bold tracking-[0.15em] text-[#D4AF37]">
+                NOUVELLE COLLECTION
+              </span>
             </div>
             
-            {/* Price */}
-            <div className="flex flex-col items-center justify-center mb-6 w-full">
+            {/* Product Name */}
+            <h1 className="font-serif font-bold text-[#1A2530] text-[22px] sm:text-2xl leading-[1.25] text-left line-clamp-2 drop-shadow-sm mb-2 w-full" dir="ltr">
+              {p.title}
+            </h1>
+            
+            {/* Rating */}
+            <div className="flex items-center gap-2 mb-5">
+              <div className="flex text-[#D4AF37] text-[11px] tracking-wider">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              </div>
+              <span className="text-[10px] font-medium text-[#1A2530]/60 mt-0.5">4.9</span>
+            </div>
+            
+            {/* Price Row */}
+            <div className="flex items-center mb-6 w-full">
               {(() => {
                 const currentPrice = offers[0]?.price;
                 const compPrice = offers[0]?.comparePrice;
@@ -154,23 +158,21 @@ function ProductPage() {
                 if (compPrice && parseFloat(compPrice) > parseFloat(currentPrice)) {
                   const discount = Math.round(((parseFloat(compPrice) - parseFloat(currentPrice)) / parseFloat(compPrice)) * 100);
                   return (
-                    <div className="flex flex-col items-center w-full bg-[#FAF9F6]/50 py-3 rounded-xl border border-slate-100">
-                      <div className="flex items-center gap-2.5 mb-1">
-                        <span className="text-sm text-slate-400 line-through font-medium">
-                          {formatMoney({ amount: compPrice, currencyCode: "DZD" })}
-                        </span>
-                        <span className="bg-[#1A2530] text-[#D4AF37] text-[10px] font-bold px-2 py-0.5 rounded-sm tracking-wide">
-                          وفر {discount}%
-                        </span>
-                      </div>
-                      <span className="text-3xl font-bold tracking-tight text-[#1A2530] drop-shadow-sm">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-3xl font-bold tracking-tight text-[#1A2530] leading-none">
                         {formatMoney({ amount: currentPrice, currencyCode: "DZD" })}
+                      </span>
+                      <span className="text-sm text-slate-400 line-through font-medium leading-none">
+                        {formatMoney({ amount: compPrice, currencyCode: "DZD" })}
+                      </span>
+                      <span className="bg-[#1A2530] text-[#D4AF37] text-[10px] font-bold px-1.5 py-0.5 rounded-sm tracking-wide leading-none ml-1">
+                        وفر {discount}%
                       </span>
                     </div>
                   );
                 }
                 return (
-                  <span className="text-3xl font-bold tracking-tight text-[#1A2530] drop-shadow-sm">
+                  <span className="text-3xl font-bold tracking-tight text-[#1A2530] leading-none">
                     {formatMoney({ amount: currentPrice ?? 0, currencyCode: "DZD" })}
                   </span>
                 );
@@ -178,18 +180,18 @@ function ProductPage() {
             </div>
             
             {/* Trust Badges */}
-            <div className="flex flex-wrap justify-center gap-2 mb-6">
-              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-3.5 py-1.5 flex items-center shadow-sm">
-                <span className="text-[10.5px] font-bold text-[#1A2530]/80">💳 الدفع عند الاستلام</span>
+            <div className="grid grid-cols-2 gap-2 w-full" dir="ltr">
+              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-2.5 py-2 flex items-center shadow-sm w-full">
+                <span className="text-[10px] font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">💳 الدفع عند الاستلام</span>
               </div>
-              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-3.5 py-1.5 flex items-center shadow-sm">
-                <span className="text-[10.5px] font-bold text-[#1A2530]/80">🚚 توصيل سريع لـ58 ولاية</span>
+              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-2.5 py-2 flex items-center shadow-sm w-full">
+                <span className="text-[10px] font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">🚚 توصيل 58 ولاية</span>
               </div>
-              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-3.5 py-1.5 flex items-center shadow-sm">
-                <span className="text-[10.5px] font-bold text-[#1A2530]/80">🔄 استبدال وإرجاع</span>
+              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-2.5 py-2 flex items-center shadow-sm w-full">
+                <span className="text-[10px] font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">🔄 استبدال وإرجاع</span>
               </div>
-              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-3.5 py-1.5 flex items-center shadow-sm">
-                <span className="text-[10.5px] font-bold text-[#1A2530]/80">🌿 قماش عالي الجودة</span>
+              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-2.5 py-2 flex items-center shadow-sm w-full">
+                <span className="text-[10px] font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">🌿 قماش عالي الجودة</span>
               </div>
             </div>
           </div>
@@ -236,27 +238,30 @@ function ProductPage() {
         <div className="mt-2 md:mt-0">
           
           {/* Desktop Only Details (Hidden on Mobile) */}
-          <div className="hidden md:block mb-8">
-            {/* Title & Rating Row */}
-            <div className="flex w-full items-center justify-between gap-6 mb-8 mt-2">
-              {/* Left: Rating */}
-              <div className="flex flex-col items-start shrink-0 text-left pt-1">
-                <div className="flex text-[#D4AF37] text-xs tracking-widest">
-                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                </div>
-                <span className="text-[10px] font-medium text-[#1A2530]/40 mt-1">4.9</span>
-              </div>
-              
-              {/* Right: Title */}
-              <h1 className="font-serif font-bold text-[#1A2530] text-3xl md:text-4xl leading-[1.2] text-right line-clamp-2 drop-shadow-sm flex-1" dir="rtl">
-                {p.title}
-              </h1>
+          <div className="hidden md:block mb-6 bg-[#FCFCFC] rounded-[22px] p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80">
+            
+            {/* Collection Label */}
+            <div className="mb-2">
+              <span className="text-[11px] uppercase font-bold tracking-[0.15em] text-[#D4AF37]">
+                NOUVELLE COLLECTION
+              </span>
             </div>
             
-            <div className="flex items-center gap-4">
-              <span className="text-4xl font-bold tracking-tight text-[#1A2530]">
-                {formatMoney({ amount: offers[0]?.price ?? 0, currencyCode: "DZD" })}
-              </span>
+            {/* Product Name */}
+            <h1 className="font-serif font-bold text-[#1A2530] text-3xl md:text-4xl leading-[1.2] text-left line-clamp-2 drop-shadow-sm mb-3 w-full" dir="ltr">
+              {p.title}
+            </h1>
+            
+            {/* Rating */}
+            <div className="flex items-center gap-2 mb-6">
+              <div className="flex text-[#D4AF37] text-xs tracking-widest">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              </div>
+              <span className="text-[11px] font-medium text-[#1A2530]/60 mt-0.5">4.9</span>
+            </div>
+            
+            {/* Price Row */}
+            <div className="flex items-center mb-8 w-full">
               {(() => {
                 const currentPrice = offers[0]?.price;
                 const comparePrice = offers[0]?.comparePrice;
@@ -264,35 +269,40 @@ function ProductPage() {
                 if (comparePrice && parseFloat(comparePrice) > parseFloat(currentPrice)) {
                   const discount = Math.round(((parseFloat(comparePrice) - parseFloat(currentPrice)) / parseFloat(comparePrice)) * 100);
                   return (
-                    <div className="flex flex-col">
-                      <span className="text-lg text-slate-400 line-through font-medium">
+                    <div className="flex items-center gap-3">
+                      <span className="text-4xl font-bold tracking-tight text-[#1A2530] leading-none">
+                        {formatMoney({ amount: currentPrice, currencyCode: "DZD" })}
+                      </span>
+                      <span className="text-lg text-slate-400 line-through font-medium leading-none">
                         {formatMoney({ amount: comparePrice, currencyCode: "DZD" })}
                       </span>
-                      <span className="bg-[#1A2530] text-[#D4AF37] text-xs font-bold px-2 py-0.5 rounded-sm tracking-wide text-center mt-1">
+                      <span className="bg-[#1A2530] text-[#D4AF37] text-xs font-bold px-2 py-0.5 rounded-sm tracking-wide leading-none ml-2">
                         وفر {discount}%
                       </span>
                     </div>
                   );
                 }
-                return null;
+                return (
+                  <span className="text-4xl font-bold tracking-tight text-[#1A2530] leading-none">
+                    {formatMoney({ amount: currentPrice ?? 0, currencyCode: "DZD" })}
+                  </span>
+                );
               })()}
             </div>
             
-            <div className="h-px bg-slate-200 my-8 w-1/3" />
-            
             {/* Desktop Trust Badges */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-4 py-2 flex items-center shadow-sm">
-                <span className="text-xs font-bold text-[#1A2530]/80">💳 الدفع عند الاستلام</span>
+            <div className="grid grid-cols-2 gap-3 w-full" dir="ltr">
+              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-4 py-2.5 flex items-center shadow-sm w-full">
+                <span className="text-xs font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">💳 الدفع عند الاستلام</span>
               </div>
-              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-4 py-2 flex items-center shadow-sm">
-                <span className="text-xs font-bold text-[#1A2530]/80">🚚 توصيل سريع لـ58 ولاية</span>
+              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-4 py-2.5 flex items-center shadow-sm w-full">
+                <span className="text-xs font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">🚚 توصيل 58 ولاية</span>
               </div>
-              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-4 py-2 flex items-center shadow-sm">
-                <span className="text-xs font-bold text-[#1A2530]/80">🔄 استبدال وإرجاع</span>
+              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-4 py-2.5 flex items-center shadow-sm w-full">
+                <span className="text-xs font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">🔄 استبدال وإرجاع</span>
               </div>
-              <div className="bg-[#FAF9F6] border border-slate-200/60 rounded-full px-4 py-2 flex items-center shadow-sm">
-                <span className="text-xs font-bold text-[#1A2530]/80">🌿 قماش عالي الجودة</span>
+              <div className="bg-[#FAF9F6] border border-slate-200/50 rounded-lg px-4 py-2.5 flex items-center shadow-sm w-full">
+                <span className="text-xs font-bold text-[#1A2530]/80 text-left w-full" dir="rtl">🌿 قماش عالي الجودة</span>
               </div>
             </div>
           </div>

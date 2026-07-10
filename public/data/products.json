@@ -137,7 +137,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17837053783280",
+              "id": "gid://shopify/ProductVariant/17837181736130",
               "title": "6",
               "availableForSale": true,
               "quantityAvailable": 1,
@@ -159,10 +159,10 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17837053783281",
+              "id": "gid://shopify/ProductVariant/17837181736131",
               "title": "8",
               "availableForSale": true,
-              "quantityAvailable": 2,
+              "quantityAvailable": 1,
               "price": {
                 "amount": "5900.0",
                 "currencyCode": "DZD"
@@ -181,7 +181,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17837053783282",
+              "id": "gid://shopify/ProductVariant/17837181736132",
               "title": "10",
               "availableForSale": true,
               "quantityAvailable": 1,
@@ -203,10 +203,10 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17837053783283",
+              "id": "gid://shopify/ProductVariant/17837181736133",
               "title": "12",
               "availableForSale": true,
-              "quantityAvailable": 2,
+              "quantityAvailable": 1,
               "price": {
                 "amount": "5900.0",
                 "currencyCode": "DZD"
@@ -244,6 +244,14 @@
         "discountValue": 0,
         "badgeText": "free",
         "maxQuantity": 3
+      },
+      "scarcityConfig": {
+        "enableLowStockWarning": true,
+        "enableDiscountMessage": true,
+        "featuredLabelText": "",
+        "enableFastShipping": true,
+        "enableSizeScarcity": true,
+        "sizeLowStockThreshold": 3
       }
     }
   }

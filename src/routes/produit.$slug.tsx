@@ -6,8 +6,8 @@ import { useCartStore } from "@/stores/cartStore";
 import { formatMoney, getOptimizedShopifyImage, getLocalSrcSet } from "@/lib/shopify";
 import { MobileImageGallery } from "@/components/MobileImageGallery";
 import { CodForm } from "@/components/CodForm";
-import { WhyChooseUs } from "@/components/WhyChooseUs";
 
+const WhyChooseUs = lazy(() => import("@/components/WhyChooseUs").then(m => ({ default: m.WhyChooseUs })));
 const Reviews = lazy(() => import("@/components/Reviews").then(m => ({ default: m.Reviews })));
 const StickyCheckoutBar = lazy(() => import("@/components/StickyCheckoutBar").then(m => ({ default: m.StickyCheckoutBar })));
 
@@ -32,7 +32,8 @@ export const Route = createFileRoute("/produit/$slug")({
         { 
           rel: "preload", 
           as: "image", 
-          href: mainImg.url,
+          imageSrcSet: getLocalSrcSet(mainImg.url) || `${getOptimizedShopifyImage(mainImg.url, 400)} 400w, ${getOptimizedShopifyImage(mainImg.url, 800)} 800w`,
+          imageSizes: "(max-width: 768px) 100vw, 50vw",
           fetchPriority: "high" 
         }
       ] : []
@@ -129,7 +130,7 @@ function ProductPage() {
           </div>
 
           {/* 2. Text Details below gallery */}
-          <div className="flex flex-col items-start text-left animate-in fade-in duration-500 bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 w-full mb-3">
+          <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 w-full mb-3">
             
             {/* Collection Label */}
             <div className="mb-2">
@@ -322,7 +323,9 @@ function ProductPage() {
       )}
 
       <div className="mt-8 mb-4">
-        <WhyChooseUs />
+        <Suspense fallback={<div className="h-32 w-full animate-pulse bg-secondary/30 mt-8 rounded-2xl" />}>
+          <WhyChooseUs />
+        </Suspense>
       </div>
 
       <Suspense fallback={<div className="h-32 w-full animate-pulse bg-secondary/30 mt-16 rounded-2xl" />}>

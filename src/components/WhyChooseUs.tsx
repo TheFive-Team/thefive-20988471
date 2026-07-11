@@ -64,7 +64,7 @@ export function WhyChooseUs() {
   return (
     <section 
       ref={sectionRef}
-      className={`w-full bg-[#F6F1E8] border-t border-[#E4DAC7] pt-[60px] pb-16 sm:pb-24 px-4 sm:px-6 transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} 
+      className={`w-full bg-[#F8F5EF] border-t border-[#E4DAC7] pt-[60px] pb-0 px-4 sm:px-6 transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} 
       dir="rtl"
     >
       <div className="max-w-2xl mx-auto flex flex-col items-center">
@@ -132,42 +132,6 @@ export function WhyChooseUs() {
               </div>
             );
           })}
-        </div>
-
-        {/* Bottom Trust Bar */}
-        <div 
-          className={`mt-8 w-full bg-white rounded-[16px] border border-[#E8E0D2] p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[0_8px_24px_rgba(16,42,67,0.04)] transition-all duration-700 ease-out delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
-        >
-          {/* Rating */}
-          <div className="flex items-center gap-2.5">
-            <div className="flex text-[#D7AE57] text-[14px] tracking-widest drop-shadow-sm">
-              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-            </div>
-            <span className="font-sans font-bold text-[#102A43] text-[14px] mt-0.5">4.9/5</span>
-          </div>
-
-          {/* Text & Avatars */}
-          <div className="flex items-center gap-3">
-            <span className="font-serif font-bold text-[#102A43] text-[14px]">
-              "ثقة آلاف العملاء"
-            </span>
-            <div className="flex items-center">
-              <div className="flex -space-x-2 -space-x-reverse mr-2">
-                <div className="w-[30px] h-[30px] rounded-full bg-[#F8F5EF] border-2 border-white flex items-center justify-center shrink-0 overflow-hidden">
-                  <img src="https://i.pravatar.cc/100?img=1" alt="Avatar" className="w-full h-full object-cover opacity-80" />
-                </div>
-                <div className="w-[30px] h-[30px] rounded-full bg-[#F8F5EF] border-2 border-white flex items-center justify-center shrink-0 overflow-hidden">
-                  <img src="https://i.pravatar.cc/100?img=5" alt="Avatar" className="w-full h-full object-cover opacity-80" />
-                </div>
-                <div className="w-[30px] h-[30px] rounded-full bg-[#F8F5EF] border-2 border-white flex items-center justify-center shrink-0 overflow-hidden">
-                  <img src="https://i.pravatar.cc/100?img=9" alt="Avatar" className="w-full h-full object-cover opacity-80" />
-                </div>
-              </div>
-              <div className="flex items-center justify-center w-[22px] h-[22px] rounded-full bg-[#102A43] -ml-2 z-10 border-2 border-white">
-                <CheckCircle2 className="w-[12px] h-[12px] text-[#D7AE57]" strokeWidth={3} />
-              </div>
-            </div>
-          </div>
         </div>
 
       </div>

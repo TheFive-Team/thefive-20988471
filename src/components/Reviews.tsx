@@ -49,7 +49,7 @@ export function Reviews({ customImages }: { customImages?: Array<{ url: string; 
   return (
     <section 
       ref={sectionRef}
-      className={`py-24 md:py-32 bg-[#F8F5EF] transition-all duration-[800ms] ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} 
+      className={`pt-[36px] pb-24 md:pb-32 bg-[#F8F5EF] transition-all duration-[800ms] ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} 
       dir="rtl"
     >
       <div className="max-w-6xl mx-auto px-4">

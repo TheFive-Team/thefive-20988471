@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -7,12 +7,31 @@ import {
   CarouselPrevious,
   type CarouselApi
 } from "@/components/ui/carousel";
-import { useEffect, useState } from "react";
 import { getOptimizedShopifyImage, getLocalSrcSet } from "@/lib/shopify";
 
 export function Reviews({ customImages }: { customImages?: Array<{ url: string; altText?: string | null }> }) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!api) return;
@@ -28,30 +47,34 @@ export function Reviews({ customImages }: { customImages?: Array<{ url: string; 
   const reviewImages = customImages;
 
   return (
-    <section className="py-20 md:py-28 bg-[#F6F1E8]" dir="rtl">
+    <section 
+      ref={sectionRef}
+      className={`py-24 md:py-32 bg-[#F8F5EF] transition-all duration-[800ms] ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} 
+      dir="rtl"
+    >
       <div className="max-w-6xl mx-auto px-4">
         
-        {/* Editorial Header */}
-        <div className="flex flex-col items-center text-center mb-8">
-          <div className="text-[#C9A34E] text-[18px] tracking-[0.2em] mb-3">★★★★★</div>
-          <div className="font-serif text-[20px] font-bold text-[#102A43] mb-2">4.9 / 5</div>
-          <div className="text-[13px] font-bold text-[#C9A34E] tracking-wider mb-5">+850 عميل سعيد</div>
-          <h2 className="font-serif text-[28px] sm:text-[34px] font-bold text-[#102A43] leading-tight max-w-[400px]">
-            آراء حقيقية من عملائنا بعد استلام الطلب.
+        {/* Minimal Editorial Header */}
+        <div className={`flex flex-col items-center text-center mb-8 transition-all duration-[800ms] ease-out delay-100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className="text-[#C9A34E] text-[18px] tracking-[0.2em] mb-5">★★★★★</div>
+          <h2 className="font-serif text-[34px] font-bold text-[#102A43] leading-tight mb-3">
+            آراء عملائنا
           </h2>
+          <p className="text-[14px] text-[#6B7280] font-medium max-w-[300px]">
+            تجارب حقيقية بعد استلام الطلب
+          </p>
         </div>
 
-        {/* Premium Rating Card */}
-        <div className="bg-white rounded-[18px] p-6 shadow-[0_8px_30px_rgba(16,42,67,0.06)] border border-[#E8E0D2]/50 max-w-[320px] mx-auto mb-16 flex flex-col items-center justify-center">
-          <div className="flex gap-1 text-[#C9A34E] mb-3">
-            {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-5 h-5 fill-current" />)}
-          </div>
-          <div className="font-sans font-bold text-[#102A43] text-[26px] mb-1 leading-none">4.9 من 5</div>
-          <p className="text-[#6B7280] text-[13px] font-medium mt-1">بناءً على أكثر من 850 تقييم حقيقي.</p>
+        {/* Compact Single-Line Rating */}
+        <div className={`flex items-center justify-center gap-2 mb-16 transition-all duration-[800ms] ease-out delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className="text-[#C9A34E] text-[16px] tracking-widest mt-0.5">★★★★★</div>
+          <span className="text-[#102A43] font-bold text-[16px] mr-1">4.9/5</span>
+          <span className="text-[#102A43]/20 mx-1.5">•</span>
+          <span className="text-[#6B7280] text-[15px]">+850 تقييم</span>
         </div>
 
         {/* Carousel */}
-        <div className="relative w-full max-w-5xl mx-auto">
+        <div className={`relative w-full max-w-5xl mx-auto transition-all duration-[1000ms] ease-out delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <Carousel
             setApi={setApi}
             opts={{
@@ -60,14 +83,14 @@ export function Reviews({ customImages }: { customImages?: Array<{ url: string; 
             }}
             className="w-full"
           >
-            <CarouselContent className="-ml-4 md:-ml-8">
+            <CarouselContent className="-ml-5 md:-ml-6">
               {reviewImages.map((imgObj, i) => {
                 const isActive = current === i;
                 return (
-                  <CarouselItem key={i} className="pl-4 md:pl-8 basis-[85%] sm:basis-[60%] md:basis-[45%] lg:basis-[35%]">
+                  <CarouselItem key={i} className="pl-5 md:pl-6 basis-[85%] sm:basis-[60%] md:basis-[45%] lg:basis-[35%]">
                     <div 
-                      className={`w-full bg-white rounded-[20px] p-3 shadow-[0_10px_40px_rgba(16,42,67,0.06)] border border-[#E8E0D2]/60 transition-all duration-500 ease-out ${
-                        isActive ? "scale-100 opacity-100" : "scale-[0.93] opacity-75"
+                      className={`w-full bg-white rounded-[22px] p-[12px] shadow-[0_8px_30px_rgba(16,42,67,0.04)] border border-[#E8E0D2]/40 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                        isActive ? "scale-100 opacity-100" : "scale-[0.92] opacity-75"
                       }`}
                     >
                       <img 
@@ -86,16 +109,9 @@ export function Reviews({ customImages }: { customImages?: Array<{ url: string; 
                 );
               })}
             </CarouselContent>
-            <CarouselPrevious className="absolute left-2 md:-left-8 lg:-left-12 z-10 w-12 h-12 border border-[#E8E0D2] shadow-xl text-[#102A43] bg-white/90 backdrop-blur hover:bg-white transition-all duration-300" />
-            <CarouselNext className="absolute right-2 md:-right-8 lg:-right-12 z-10 w-12 h-12 border border-[#E8E0D2] shadow-xl text-[#102A43] bg-white/90 backdrop-blur hover:bg-white transition-all duration-300" />
+            <CarouselPrevious className="absolute left-2 md:-left-6 lg:-left-12 z-10 w-[44px] h-[44px] border border-transparent shadow-[0_4px_20px_rgba(16,42,67,0.08)] text-[#102A43] bg-white hover:bg-[#FDFCF9] transition-all duration-300 flex items-center justify-center [&_svg]:w-4 [&_svg]:h-4" />
+            <CarouselNext className="absolute right-2 md:-right-6 lg:-right-12 z-10 w-[44px] h-[44px] border border-transparent shadow-[0_4px_20px_rgba(16,42,67,0.08)] text-[#102A43] bg-white hover:bg-[#FDFCF9] transition-all duration-300 flex items-center justify-center [&_svg]:w-4 [&_svg]:h-4" />
           </Carousel>
-        </div>
-
-        {/* Bottom Trust Statement */}
-        <div className="mt-16 text-center">
-          <p className="text-[13px] text-[#6B7280] font-medium tracking-wide">
-            انضم إلى آلاف العملاء الذين اختاروا The Five A
-          </p>
         </div>
 
       </div>

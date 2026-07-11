@@ -43,6 +43,21 @@ export function Reviews({ customImages }: { customImages?: Array<{ url: string; 
     api.on("select", () => {
       setCurrent(api.selectedScrollSnap());
     });
+
+    // Temporary debug logs as requested
+    const logDebugInfo = () => {
+      console.log("[Reviews Carousel Debug]", {
+        activeIndex: api.selectedScrollSnap(),
+        slideCount: api.slideNodes().length,
+        snapPoints: api.scrollSnapList(),
+        selectedSnap: api.selectedScrollSnap(),
+        viewportWidth: api.rootNode().getBoundingClientRect().width,
+        firstThreeSlideWidths: api.slideNodes().slice(0, 3).map(n => n.getBoundingClientRect().width)
+      });
+    };
+    logDebugInfo();
+    api.on("select", logDebugInfo);
+    api.on("reInit", logDebugInfo);
   }, [api]);
 
   if (!customImages || customImages.length === 0) return null;
@@ -81,17 +96,22 @@ export function Reviews({ customImages }: { customImages?: Array<{ url: string; 
             setApi={setApi}
             opts={{
               align: "center",
-              loop: true,
+              containScroll: "trimSnaps",
+              loop: false,
+              dragFree: false,
               skipSnaps: false,
-              dragFree: false
+              direction: "rtl"
             }}
-            className="w-full"
+            className="w-full overflow-hidden"
           >
-            <CarouselContent className="-ml-4 md:-ml-5">
+            <CarouselContent className="ml-0 -mr-4 md:-mr-5 flex flex-row w-full">
               {reviewImages.map((imgObj, i) => {
                 const isActive = current === i;
                 return (
-                  <CarouselItem key={i} className="pl-4 md:pl-5 basis-[88%] sm:basis-[75%] md:basis-[60%] lg:basis-[50%]">
+                  <CarouselItem 
+                    key={imgObj.url || `review-${i}`} 
+                    className="pl-0 pr-4 md:pr-5 min-w-0 shrink-0 grow-0 basis-[88%] sm:basis-[75%] md:basis-[60%] lg:basis-[50%]"
+                  >
                     <div 
                       className={`w-full bg-white rounded-[24px] p-[12px] transition-all duration-[300ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] ${
                         isActive 
@@ -109,6 +129,7 @@ export function Reviews({ customImages }: { customImages?: Array<{ url: string; 
                         width={600}
                         height={600} 
                         className="w-full h-auto object-cover rounded-[16px]" 
+                        onLoad={() => api?.reInit()}
                       />
                     </div>
                   </CarouselItem>
@@ -117,8 +138,14 @@ export function Reviews({ customImages }: { customImages?: Array<{ url: string; 
             </CarouselContent>
             
             {/* Navigation Arrows */}
-            <CarouselPrevious className="absolute left-2 md:-left-4 lg:-left-6 z-10 w-[44px] h-[44px] border border-transparent shadow-[0_4px_20px_rgba(16,42,67,0.08)] text-[#102A43] bg-white hover:bg-[#FDFCF9] transition-all duration-300 flex items-center justify-center [&_svg]:w-5 [&_svg]:h-5 opacity-100 md:opacity-0 md:group-hover:opacity-100 disabled:opacity-0" />
-            <CarouselNext className="absolute right-2 md:-right-4 lg:-right-6 z-10 w-[44px] h-[44px] border border-transparent shadow-[0_4px_20px_rgba(16,42,67,0.08)] text-[#102A43] bg-white hover:bg-[#FDFCF9] transition-all duration-300 flex items-center justify-center [&_svg]:w-5 [&_svg]:h-5 opacity-100 md:opacity-0 md:group-hover:opacity-100 disabled:opacity-0" />
+            <CarouselPrevious 
+              onClick={() => api?.scrollPrev()} 
+              className="absolute left-2 md:-left-4 lg:-left-6 z-10 w-[44px] h-[44px] border border-transparent shadow-[0_4px_20px_rgba(16,42,67,0.08)] text-[#102A43] bg-white hover:bg-[#FDFCF9] transition-all duration-300 flex items-center justify-center [&_svg]:w-5 [&_svg]:h-5 opacity-100 md:opacity-0 md:group-hover:opacity-100 disabled:opacity-0" 
+            />
+            <CarouselNext 
+              onClick={() => api?.scrollNext()} 
+              className="absolute right-2 md:-right-4 lg:-right-6 z-10 w-[44px] h-[44px] border border-transparent shadow-[0_4px_20px_rgba(16,42,67,0.08)] text-[#102A43] bg-white hover:bg-[#FDFCF9] transition-all duration-300 flex items-center justify-center [&_svg]:w-5 [&_svg]:h-5 opacity-100 md:opacity-0 md:group-hover:opacity-100 disabled:opacity-0" 
+            />
           </Carousel>
         </div>
 

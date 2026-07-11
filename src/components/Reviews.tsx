@@ -115,7 +115,6 @@ export function Reviews({ customImages }: { customImages?: Array<{ url: string; 
                         width={600}
                         height={600} 
                         className="w-full h-auto object-cover rounded-[16px]" 
-                        onLoad={() => api?.reInit()}
                       />
                     </div>
                   </CarouselItem>

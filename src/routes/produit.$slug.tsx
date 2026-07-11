@@ -6,6 +6,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { formatMoney, getOptimizedShopifyImage, getLocalSrcSet } from "@/lib/shopify";
 import { MobileImageGallery } from "@/components/MobileImageGallery";
 import { CodForm } from "@/components/CodForm";
+import { LazySection } from "@/components/LazySection";
 
 const WhyChooseUs = lazy(() => import("@/components/WhyChooseUs").then(m => ({ default: m.WhyChooseUs })));
 const Reviews = lazy(() => import("@/components/Reviews").then(m => ({ default: m.Reviews })));
@@ -327,18 +328,24 @@ function ProductPage() {
       )}
 
       <div className="mt-8 mb-4">
-        <Suspense fallback={<div className="h-32 w-full animate-pulse bg-secondary/30 mt-8 rounded-2xl" />}>
-          <WhyChooseUs />
-        </Suspense>
+        <LazySection minHeight="128px">
+          <Suspense fallback={<div className="h-32 w-full animate-pulse bg-secondary/30 mt-8 rounded-2xl" />}>
+            <WhyChooseUs />
+          </Suspense>
+        </LazySection>
       </div>
 
-      <Suspense fallback={<div className="h-32 w-full animate-pulse bg-secondary/30 mt-16 rounded-2xl" />}>
-        <Reviews customImages={p.reviewImages?.edges.map(e => e.node) || []} />
-      </Suspense>
+      <LazySection minHeight="400px">
+        <Suspense fallback={<div className="h-32 w-full animate-pulse bg-secondary/30 mt-16 rounded-2xl" />}>
+          <Reviews customImages={p.reviewImages?.edges.map(e => e.node) || []} />
+        </Suspense>
+      </LazySection>
 
-      <Suspense fallback={null}>
-        <StickyCheckoutBar price={p?.priceRange?.minVariantPrice} />
-      </Suspense>
+      <LazySection minHeight="60px">
+        <Suspense fallback={null}>
+          <StickyCheckoutBar price={p?.priceRange?.minVariantPrice} />
+        </Suspense>
+      </LazySection>
     </div>
   );
 }

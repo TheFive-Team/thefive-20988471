@@ -17,6 +17,7 @@ import { I18nProvider, useI18n } from "@/lib/i18n";
 import { SiteHeader } from "@/components/site-layout";
 const SiteFooter = lazy(() => import("@/components/SiteFooter").then(m => ({ default: m.SiteFooter })));
 import { useCartSync } from "@/hooks/useCartSync";
+import { LazySection } from "@/components/LazySection";
 
 function PromoBar() {
   const item = (
@@ -165,9 +166,11 @@ function RootComponent() {
           <main className="flex-1">
             <Outlet />
           </main>
-          <Suspense fallback={null}>
-            <SiteFooter />
-          </Suspense>
+          <LazySection minHeight="400px">
+            <Suspense fallback={null}>
+              <SiteFooter />
+            </Suspense>
+          </LazySection>
         </div>
       </I18nProvider>
     </QueryClientProvider>

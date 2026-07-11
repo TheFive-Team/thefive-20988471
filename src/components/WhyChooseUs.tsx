@@ -64,21 +64,25 @@ export function WhyChooseUs() {
   return (
     <section 
       ref={sectionRef}
-      className={`w-full bg-[#F8F5EF] py-16 sm:py-24 px-4 sm:px-6 transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} 
+      className={`w-full bg-[#F6F1E8] border-t border-[#E4DAC7] pt-[60px] pb-16 sm:pb-24 px-4 sm:px-6 transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} 
       dir="rtl"
     >
       <div className="max-w-2xl mx-auto flex flex-col items-center">
         
         {/* Editorial Header */}
-        <div className={`flex flex-col items-center w-full pt-[36px] mb-[28px] transition-all duration-[350ms] ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <div className="w-8 h-[1px] bg-[#C9A34E] mb-[10px]"></div>
-          <span className="uppercase text-[11px] sm:text-[12px] font-semibold text-[#C9A34E] tracking-[0.28em] text-center mb-[12px] ml-[0.28em]">
+        <div className={`flex flex-col items-center w-full mb-[40px] transition-all duration-[350ms] ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className="flex items-center gap-3 mb-[16px]">
+            <div className="w-8 sm:w-10 h-[1px] bg-[#C9A34E]/60"></div>
+            <div className="w-1.5 h-1.5 rotate-45 bg-[#C9A34E]"></div>
+            <div className="w-8 sm:w-10 h-[1px] bg-[#C9A34E]/60"></div>
+          </div>
+          <span className="uppercase text-[12px] sm:text-[13px] font-semibold text-[#C9A34E] tracking-[0.32em] text-center mb-[16px] ml-[0.32em]">
             THE FIVE A
           </span>
-          <h2 className="font-serif text-[30px] sm:text-[34px] font-semibold text-[#102A43] text-center leading-tight mb-[14px]">
+          <h2 className="font-serif text-[36px] sm:text-[42px] font-bold text-[#102A43] text-center leading-[1.15] mb-[16px]">
             تسوّق بثقة
           </h2>
-          <p className="text-[13px] sm:text-[14px] text-[#6B7280] text-center leading-[1.8] max-w-[300px]">
+          <p className="text-[14px] sm:text-[15px] text-[#6B7280] text-center leading-[1.9] max-w-[320px]">
             نختار كل تفصيل بعناية لنمنحك تجربة شراء راقية ومنتجًا بجودة تستحق ثقتك.
           </p>
         </div>

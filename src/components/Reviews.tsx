@@ -43,21 +43,6 @@ export function Reviews({ customImages }: { customImages?: Array<{ url: string; 
     api.on("select", () => {
       setCurrent(api.selectedScrollSnap());
     });
-
-    // Temporary debug logs as requested
-    const logDebugInfo = () => {
-      console.log("[Reviews Carousel Debug]", {
-        activeIndex: api.selectedScrollSnap(),
-        slideCount: api.slideNodes().length,
-        snapPoints: api.scrollSnapList(),
-        selectedSnap: api.selectedScrollSnap(),
-        viewportWidth: api.rootNode().getBoundingClientRect().width,
-        firstThreeSlideWidths: api.slideNodes().slice(0, 3).map(n => n.getBoundingClientRect().width)
-      });
-    };
-    logDebugInfo();
-    api.on("select", logDebugInfo);
-    api.on("reInit", logDebugInfo);
   }, [api]);
 
   if (!customImages || customImages.length === 0) return null;
@@ -151,7 +136,7 @@ export function Reviews({ customImages }: { customImages?: Array<{ url: string; 
         </div>
 
         {/* Pagination Dots */}
-        <div className={`flex justify-center items-center gap-2.5 mt-10 transition-all duration-[1000ms] ease-out delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+        <div dir="ltr" className={`flex justify-center items-center gap-2.5 mt-10 transition-all duration-[1000ms] ease-out delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           {scrollSnaps.map((_, index) => (
             <button
               key={index}

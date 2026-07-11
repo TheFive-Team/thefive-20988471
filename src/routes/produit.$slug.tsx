@@ -7,7 +7,6 @@ import { formatMoney, getOptimizedShopifyImage, getLocalSrcSet } from "@/lib/sho
 import { MobileImageGallery } from "@/components/MobileImageGallery";
 import { CodForm } from "@/components/CodForm";
 import { WhyChooseUs } from "@/components/WhyChooseUs";
-import { UrgencySignals } from "@/components/UrgencySignals";
 
 const Reviews = lazy(() => import("@/components/Reviews").then(m => ({ default: m.Reviews })));
 const StickyCheckoutBar = lazy(() => import("@/components/StickyCheckoutBar").then(m => ({ default: m.StickyCheckoutBar })));
@@ -181,13 +180,6 @@ function ProductPage() {
                 );
               })()}
             </div>
-            
-            <UrgencySignals 
-              scarcityConfig={(p as any).scarcityConfig} 
-              totalStock={totalStock} 
-              basePrice={basePrice} 
-              comparePrice={comparePrice} 
-            />
           </div>
         </div>
 
@@ -283,13 +275,6 @@ function ProductPage() {
                 );
               })()}
             </div>
-            
-            <UrgencySignals 
-              scarcityConfig={(p as any).scarcityConfig} 
-              totalStock={totalStock} 
-              basePrice={basePrice} 
-              comparePrice={comparePrice} 
-            />
           </div>
 
           {/* 8 & 9: Size / Quantity / COD Form */}

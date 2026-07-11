@@ -70,8 +70,9 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
                     src={img.url.endsWith("-800w.webp") ? img.url.replace("-800w.webp", "-160w.webp") : getOptimizedShopifyImage(img.url, 200)} 
                     alt={`Thumbnail ${idx + 1}`} 
                     className="w-full h-auto object-cover aspect-[4/5]" 
-                    loading="lazy" 
-                    decoding="async" 
+                    loading={idx === 0 ? "eager" : "lazy"}
+                    decoding={idx === 0 ? "sync" : "async"}
+                    fetchPriority={idx === 0 ? "high" : "auto"}
                     width={200}
                     height={250}
                   />

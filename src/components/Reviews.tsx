@@ -91,32 +91,33 @@ export function Reviews({ customImages }: { customImages?: Array<{ url: string; 
         </div>
 
         {/* Carousel */}
-        <div className={`relative w-full max-w-5xl mx-auto group transition-all duration-[1000ms] ease-out delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div dir="ltr" className={`relative w-full max-w-5xl mx-auto group transition-all duration-[1000ms] ease-out delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <Carousel
             setApi={setApi}
             opts={{
-              align: "center",
-              containScroll: "trimSnaps",
-              loop: false,
+              align: "start",
+              loop: true,
               dragFree: false,
               skipSnaps: false,
-              direction: "rtl"
+              containScroll: false,
+              direction: "ltr",
+              duration: 32
             }}
             className="w-full overflow-hidden"
           >
-            <CarouselContent className="ml-0 -mr-4 md:-mr-5 flex flex-row w-full">
+            <CarouselContent className="-ml-4 md:-ml-5 flex flex-row w-full">
               {reviewImages.map((imgObj, i) => {
                 const isActive = current === i;
                 return (
                   <CarouselItem 
                     key={imgObj.url || `review-${i}`} 
-                    className="pl-0 pr-4 md:pr-5 min-w-0 shrink-0 grow-0 basis-[88%] sm:basis-[75%] md:basis-[60%] lg:basis-[50%]"
+                    className="pl-4 md:pl-5 min-w-0 shrink-0 grow-0 basis-[88%] sm:basis-[75%] md:basis-[60%] lg:basis-[50%]"
                   >
                     <div 
-                      className={`w-full bg-white rounded-[24px] p-[12px] transition-all duration-[300ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] ${
+                      className={`w-full bg-white rounded-[24px] p-[12px] transition-all duration-[400ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] ${
                         isActive 
                           ? "scale-100 opacity-100 shadow-[0_12px_35px_rgba(16,42,67,0.08)]" 
-                          : "scale-[0.94] opacity-60 shadow-none"
+                          : "scale-[0.94] opacity-65 shadow-none"
                       }`}
                     >
                       <img 

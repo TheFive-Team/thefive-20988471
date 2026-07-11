@@ -40,8 +40,11 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      const startTime = performance.now();
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
+      const duration = (performance.now() - startTime).toFixed(2);
+      console.log(`[TTFB] Total SSR response generation for ${request.url}: ${duration}ms`);
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
       console.error(error);

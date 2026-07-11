@@ -51,9 +51,12 @@ export async function fetchProducts(query?: string, first = 50): Promise<Shopify
 }
 
 export async function fetchProductByHandle(handle: string): Promise<ShopifyProduct | null> {
+  const t0 = performance.now();
   try {
     const products = productsData as ShopifyProduct[];
-    return products.find(p => p.node.handle === handle) || null;
+    const result = products.find(p => p.node.handle === handle) || null;
+    console.log(`[TTFB] JSON Lookup for ${handle}: ${(performance.now() - t0).toFixed(2)}ms`);
+    return result;
   } catch (err) {
     console.error("Error fetching local product", err);
     return null;

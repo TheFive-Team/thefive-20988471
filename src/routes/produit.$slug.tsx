@@ -16,7 +16,11 @@ import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
 
 export const Route = createFileRoute("/produit/$slug")({
   loader: async ({ context, params }) => {
-    return context.queryClient.ensureQueryData(productQueryOptions(params.slug));
+    const t0 = performance.now();
+    const data = await context.queryClient.ensureQueryData(productQueryOptions(params.slug));
+    const duration = (performance.now() - t0).toFixed(2);
+    console.log(`[TTFB] Loader execution for ${params.slug}: ${duration}ms (Includes JSON parse & lookup)`);
+    return data;
   },
   head: ({ loaderData, params }) => {
     const images = (loaderData as any)?.node?.images?.edges?.map((e: any) => e.node) ?? [];

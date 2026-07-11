@@ -76,7 +76,7 @@ export function WhyChooseUs() {
             <div className="w-1.5 h-1.5 rotate-45 bg-[#C9A34E]"></div>
             <div className="w-8 sm:w-10 h-[1px] bg-[#C9A34E]/60"></div>
           </div>
-          <span className="uppercase text-[16px] sm:text-[18px] font-semibold text-[#C9A34E] tracking-[0.35em] text-center mb-[18px] ml-[0.35em]">
+          <span className="font-serif uppercase font-medium text-[22px] sm:text-[26px] text-[#C9A34E] tracking-[0.2em] text-center mb-[18px] ml-[0.2em]">
             THE FIVE A
           </span>
           <h2 className="font-serif text-[36px] sm:text-[42px] font-bold text-[#102A43] text-center leading-[1.15] mb-[16px]">

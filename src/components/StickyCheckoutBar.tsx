@@ -6,18 +6,19 @@ export function StickyCheckoutBar({ price }: { price?: ShopifyMoney }) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      // Show sticky bar after scrolling past the form
-      const formEl = document.getElementById("checkout-form");
-      if (formEl) {
-        const rect = formEl.getBoundingClientRect();
-        // If the form is above the viewport (scrolled past it)
-        setIsVisible(rect.bottom < 0);
-      }
-    };
+    const formEl = document.getElementById("checkout-form");
+    if (!formEl) return;
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Show sticky bar only if we have scrolled past the form (form is completely above viewport)
+        setIsVisible(!entry.isIntersecting && entry.boundingClientRect.bottom < 0);
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(formEl);
+    return () => observer.disconnect();
   }, []);
 
   const scrollToCheckout = () => {

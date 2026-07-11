@@ -69,14 +69,17 @@ export function WhyChooseUs() {
     >
       <div className="max-w-2xl mx-auto flex flex-col items-center">
         
-        {/* Header */}
-        <div className="flex flex-col items-center mb-10 w-full">
-          <div className="w-10 h-1 bg-[#D7AE57] rounded-full mb-5 opacity-80"></div>
-          <h2 className="font-serif text-[28px] sm:text-[32px] font-bold text-[#102A43] mb-3 text-center leading-tight tracking-tight">
-            تسوّق بثقة مع The Five A
+        {/* Editorial Header */}
+        <div className={`flex flex-col items-center w-full pt-[36px] mb-[28px] transition-all duration-[350ms] ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className="w-8 h-[1px] bg-[#C9A34E] mb-[10px]"></div>
+          <span className="uppercase text-[11px] sm:text-[12px] font-semibold text-[#C9A34E] tracking-[0.28em] text-center mb-[12px] ml-[0.28em]">
+            THE FIVE A
+          </span>
+          <h2 className="font-serif text-[30px] sm:text-[34px] font-semibold text-[#102A43] text-center leading-tight mb-[14px]">
+            تسوّق بثقة
           </h2>
-          <p className="text-[14px] sm:text-[15px] font-medium text-[#7D7D7D] text-center max-w-[340px] sm:max-w-[420px] leading-relaxed">
-            نهتم بكل تفصيل لنمنحك تجربة شراء مريحة ومنتجًا بجودة تستحق ثقتك.
+          <p className="text-[13px] sm:text-[14px] text-[#6B7280] text-center leading-[1.8] max-w-[300px]">
+            نختار كل تفصيل بعناية لنمنحك تجربة شراء راقية ومنتجًا بجودة تستحق ثقتك.
           </p>
         </div>
 

@@ -135,7 +135,8 @@ function ProductPage() {
           </div>
 
           {/* 2. Text Details below gallery */}
-          <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 mb-6 mx-4 w-auto max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px] box-border">
+          <div className="mb-6 mx-4 w-auto max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px] box-border">
+            <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-[24px_20px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 w-full max-w-full min-w-0 m-0 box-border overflow-hidden">
             
             {/* Collection Label */}
             <div className="mb-2">
@@ -186,6 +187,7 @@ function ProductPage() {
                 );
               })()}
             </div>
+          </div>
           </div>
         </div>
 

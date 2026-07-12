@@ -25,24 +25,24 @@ export function WhyChooseUs() {
 
   const features = [
     {
-      icon: <ShieldCheck className="w-[28px] h-[28px] text-[#C9A34A]" strokeWidth={1.5} />,
+      icon: <ShieldCheck className="w-[32px] h-[32px] text-[#C9A34A]" strokeWidth={1.5} />,
       title: "ضمان الجودة",
       desc: "خامات مختارة بعناية",
     },
     {
-      icon: <Banknote className="w-[28px] h-[28px] text-[#C9A34A]" strokeWidth={1.5} />,
+      icon: <Banknote className="w-[32px] h-[32px] text-[#C9A34A]" strokeWidth={1.5} />,
       title: "الدفع عند الاستلام",
       desc: "ادفع فقط عند وصول طلبك",
     },
     {
-      icon: <RotateCcw className="w-[28px] h-[28px] text-[#C9A34A]" strokeWidth={1.5} />,
-      title: "استبدال وإرجاع",
-      desc: "خدمة سهلة عند الحاجة",
-    },
-    {
-      icon: <Truck className="w-[28px] h-[28px] text-[#C9A34A]" strokeWidth={1.5} />,
+      icon: <Truck className="w-[32px] h-[32px] text-[#C9A34A]" strokeWidth={1.5} />,
       title: "توصيل سريع",
       desc: "إلى جميع ولايات الجزائر",
+    },
+    {
+      icon: <RotateCcw className="w-[32px] h-[32px] text-[#C9A34A]" strokeWidth={1.5} />,
+      title: "استبدال وإرجاع",
+      desc: "خدمة سهلة عند الحاجة",
     },
   ];
 
@@ -57,16 +57,16 @@ export function WhyChooseUs() {
           {features.map((feature, idx) => (
             <div 
               key={idx} 
-              className={`bg-[#FFFDF8] rounded-[16px] border border-[#E8E0D2] p-4 sm:p-5 flex flex-col items-center text-center justify-start shadow-[0_2px_8px_rgba(16,42,67,0.03)] transition-all duration-500 ease-out hover:shadow-[0_4px_12px_rgba(16,42,67,0.06)] ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+              className={`bg-[#FFFDF8] rounded-[18px] border border-[#E9DDC8] p-[22px] min-h-[156px] flex flex-col items-center text-center justify-start shadow-[0_2px_8px_rgba(16,42,67,0.02)] transition-all duration-300 ease-out md:hover:-translate-y-[3px] md:hover:shadow-[0_6px_20px_rgba(16,42,67,0.05)] ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
               style={{ transitionDelay: `${idx * 75}ms` }}
             >
-              <div className="w-[48px] h-[48px] rounded-full bg-[#F8F5EF] flex items-center justify-center mb-3 border border-[#E8E0D2]/40 shrink-0">
+              <div className="w-[56px] h-[56px] rounded-full bg-[#F8F5EF] flex items-center justify-center mb-3.5 border border-[#C9A34A]/30 shrink-0">
                 {feature.icon}
               </div>
-              <h3 className="font-serif text-[14px] font-bold text-[#102A43] mb-1.5 leading-tight">
+              <h3 className="font-sans text-[18px] font-bold text-[#102A43] mb-1.5 tracking-normal leading-[1.25]">
                 {feature.title}
               </h3>
-              <p className="font-sans text-[11.5px] sm:text-[12px] font-medium text-[#7D7D7D] leading-[1.4] line-clamp-2">
+              <p className="font-sans text-[13px] font-medium text-[#6E6E6E] leading-[1.45] line-clamp-2">
                 {feature.desc}
               </p>
             </div>

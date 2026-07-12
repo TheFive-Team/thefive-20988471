@@ -135,7 +135,7 @@ function ProductPage() {
           </div>
 
           {/* 2. Text Details below gallery */}
-          <div className="flex flex-col items-center text-center bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 w-full mb-3">
+          <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 w-full mb-3">
             
             {/* Collection Label */}
             <div className="mb-2">
@@ -145,7 +145,7 @@ function ProductPage() {
             </div>
             
             {/* Product Name */}
-            <h1 className="font-serif font-bold text-[#1A2530] text-[22px] sm:text-2xl leading-[1.25] text-center line-clamp-2 drop-shadow-sm mb-2 w-full" dir="ltr">
+            <h1 className="font-serif font-bold text-[#1A2530] text-[22px] sm:text-2xl leading-[1.25] text-left line-clamp-2 drop-shadow-sm mb-2 w-full" dir="ltr">
               {p.title}
             </h1>
             
@@ -158,7 +158,7 @@ function ProductPage() {
             </div>
             
             {/* Price Row */}
-            <div className="flex items-center justify-center w-full">
+            <div className="flex items-center w-full">
               {(() => {
                 const currentPrice = offers[0]?.price;
                 const compPrice = offers[0]?.comparePrice;
@@ -230,7 +230,7 @@ function ProductPage() {
         <div className="mt-2 md:mt-0">
           
           {/* Desktop Only Details (Hidden on Mobile) */}
-          <div className="hidden md:flex flex-col items-center text-center mb-4 bg-[#FCFCFC] rounded-[22px] p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80">
+          <div className="hidden md:block mb-4 bg-[#FCFCFC] rounded-[22px] p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80">
             
             {/* Collection Label */}
             <div className="mb-2">
@@ -240,7 +240,7 @@ function ProductPage() {
             </div>
             
             {/* Product Name */}
-            <h1 className="font-serif font-bold text-[#1A2530] text-3xl md:text-4xl leading-[1.2] text-center line-clamp-2 drop-shadow-sm mb-3 w-full" dir="ltr">
+            <h1 className="font-serif font-bold text-[#1A2530] text-3xl md:text-4xl leading-[1.2] text-left line-clamp-2 drop-shadow-sm mb-3 w-full" dir="ltr">
               {p.title}
             </h1>
             
@@ -253,7 +253,7 @@ function ProductPage() {
             </div>
             
             {/* Price Row */}
-            <div className="flex items-center justify-center w-full">
+            <div className="flex items-center w-full">
               {(() => {
                 const currentPrice = offers[0]?.price;
                 const comparePrice = offers[0]?.comparePrice;

@@ -314,16 +314,15 @@ function ProductPage() {
       {p.detailImages?.edges && p.detailImages.edges.length > 0 && (
         <section className="mx-4 w-auto max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px] flex flex-col items-center justify-center mt-6 mb-6 space-y-4 box-border">
           {p.detailImages.edges.map((e, idx) => (
-            <div key={idx} className="w-full aspect-[1/1] rounded-[18px] overflow-hidden box-border">
+            <div key={idx} className="w-full rounded-[18px] overflow-hidden box-border bg-transparent">
               <img 
                 src={getOptimizedShopifyImage(e.node.url, 800)} 
                 srcSet={getLocalSrcSet(e.node.url) || `${getOptimizedShopifyImage(e.node.url, 400)} 400w, ${getOptimizedShopifyImage(e.node.url, 800)} 800w`}
                 sizes="(max-width: 520px) 100vw, 520px"
                 alt={e.node.altText || `${p.title} detail view ${idx + 1}`} 
-                className="w-full h-full block object-cover object-center" 
+                className="w-full h-auto block object-contain object-center aspect-auto" 
                 loading="lazy"
                 decoding="async"
-                width={800} height={800}
               />
             </div>
           ))}

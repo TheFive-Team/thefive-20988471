@@ -526,9 +526,9 @@ export function CodForm({
             )}
           </button>
           <div className="mt-3.5 w-full">
-             <div className="flex items-center justify-center gap-[6px] bg-[#F9F6EF] border border-[#E9DDC8] rounded-full py-[8px] px-[12px] w-full max-w-none shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-               <span className="text-[14px] leading-none shrink-0">🛡️</span>
-               <span className="text-[13.5px] font-semibold text-[#102A43] leading-[1.3] max-[339px]:whitespace-normal whitespace-nowrap">
+             <div className="flex items-center justify-center gap-[8px] bg-[#F9F6EF] border border-[#E9DDC8] rounded-full py-[8px] px-[12px] w-full max-w-none shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+               <ShieldCheck className="w-[18px] h-[18px] text-[#C9A34A] shrink-0" strokeWidth={1.8} />
+               <span className="text-[14px] font-semibold text-[#102A43] leading-[1.3] max-[339px]:whitespace-normal whitespace-nowrap">
                  الاستبدال والإرجاع متاح لضمان تجربة تسوق مريحة.
                </span>
              </div>

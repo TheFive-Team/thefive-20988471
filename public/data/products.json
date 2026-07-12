@@ -137,7 +137,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17837181736130",
+              "id": "gid://shopify/ProductVariant/17838798333780",
               "title": "6",
               "availableForSale": true,
               "quantityAvailable": 1,
@@ -159,7 +159,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17837181736131",
+              "id": "gid://shopify/ProductVariant/17838798333781",
               "title": "8",
               "availableForSale": true,
               "quantityAvailable": 1,
@@ -181,7 +181,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17837181736132",
+              "id": "gid://shopify/ProductVariant/17838798333782",
               "title": "10",
               "availableForSale": true,
               "quantityAvailable": 1,
@@ -203,7 +203,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17837181736133",
+              "id": "gid://shopify/ProductVariant/17838798333783",
               "title": "12",
               "availableForSale": true,
               "quantityAvailable": 1,
@@ -241,14 +241,14 @@
         "enabled": true,
         "quantityRequired": 2,
         "discountType": "fixed",
-        "discountValue": 0,
-        "badgeText": "free",
+        "discountValue": 500,
+        "badgeText": "ًالشحن مجانا",
         "maxQuantity": 3
       },
       "scarcityConfig": {
         "enableLowStockWarning": true,
         "enableDiscountMessage": true,
-        "featuredLabelText": "",
+        "featuredLabelText": "ًالشحن مجانا",
         "enableFastShipping": true,
         "enableSizeScarcity": true,
         "sizeLowStockThreshold": 3

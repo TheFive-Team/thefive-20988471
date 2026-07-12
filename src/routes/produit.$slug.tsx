@@ -130,12 +130,12 @@ function ProductPage() {
         <div className="block md:hidden mb-6">
           
           {/* 1. Gallery (Mobile) */}
-          <div className="mb-5 w-[calc(100%-32px)] max-w-[520px] mx-auto box-border">
+          <div className="mb-5 mx-4 w-auto max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px]">
             <MobileImageGallery images={images} />
           </div>
 
           {/* 2. Text Details below gallery */}
-          <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 mb-6 w-[calc(100%-32px)] max-w-[520px] mx-auto box-border">
+          <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 mb-6 mx-4 w-auto max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px] box-border">
             
             {/* Collection Label */}
             <div className="mb-2">
@@ -284,7 +284,7 @@ function ProductPage() {
           </div>
 
           {/* 8 & 9: Size / Quantity / COD Form */}
-          <div className="mb-8 w-[calc(100%-32px)] max-w-[520px] mx-auto box-border relative z-10">
+          <div className="mb-8 mx-4 w-auto max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px] relative z-10 box-border">
             <CodForm 
               productName={p?.title}
               offers={offers}
@@ -310,9 +310,9 @@ function ProductPage() {
 
       {/* Middle Detail Images */}
       {p.detailImages?.edges && p.detailImages.edges.length > 0 && (
-        <section className="w-[calc(100%-32px)] max-w-[520px] mx-auto flex flex-col items-center justify-center mt-6 mb-6 space-y-4 box-border">
+        <section className="mx-4 w-auto max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px] flex flex-col items-center justify-center mt-6 mb-6 space-y-4 box-border">
           {p.detailImages.edges.map((e, idx) => (
-            <div key={idx} className="w-full aspect-square rounded-[18px] overflow-hidden bg-[#F8F5EF] box-border">
+            <div key={idx} className="w-full aspect-[1/1] rounded-[18px] overflow-hidden box-border">
               <img 
                 src={getOptimizedShopifyImage(e.node.url, 800)} 
                 srcSet={getLocalSrcSet(e.node.url) || `${getOptimizedShopifyImage(e.node.url, 400)} 400w, ${getOptimizedShopifyImage(e.node.url, 800)} 800w`}

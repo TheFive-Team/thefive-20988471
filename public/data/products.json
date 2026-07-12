@@ -29,31 +29,31 @@
         "edges": [
           {
             "node": {
-              "url": "/images/product-gallery-1783894122320-13-800w.webp",
+              "url": "/images/product-gallery-1783896006120-13-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-gallery-1783894135092-14-800w.webp",
+              "url": "/images/product-gallery-1783896010708-14-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-gallery-1783894147232-15-800w.webp",
+              "url": "/images/product-gallery-1783896015125-15-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-gallery-1783894158497-16-800w.webp",
+              "url": "/images/product-gallery-1783896023042-16-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-gallery-1783894168985-17-800w.webp",
+              "url": "/images/product-gallery-1783896027227-17-800w.webp",
               "altText": null
             }
           }
@@ -149,10 +149,10 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17838941875910",
+              "id": "gid://shopify/ProductVariant/17838960359930",
               "title": "6",
               "availableForSale": true,
-              "quantityAvailable": 20,
+              "quantityAvailable": 1,
               "price": {
                 "amount": "5900.0",
                 "currencyCode": "DZD"
@@ -171,10 +171,10 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17838941875911",
+              "id": "gid://shopify/ProductVariant/17838960359931",
               "title": "8",
               "availableForSale": true,
-              "quantityAvailable": 20,
+              "quantityAvailable": 1,
               "price": {
                 "amount": "5900.0",
                 "currencyCode": "DZD"
@@ -193,10 +193,10 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17838941875912",
+              "id": "gid://shopify/ProductVariant/17838960359932",
               "title": "10",
               "availableForSale": true,
-              "quantityAvailable": 20,
+              "quantityAvailable": 1,
               "price": {
                 "amount": "5900.0",
                 "currencyCode": "DZD"
@@ -215,10 +215,10 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17838941875913",
+              "id": "gid://shopify/ProductVariant/17838960359933",
               "title": "12",
               "availableForSale": true,
-              "quantityAvailable": 20,
+              "quantityAvailable": 1,
               "price": {
                 "amount": "5900.0",
                 "currencyCode": "DZD"

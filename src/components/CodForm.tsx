@@ -525,8 +525,13 @@ export function CodForm({
               <span className="text-[15px] font-bold tracking-wide">اطلب الآن · الدفع عند الاستلام</span>
             )}
           </button>
-          <div className="mt-2.5 flex justify-center text-center">
-             <span className="text-[11.5px] font-medium text-[#7A7A7A]">🛡️ استبدال وإرجاع متاح لضمان تجربة تسوق مريحة.</span>
+          <div className="mt-3.5 flex justify-center">
+             <div className="flex items-center gap-2 bg-[#F9F6EF] border border-[#E9DDC8] rounded-full py-[10px] px-[16px] w-fit shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+               <ShieldCheck className="w-4 h-4 text-[#102A43] shrink-0" strokeWidth={2.5} />
+               <span className="text-[14.5px] font-semibold text-[#102A43]">
+                 الاستبدال والإرجاع متاح لضمان تجربة تسوق مريحة.
+               </span>
+             </div>
           </div>
         </div>
       </form>

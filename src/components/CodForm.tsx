@@ -243,16 +243,16 @@ export function CodForm({
         
         {/* Section 1: Quantity */}
         <section className="animate-in fade-in duration-500">
-          <div className="flex items-center justify-between mb-[10px]">
-            <div className="flex flex-col">
-              <h3 className="text-[17px] font-bold text-[#102A43] flex items-center gap-2.5">
+          <div className="flex flex-col items-center justify-center gap-3 mb-[10px]">
+            <div className="flex flex-col items-center text-center">
+              <h3 className="text-[17px] font-bold text-[#102A43] flex items-center justify-center gap-2.5">
                 <span className="flex items-center justify-center w-[22px] h-[22px] rounded-full bg-[#102A43] text-[#D7AE57] font-serif text-[12px] pt-[1px]">1</span>
                 الكمية
               </h3>
-              <p className="text-[11px] sm:text-[12px] font-medium text-[#9A9A9A] mt-1 mr-8">اختر عدد القطع التي تحتاجها</p>
+              <p className="text-[11px] sm:text-[12px] font-medium text-[#9A9A9A] mt-1">اختر عدد القطع التي تحتاجها</p>
             </div>
             
-            <div className="flex items-center gap-[14px]">
+            <div className="flex items-center justify-center gap-[14px]">
               <button type="button" onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-[36px] h-[36px] rounded-full bg-[#FFFFFF] border border-[#D8DDE3] flex items-center justify-center text-xl font-medium text-[#617080] hover:bg-slate-50 transition-all duration-300 active:scale-[0.98]">-</button>
               <span className="text-[18px] font-bold text-[#0B1F33] w-4 text-center">{quantity}</span>
               <button type="button" onClick={() => setQuantity(q => Math.min(maxQty, q + 1))} className="w-[36px] h-[36px] rounded-full bg-[#102A43] text-[#D7AE57] flex items-center justify-center text-xl font-medium hover:bg-[#102A43]/90 transition-all duration-300 active:scale-[0.98]">+</button>
@@ -265,22 +265,22 @@ export function CodForm({
         {variants.length > 1 && (
           <>
             <section id="size-selector" className="animate-in fade-in slide-in-from-top-4 duration-500">
-              <div className="flex flex-col mb-[10px]">
-                <h3 className="text-[17px] font-bold text-[#102A43] flex items-center gap-2.5">
+              <div className="flex flex-col items-center text-center mb-[10px]">
+                <h3 className="text-[17px] font-bold text-[#102A43] flex items-center justify-center gap-2.5">
                   <span className="flex items-center justify-center w-[22px] h-[22px] rounded-full bg-[#102A43] text-[#D7AE57] font-serif text-[12px] pt-[1px]">2</span>
                   {quantity === 1 ? 'المقاس' : 'المقاسات'}
                   {sizeError && <span className="text-[#B94A48] normal-case font-bold text-[10px] mr-2 animate-pulse">* يرجى الاختيار</span>}
                 </h3>
-                <p className="text-[11px] sm:text-[12px] font-medium text-[#9A9A9A] mt-1 mr-8">اختر المقاس المناسب لكل قطعة</p>
+                <p className="text-[11px] sm:text-[12px] font-medium text-[#9A9A9A] mt-1">اختر المقاس المناسب لكل قطعة</p>
               </div>
               
-              <div className="space-y-4 pr-8">
+              <div className="space-y-4">
                 {Array.from({ length: quantity }).map((_, pieceIndex) => (
-                  <div key={pieceIndex} className="flex flex-col gap-2 animate-in fade-in duration-300">
+                  <div key={pieceIndex} className="flex flex-col items-center text-center gap-2 animate-in fade-in duration-300">
                     {quantity > 1 && (
-                      <p className="font-bold text-[11px] text-[#9A9A9A] pr-1">القطعة {pieceIndex + 1}</p>
+                      <p className="font-bold text-[11px] text-[#9A9A9A]">القطعة {pieceIndex + 1}</p>
                     )}
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap items-center justify-center gap-2">
                       {variants.map((v: any) => {
                         const isAvailable = isVariantAvailable(v.node, pieceIndex);
                         const isSelected = selectedSizes[pieceIndex] === v.node.id;
@@ -322,14 +322,14 @@ export function CodForm({
 
         {/* Section 3: Customer Info */}
         <section className="animate-in fade-in slide-in-from-top-4 duration-500">
-          <div className="flex flex-col mb-[10px]">
-            <h3 className="text-[17px] font-bold text-[#102A43] flex items-center gap-2.5">
+          <div className="flex flex-col items-center text-center mb-[10px]">
+            <h3 className="text-[17px] font-bold text-[#102A43] flex items-center justify-center gap-2.5">
               <span className="flex items-center justify-center w-[22px] h-[22px] rounded-full bg-[#102A43] text-[#D7AE57] font-serif text-[12px] pt-[1px]">
                  {variants.length > 1 ? '3' : '2'}
               </span>
               معلومات العميل
             </h3>
-            <p className="text-[11px] sm:text-[12px] font-medium text-[#9A9A9A] mt-1 mr-8">سنستخدمها فقط لتأكيد الطلب</p>
+            <p className="text-[11px] sm:text-[12px] font-medium text-[#9A9A9A] mt-1">سنستخدمها فقط لتأكيد الطلب</p>
           </div>
           
           <div className="grid grid-cols-2 gap-[10px] pr-8">
@@ -388,15 +388,15 @@ export function CodForm({
         {/* Section 4: Delivery */}
         <section id="shipping-method" className="animate-in fade-in slide-in-from-top-4 duration-500">
           <div className="h-px bg-[#EEE8DE] my-[22px]"></div>
-          <div className="flex flex-col mb-[10px]">
-            <h3 className="text-[17px] font-bold text-[#102A43] flex items-center gap-2.5">
+          <div className="flex flex-col items-center text-center mb-[10px]">
+            <h3 className="text-[17px] font-bold text-[#102A43] flex items-center justify-center gap-2.5">
               <span className="flex items-center justify-center w-[22px] h-[22px] rounded-full bg-[#102A43] text-[#D7AE57] font-serif text-[12px] pt-[1px]">
                  {variants.length > 1 ? '4' : '3'}
               </span>
               طريقة التوصيل
               {shippingError && <span className="text-[#B94A48] normal-case font-bold text-[10px] mr-2 animate-pulse">* يرجى الاختيار</span>}
             </h3>
-            <p className="text-[11px] sm:text-[12px] font-medium text-[#9A9A9A] mt-1 mr-8">اختر طريقة التوصيل المفضلة</p>
+            <p className="text-[11px] sm:text-[12px] font-medium text-[#9A9A9A] mt-1">اختر طريقة التوصيل المفضلة</p>
           </div>
           
           <div className="grid grid-cols-2 gap-[10px] pr-8">
@@ -432,8 +432,8 @@ export function CodForm({
 
         {/* Section 5: Order Summary */}
         <section className="animate-in fade-in slide-in-from-top-4 duration-500 bg-[#FBF8F2] border border-[#E8E0D2] rounded-[14px] p-[14px] mt-4">
-          <div className="flex flex-col mb-[10px]">
-            <h3 className="text-[17px] font-bold text-[#102A43] flex items-center gap-2.5">
+          <div className="flex flex-col items-center text-center mb-[10px]">
+            <h3 className="text-[17px] font-bold text-[#102A43] flex items-center justify-center gap-2.5">
               <span className="flex items-center justify-center w-[22px] h-[22px] rounded-full bg-[#102A43] text-[#D7AE57] font-serif text-[12px] pt-[1px]">
                  {variants.length > 1 ? '5' : '4'}
               </span>

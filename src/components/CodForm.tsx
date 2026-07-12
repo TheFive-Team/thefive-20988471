@@ -230,7 +230,7 @@ export function CodForm({
   const labelClasses = "block text-[12px] font-semibold text-[#20364B] mb-[5px] tracking-wide";
 
   return (
-    <div className="bg-[#FFFDF8] rounded-[20px] shadow-[0_8px_24px_rgba(13,35,56,0.06)] border border-[#E8E0D2] px-4 py-[18px] sm:p-6 font-arabic transition-all duration-500" id="checkout-form" dir="rtl" style={{ width: '100%', maxWidth: '100%', minWidth: 0, marginInline: 'auto', boxSizing: 'border-box' }}>
+    <div className="bg-[#FFFDF8] rounded-[20px] shadow-[0_8px_24px_rgba(13,35,56,0.06)] border border-[#E8E0D2] p-[20px_16px] sm:p-6 font-arabic transition-all duration-500 w-full box-border overflow-hidden" id="checkout-form" dir="rtl">
       
       {formError && (
         <div className="mb-[22px] p-4 bg-[#B94A48]/10 border border-[#B94A48]/20 rounded-xl flex items-center gap-2 text-[#B94A48] text-xs sm:text-sm font-bold animate-in fade-in">
@@ -332,7 +332,7 @@ export function CodForm({
             <p className="text-[11px] sm:text-[12px] font-medium text-[#9A9A9A] mt-1 mr-8">سنستخدمها فقط لتأكيد الطلب</p>
           </div>
           
-          <div className="grid grid-cols-2 gap-[10px] pr-8">
+          <div className="grid grid-cols-1 min-[380px]:grid-cols-2 gap-[10px] pr-8">
             <div>
               <label htmlFor="fullname" className={labelClasses}>الاسم الكامل</label>
               <input 
@@ -399,7 +399,7 @@ export function CodForm({
             <p className="text-[11px] sm:text-[12px] font-medium text-[#9A9A9A] mt-1 mr-8">اختر طريقة التوصيل المفضلة</p>
           </div>
           
-          <div className="grid grid-cols-2 gap-[10px] pr-8">
+          <div className="grid grid-cols-1 min-[380px]:grid-cols-2 gap-[10px] pr-8">
             <label className={`relative flex items-center px-4 h-[52px] border rounded-[11px] cursor-pointer transition-all duration-300 min-w-0 ${form.shippingMethod === 'home' ? 'border-[#D7AE57] border-[1.5px] bg-[#FFF8E8]' : 'border-[#DDE2E7] hover:bg-slate-50 bg-[#FFFFFF]'}`}>
               <input type="radio" name="shippingMethod" value="home" checked={form.shippingMethod === 'home'} onChange={() => { setForm({...form, shippingMethod: 'home'}); setShippingError(false); }} className="sr-only" />
               <div className="flex items-center gap-3 w-full min-w-0">

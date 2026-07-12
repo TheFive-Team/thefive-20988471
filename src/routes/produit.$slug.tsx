@@ -130,12 +130,12 @@ function ProductPage() {
         <div className="block md:hidden mb-6">
           
           {/* 1. Gallery (Mobile) */}
-          <div className="mb-5 sm:-mx-6">
+          <div className="mb-5 w-[calc(100%-32px)] max-w-[520px] mx-auto box-border">
             <MobileImageGallery images={images} />
           </div>
 
           {/* 2. Text Details below gallery */}
-          <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 mb-3 w-auto mx-4 sm:mx-auto max-w-[480px] min-w-0 box-border">
+          <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 mb-6 w-[calc(100%-32px)] max-w-[520px] mx-auto box-border">
             
             {/* Collection Label */}
             <div className="mb-2">
@@ -284,7 +284,7 @@ function ProductPage() {
           </div>
 
           {/* 8 & 9: Size / Quantity / COD Form */}
-          <div className="w-auto mx-4 sm:mx-auto max-w-[480px] min-w-0 box-border">
+          <div className="mb-8 w-[calc(100%-32px)] max-w-[520px] mx-auto box-border relative z-10">
             <CodForm 
               productName={p?.title}
               offers={offers}
@@ -310,19 +310,20 @@ function ProductPage() {
 
       {/* Middle Detail Images */}
       {p.detailImages?.edges && p.detailImages.edges.length > 0 && (
-        <section className="w-full flex flex-col items-center justify-center mt-16 space-y-4">
+        <section className="w-[calc(100%-32px)] max-w-[520px] mx-auto flex flex-col items-center justify-center mt-6 mb-6 space-y-4 box-border">
           {p.detailImages.edges.map((e, idx) => (
-            <img 
-              key={idx} 
-              src={getOptimizedShopifyImage(e.node.url, 800)} 
-              srcSet={getLocalSrcSet(e.node.url) || `${getOptimizedShopifyImage(e.node.url, 400)} 400w, ${getOptimizedShopifyImage(e.node.url, 800)} 800w`}
-              sizes="100vw"
-              alt={e.node.altText || `${p.title} detail view ${idx + 1}`} 
-              className="w-full max-w-2xl h-auto object-cover rounded-2xl shadow-md" 
-              loading="lazy"
-              decoding="async"
-              width={800} height={1000}
-            />
+            <div key={idx} className="w-full aspect-square rounded-[18px] overflow-hidden bg-[#F8F5EF] box-border">
+              <img 
+                src={getOptimizedShopifyImage(e.node.url, 800)} 
+                srcSet={getLocalSrcSet(e.node.url) || `${getOptimizedShopifyImage(e.node.url, 400)} 400w, ${getOptimizedShopifyImage(e.node.url, 800)} 800w`}
+                sizes="(max-width: 520px) 100vw, 520px"
+                alt={e.node.altText || `${p.title} detail view ${idx + 1}`} 
+                className="w-full h-full block object-cover object-center" 
+                loading="lazy"
+                decoding="async"
+                width={800} height={800}
+              />
+            </div>
           ))}
         </section>
       )}

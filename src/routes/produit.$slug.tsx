@@ -135,7 +135,8 @@ function ProductPage() {
           </div>
 
           {/* 2. Text Details below gallery */}
-          <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 w-full mb-3">
+          <div className="-mx-4 sm:mx-0">
+            <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 mb-3 w-[calc(100%-32px)] sm:w-full mx-auto box-border">
             
             {/* Collection Label */}
             <div className="mb-2">
@@ -185,6 +186,7 @@ function ProductPage() {
                   </span>
                 );
               })()}
+              </div>
             </div>
           </div>
         </div>
@@ -284,7 +286,7 @@ function ProductPage() {
           </div>
 
           {/* 8 & 9: Size / Quantity / COD Form */}
-          <div id="checkout-form" className="bg-transparent -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="bg-transparent -mx-4 sm:mx-0">
             <CodForm 
               productName={p?.title}
               offers={offers}

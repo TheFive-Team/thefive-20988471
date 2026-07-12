@@ -123,19 +123,19 @@ function ProductPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-10 sm:py-24 overflow-x-clip">
+    <div className="mx-auto max-w-7xl py-8 sm:px-10 sm:py-24 overflow-x-clip">
       <div className="grid gap-0 md:grid-cols-2 md:gap-10 lg:gap-12">
         
         {/* Mobile View: Gallery first, then Text */}
         <div className="block md:hidden mb-6">
           
           {/* 1. Gallery (Mobile) */}
-          <div className="-mx-4 sm:-mx-6 mb-5">
+          <div className="mb-5 sm:-mx-6">
             <MobileImageGallery images={images} />
           </div>
 
           {/* 2. Text Details below gallery */}
-          <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 mb-3" style={{ width: '100%', maxWidth: '100%', minWidth: 0, marginInline: 'auto', boxSizing: 'border-box' }}>
+          <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 mb-3 w-[calc(100dvw-16px)] max-w-[480px] min-w-0 mx-auto box-border">
             
             {/* Collection Label */}
             <div className="mb-2">
@@ -284,7 +284,7 @@ function ProductPage() {
           </div>
 
           {/* 8 & 9: Size / Quantity / COD Form */}
-          <div style={{ width: '100%', maxWidth: '100%', minWidth: 0, marginInline: 'auto', boxSizing: 'border-box' }}>
+          <div className="w-[calc(100dvw-16px)] max-w-[480px] min-w-0 mx-auto box-border">
             <CodForm 
               productName={p?.title}
               offers={offers}

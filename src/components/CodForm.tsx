@@ -400,28 +400,28 @@ export function CodForm({
           </div>
           
           <div className="grid grid-cols-2 gap-[10px] pr-8">
-            <label className={`relative flex items-center px-4 h-[52px] border rounded-[11px] cursor-pointer transition-all duration-300 ${form.shippingMethod === 'home' ? 'border-[#D7AE57] border-[1.5px] bg-[#FFF8E8]' : 'border-[#DDE2E7] hover:bg-slate-50 bg-[#FFFFFF]'}`}>
+            <label className={`relative flex items-center px-4 h-[52px] border rounded-[11px] cursor-pointer transition-all duration-300 min-w-0 ${form.shippingMethod === 'home' ? 'border-[#D7AE57] border-[1.5px] bg-[#FFF8E8]' : 'border-[#DDE2E7] hover:bg-slate-50 bg-[#FFFFFF]'}`}>
               <input type="radio" name="shippingMethod" value="home" checked={form.shippingMethod === 'home'} onChange={() => { setForm({...form, shippingMethod: 'home'}); setShippingError(false); }} className="sr-only" />
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full min-w-0">
                  <div className={`w-[14px] h-[14px] rounded-full border transition-colors duration-300 flex items-center justify-center shrink-0 ${form.shippingMethod === 'home' ? 'border-[#D7AE57] bg-[#D7AE57]' : 'border-[#DDE2E7] bg-white'}`}>
                     {form.shippingMethod === 'home' && <Check className="w-2.5 h-2.5 text-[#102A43]" strokeWidth={3} />}
                  </div>
-                 <div className="flex flex-col">
-                    <span className={`text-[13px] font-semibold flex items-center gap-1.5 transition-colors duration-300 ${form.shippingMethod === 'home' ? 'text-[#102A43]' : 'text-[#68737F]'}`}>
+                 <div className="flex flex-col min-w-0 overflow-hidden">
+                    <span className={`text-[13px] font-semibold flex items-center gap-1.5 transition-colors duration-300 truncate ${form.shippingMethod === 'home' ? 'text-[#102A43]' : 'text-[#68737F]'}`}>
                        توصيل للمنزل
                     </span>
                  </div>
               </div>
             </label>
 
-            <label className={`relative flex items-center px-4 h-[52px] border rounded-[11px] cursor-pointer transition-all duration-300 ${form.shippingMethod === 'stopdesk' ? 'border-[#D7AE57] border-[1.5px] bg-[#FFF8E8]' : 'border-[#DDE2E7] hover:bg-slate-50 bg-[#FFFFFF]'}`}>
+            <label className={`relative flex items-center px-4 h-[52px] border rounded-[11px] cursor-pointer transition-all duration-300 min-w-0 ${form.shippingMethod === 'stopdesk' ? 'border-[#D7AE57] border-[1.5px] bg-[#FFF8E8]' : 'border-[#DDE2E7] hover:bg-slate-50 bg-[#FFFFFF]'}`}>
               <input type="radio" name="shippingMethod" value="stopdesk" checked={form.shippingMethod === 'stopdesk'} onChange={() => { setForm({...form, shippingMethod: 'stopdesk'}); setShippingError(false); }} className="sr-only" />
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full min-w-0">
                  <div className={`w-[14px] h-[14px] rounded-full border transition-colors duration-300 flex items-center justify-center shrink-0 ${form.shippingMethod === 'stopdesk' ? 'border-[#D7AE57] bg-[#D7AE57]' : 'border-[#DDE2E7] bg-white'}`}>
                     {form.shippingMethod === 'stopdesk' && <Check className="w-2.5 h-2.5 text-[#102A43]" strokeWidth={3} />}
                  </div>
-                 <div className="flex flex-col">
-                    <span className={`text-[13px] font-semibold flex items-center gap-1.5 transition-colors duration-300 ${form.shippingMethod === 'stopdesk' ? 'text-[#102A43]' : 'text-[#68737F]'}`}>
+                 <div className="flex flex-col min-w-0 overflow-hidden">
+                    <span className={`text-[13px] font-semibold flex items-center gap-1.5 transition-colors duration-300 truncate ${form.shippingMethod === 'stopdesk' ? 'text-[#102A43]' : 'text-[#68737F]'}`}>
                        استلام من المكتب
                     </span>
                  </div>

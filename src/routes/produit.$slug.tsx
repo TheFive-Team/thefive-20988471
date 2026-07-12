@@ -123,7 +123,7 @@ function ProductPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-10 sm:py-24">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-10 sm:py-24 overflow-x-clip">
       <div className="grid gap-0 md:grid-cols-2 md:gap-10 lg:gap-12">
         
         {/* Mobile View: Gallery first, then Text */}
@@ -135,7 +135,7 @@ function ProductPage() {
           </div>
 
           {/* 2. Text Details below gallery */}
-          <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 mb-3 w-full box-border">
+          <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 mb-3" style={{ width: '100%', maxWidth: '100%', margin: '0', boxSizing: 'border-box' }}>
             
             {/* Collection Label */}
             <div className="mb-2">
@@ -284,7 +284,7 @@ function ProductPage() {
           </div>
 
           {/* 8 & 9: Size / Quantity / COD Form */}
-          <div className="w-full box-border">
+          <div style={{ width: '100%', maxWidth: '100%', margin: '0', boxSizing: 'border-box' }}>
             <CodForm 
               productName={p?.title}
               offers={offers}

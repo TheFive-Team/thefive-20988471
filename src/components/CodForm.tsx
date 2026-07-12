@@ -230,7 +230,7 @@ export function CodForm({
   const labelClasses = "block text-[12px] font-semibold text-[#20364B] mb-[5px] tracking-wide";
 
   return (
-    <div className="bg-[#FFFDF8] rounded-[20px] shadow-[0_8px_24px_rgba(13,35,56,0.06)] border border-[#E8E0D2] px-4 py-[18px] sm:p-6 font-arabic transition-all duration-500 w-full box-border" id="checkout-form" dir="rtl">
+    <div className="bg-[#FFFDF8] rounded-[20px] shadow-[0_8px_24px_rgba(13,35,56,0.06)] border border-[#E8E0D2] px-4 py-[18px] sm:p-6 font-arabic transition-all duration-500" id="checkout-form" dir="rtl" style={{ width: '100%', maxWidth: '100%', margin: '0', boxSizing: 'border-box' }}>
       
       {formError && (
         <div className="mb-[22px] p-4 bg-[#B94A48]/10 border border-[#B94A48]/20 rounded-xl flex items-center gap-2 text-[#B94A48] text-xs sm:text-sm font-bold animate-in fade-in">

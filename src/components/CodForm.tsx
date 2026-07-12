@@ -525,10 +525,10 @@ export function CodForm({
               <span className="text-[15px] font-bold tracking-wide">اطلب الآن · الدفع عند الاستلام</span>
             )}
           </button>
-          <div className="mt-3.5 flex justify-center">
-             <div className="flex items-center gap-2 bg-[#F9F6EF] border border-[#E9DDC8] rounded-full py-[10px] px-[16px] w-fit shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-               <ShieldCheck className="w-4 h-4 text-[#102A43] shrink-0" strokeWidth={2.5} />
-               <span className="text-[14.5px] font-semibold text-[#102A43]">
+          <div className="mt-3.5 w-full">
+             <div className="flex items-center justify-center gap-[6px] bg-[#F9F6EF] border border-[#E9DDC8] rounded-full py-[8px] px-[12px] w-full max-w-none shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+               <span className="text-[14px] leading-none shrink-0">🛡️</span>
+               <span className="text-[13.5px] font-semibold text-[#102A43] leading-[1.3] max-[339px]:whitespace-normal whitespace-nowrap">
                  الاستبدال والإرجاع متاح لضمان تجربة تسوق مريحة.
                </span>
              </div>

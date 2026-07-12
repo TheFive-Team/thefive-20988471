@@ -3,8 +3,8 @@ import { formatMoney, type ShopifyProduct } from "@/lib/shopify";
 
 export function ProductCard({ product }: { product: ShopifyProduct }) {
   const p = product.node;
-  const img = p.images.edges[0]?.node;
-  const tagLabel = p.productType || p.tags[0] || "";
+  const img = p.images?.edges?.[0]?.node;
+  const tagLabel = p.productType || p.tags?.[0] || "";
   return (
     <Link
       to="/produit/$slug"
@@ -31,7 +31,7 @@ export function ProductCard({ product }: { product: ShopifyProduct }) {
       <div className="mt-4 space-y-1 text-center">
         <h3 className="font-serif text-lg leading-tight">{p.title}</h3>
         <p className="text-sm tracking-wide text-muted-foreground">
-          {formatMoney(p.priceRange.minVariantPrice)}
+          {p.priceRange?.minVariantPrice ? formatMoney(p.priceRange.minVariantPrice) : ""}
         </p>
       </div>
     </Link>

@@ -21,8 +21,8 @@ function CartPage() {
   const removeItem = useCartStore((s) => s.removeItem);
   const isLoading = useCartStore((s) => s.isLoading);
 
-  const subtotal = items.reduce((a, b) => a + parseFloat(b.price.amount) * b.quantity, 0);
-  const currency = items[0]?.price.currencyCode ?? "DZD";
+  const subtotal = items.reduce((a, b) => a + parseFloat(b?.price?.amount || "0") * b.quantity, 0);
+  const currency = items[0]?.price?.currencyCode ?? "DZD";
 
   const handleCheckout = () => {
     if (items.length === 0) return;
@@ -73,7 +73,7 @@ function CartPage() {
                   {l.variantTitle && l.variantTitle !== "Default Title" && (
                     <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">{l.variantTitle}</p>
                   )}
-                  <p className="mt-2 text-sm text-foreground/80">{formatMoney(l.price)}</p>
+                  <p className="mt-2 text-sm text-foreground/80">{l.price ? formatMoney(l.price) : "0 DA"}</p>
                   <div className="mt-3 flex items-center gap-3">
                     <div className="inline-flex items-center border border-border">
                       <button aria-label={tr("cart.decrease", "إنقاص الكمية")} disabled={isLoading} onClick={() => updateQuantity(l.variantId, l.quantity - 1)} className="px-3 py-1 text-foreground/70 hover:text-foreground disabled:opacity-50">−</button>
@@ -86,7 +86,7 @@ function CartPage() {
                   </div>
                 </div>
                 <div className="text-end font-serif text-lg">
-                  {formatMoney({ amount: String(parseFloat(l.price.amount) * l.quantity), currencyCode: l.price.currencyCode })}
+                  {formatMoney({ amount: String(parseFloat(l.price?.amount || "0") * l.quantity), currencyCode: l.price?.currencyCode || "DZD" })}
                 </div>
               </div>
             ))}

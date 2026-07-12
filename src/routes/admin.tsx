@@ -1285,7 +1285,7 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
   const startEdit = (product: ShopifyProduct) => {
     setMode("edit");
     setEditingProductId(product.node.id);
-    const inventory = product.node.variants.edges.map(e => ({
+    const inventory = product.node.variants?.edges?.map(e => ({
       size: e.node.selectedOptions.find(o => o.name.toLowerCase() === "size")?.value || e.node.title,
       stock: e.node.quantityAvailable ?? 10 // Fallback to 10 for backward compatibility if undefined
     }));

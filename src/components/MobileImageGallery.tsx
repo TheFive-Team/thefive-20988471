@@ -41,7 +41,6 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
       
       {/* 1. MAIN GALLERY (Top Carousel + Thumbnails) */}
       <section className="w-full">
-        <div className="bg-red-500 text-white font-bold p-2 text-center">MOBILE GALLERY UPDATED</div>
         <div className="overflow-hidden w-full relative box-border" ref={mainRef}>
           <div className="flex touch-pan-y">
             {images.map((img, idx) => (

@@ -1,15 +1,10 @@
 import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
+import { getCookie } from "@tanstack/react-start/server";
 import { supabase } from "@/lib/supabase";
 
 export const getAuthenticatedSupabaseUser = createServerFn({ method: "GET" }).handler(async () => {
-  const request = getWebRequest();
-  if (!request) return null;
-  
-  const cookieHeader = request.headers.get("cookie");
-  const match = cookieHeader?.match(/sb-access-token=([^;]+)/);
-  const token = match ? match[1] : null;
+  const token = getCookie("sb-access-token");
   
   if (!token) return null;
   

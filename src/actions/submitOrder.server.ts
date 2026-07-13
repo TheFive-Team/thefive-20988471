@@ -42,58 +42,8 @@ export const submitOrderFn = createServerFn({ method: "POST" })
       const totalAmount = data.finalTotal !== undefined ? data.finalTotal : (productFee + deliveryFee);
 
       // 1. Stock Deduction Logic
-      let productsData: any[] = [];
-      const productsFilePath = path.join(process.cwd(), "public", "data", "products.json");
-      let deductedSizes: { variantIndex: number }[] = [];
-      let targetProductIndex = -1;
-
-      try {
-        const fileContent = fs.readFileSync(productsFilePath, "utf-8");
-        productsData = JSON.parse(fileContent);
-
-        if (data.productName && data.selectedSizes && data.selectedSizes.length > 0) {
-          targetProductIndex = productsData.findIndex((p: any) => p.node.title === data.productName);
-          if (targetProductIndex !== -1) {
-            const product = productsData[targetProductIndex];
-            let allAvailable = true;
-            
-            for (const size of data.selectedSizes) {
-              const variantIndex = product.node.variants.edges.findIndex((v: any) => v.node.title === size);
-              if (variantIndex === -1) {
-                allAvailable = false;
-                break;
-              }
-              const variant = product.node.variants.edges[variantIndex].node;
-              
-              const alreadyDeductedCount = deductedSizes.filter(d => d.variantIndex === variantIndex).length;
-              
-              if (variant.quantityAvailable === undefined || variant.quantityAvailable - alreadyDeductedCount <= 0) {
-                allAvailable = false;
-                break;
-              }
-              
-              deductedSizes.push({ variantIndex });
-            }
-            
-            if (!allAvailable) {
-              return { success: false, message: "عذراً، بعض المقاسات المختارة غير متوفرة حالياً بالكمية المطلوبة." };
-            }
-
-            for (const deduction of deductedSizes) {
-              const variant = product.node.variants.edges[deduction.variantIndex].node;
-              variant.quantityAvailable -= 1;
-              if (variant.quantityAvailable === 0) {
-                variant.availableForSale = false;
-              }
-              console.log(`[Stock] Deducted 1 from ${data.productName} size ${variant.title}. Remaining: ${variant.quantityAvailable}`);
-            }
-            
-            fs.writeFileSync(productsFilePath, JSON.stringify(productsData, null, 2), "utf-8");
-          }
-        }
-      } catch (e) {
-        console.error("Error reading/updating stock:", e);
-      }
+      // Stock tracking is currently disabled. Vercel's immutable filesystem prevents modifying local JSON files.
+      console.log("[Stock] Live stock tracking is currently disabled. Proceeding with order.");
 
       // 2. Insert into Supabase
       const { error } = await supabase.from('orders').insert({
@@ -118,27 +68,6 @@ export const submitOrderFn = createServerFn({ method: "POST" })
 
       if (error) {
         console.error("Supabase insert error:", error);
-        
-        // Rollback stock if Supabase failed
-        if (deductedSizes.length > 0) {
-          try {
-            const fileContent = fs.readFileSync(productsFilePath, "utf-8");
-            const currentData = JSON.parse(fileContent);
-            const product = currentData[targetProductIndex];
-            for (const deduction of deductedSizes) {
-              const variant = product.node.variants.edges[deduction.variantIndex].node;
-              variant.quantityAvailable += 1;
-              if (variant.quantityAvailable > 0) {
-                variant.availableForSale = true;
-              }
-              console.log(`[Stock] Rolled back stock for ${data.productName} size ${variant.title}`);
-            }
-            fs.writeFileSync(productsFilePath, JSON.stringify(currentData, null, 2), "utf-8");
-          } catch (e) {
-            console.error("Failed to rollback stock:", e);
-          }
-        }
-        
         return { success: false, message: "Failed to save order to database." };
       }
 

@@ -149,8 +149,8 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17839730646860",
-              "title": "6,8,10,12",
+              "id": "gid://shopify/ProductVariant/17839731687350",
+              "title": "6",
               "availableForSale": true,
               "quantityAvailable": 100,
               "price": {
@@ -164,7 +164,73 @@
               "selectedOptions": [
                 {
                   "name": "size",
-                  "value": "6,8,10,12"
+                  "value": "6"
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "id": "gid://shopify/ProductVariant/17839731687351",
+              "title": "8",
+              "availableForSale": true,
+              "quantityAvailable": 100,
+              "price": {
+                "amount": "5800.0",
+                "currencyCode": "DZD"
+              },
+              "compareAtPrice": {
+                "amount": "6900",
+                "currencyCode": "DZD"
+              },
+              "selectedOptions": [
+                {
+                  "name": "size",
+                  "value": "8"
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "id": "gid://shopify/ProductVariant/17839731687352",
+              "title": "10",
+              "availableForSale": true,
+              "quantityAvailable": 100,
+              "price": {
+                "amount": "5800.0",
+                "currencyCode": "DZD"
+              },
+              "compareAtPrice": {
+                "amount": "6900",
+                "currencyCode": "DZD"
+              },
+              "selectedOptions": [
+                {
+                  "name": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "id": "gid://shopify/ProductVariant/17839731687353",
+              "title": "12",
+              "availableForSale": true,
+              "quantityAvailable": 100,
+              "price": {
+                "amount": "5800.0",
+                "currencyCode": "DZD"
+              },
+              "compareAtPrice": {
+                "amount": "6900",
+                "currencyCode": "DZD"
+              },
+              "selectedOptions": [
+                {
+                  "name": "size",
+                  "value": "12"
                 }
               ]
             }
@@ -175,7 +241,10 @@
         {
           "name": "size",
           "values": [
-            "6,8,10,12"
+            "6",
+            "8",
+            "10",
+            "12"
           ]
         }
       ],

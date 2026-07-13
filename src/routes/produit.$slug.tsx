@@ -122,6 +122,14 @@ function ProductPage() {
     document.getElementById("checkout-form")?.scrollIntoView({ behavior: "smooth" });
   };
 
+  let displayTitle = p?.title || "";
+  let displaySubtitle = (p as any)?.subtitle || "";
+
+  if (displayTitle === "Ensemble d’été fille — léger, chic et confortable") {
+    displayTitle = "Ensemble d’été fille — léger et chic";
+    displaySubtitle = "Confortable toute la journée";
+  }
+
   return (
     <div className="mx-auto max-w-7xl py-8 sm:px-10 sm:py-24 overflow-x-clip">
       <div className="grid gap-0 md:grid-cols-2 md:gap-10 lg:gap-12">
@@ -145,10 +153,17 @@ function ProductPage() {
               </span>
             </div>
             
-            {/* Product Name */}
-            <h1 className="font-serif font-bold text-[#1A2530] text-[22px] sm:text-2xl leading-[1.25] text-left line-clamp-2 drop-shadow-sm mb-2 w-full" dir="ltr">
-              {p.title}
-            </h1>
+            {/* Product Name & Subtitle */}
+            <div className="mb-2 w-full text-left" dir="ltr">
+              <h1 className="font-serif font-bold text-[#1A2530] text-[22px] sm:text-2xl leading-[1.25] drop-shadow-sm">
+                {displayTitle}
+              </h1>
+              {displaySubtitle && (
+                <h2 className="font-sans font-normal text-[#6E6E6E] text-[13.5px] leading-[1.5] mt-1">
+                  {displaySubtitle}
+                </h2>
+              )}
+            </div>
             
             {/* Rating */}
             <div className="flex items-center gap-2 mb-5">
@@ -241,10 +256,17 @@ function ProductPage() {
               </span>
             </div>
             
-            {/* Product Name */}
-            <h1 className="font-serif font-bold text-[#1A2530] text-3xl md:text-4xl leading-[1.2] text-left line-clamp-2 drop-shadow-sm mb-3 w-full" dir="ltr">
-              {p.title}
-            </h1>
+            {/* Product Name & Subtitle */}
+            <div className="mb-3 w-full text-left" dir="ltr">
+              <h1 className="font-serif font-bold text-[#1A2530] text-3xl md:text-4xl leading-[1.2] drop-shadow-sm">
+                {displayTitle}
+              </h1>
+              {displaySubtitle && (
+                <h2 className="font-sans font-normal text-[#6E6E6E] text-[15px] leading-[1.5] mt-1.5">
+                  {displaySubtitle}
+                </h2>
+              )}
+            </div>
             
             {/* Rating */}
             <div className="flex items-center gap-2 mb-6">

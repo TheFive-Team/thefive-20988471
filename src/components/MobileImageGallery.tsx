@@ -6,7 +6,7 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
   const [mainRef, mainApi] = useEmblaCarousel({ 
     align: "start",
     containScroll: "trimSnaps",
-    loop: false,
+    loop: true,
     dragFree: false,
     skipSnaps: false,
     direction: "ltr"

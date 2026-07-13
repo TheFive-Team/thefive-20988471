@@ -149,7 +149,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17839684906790",
+              "id": "gid://shopify/ProductVariant/17839685555270",
               "title": "Default Title",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -181,7 +181,7 @@
       ],
       "offers": [],
       "pricingConfig": {
-        "enabled": true,
+        "enabled": false,
         "quantityRequired": 2,
         "discountType": "fixed",
         "discountValue": 500,

@@ -38,21 +38,28 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
   if (!images || images.length === 0) return null;
 
   return (
-    <div className="mobile-gallery-root" dir="ltr">
+    <div className="w-full min-w-0 max-w-full box-border">
       
       {/* 1. MAIN GALLERY (Top Carousel + Thumbnails) */}
-      <section className="w-full">
-        <div className="mobile-gallery-viewport" ref={mainRef}>
-          <div className="mobile-gallery-track">
+      <section className="w-full min-w-0 max-w-full box-border">
+        <div
+          ref={mainRef}
+          dir="ltr"
+          className="w-full min-w-0 max-w-full overflow-hidden box-border"
+        >
+          <div className="flex w-full min-w-0 max-w-full m-0 p-0 gap-0 touch-pan-y">
             {images.map((img, idx) => (
-              <div className="mobile-gallery-slide" key={idx}>
-                <div className="mobile-gallery-card shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 bg-[#FCFCFC] relative">
+              <div
+                key={idx}
+                className="flex-[0_0_100%] w-full min-w-0 max-w-full box-border"
+              >
+                <div className="w-full min-w-0 max-w-full overflow-hidden rounded-[18px] box-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 bg-[#FCFCFC]">
                   <img 
                     src={getOptimizedShopifyImage(img.url, 800)} 
                     srcSet={getLocalSrcSet(img.url) || `${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
                     sizes="100vw"
                     alt={img.altText || `Product view ${idx + 1}`} 
-                    className="mobile-gallery-image" 
+                    className="block w-full min-w-0 max-w-full h-auto object-contain object-center" 
                     loading={idx === 0 ? "eager" : "lazy"}
                     decoding={idx === 0 ? "sync" : "async"}
                     fetchPriority={idx === 0 ? "high" : "auto"}
@@ -65,8 +72,8 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
         
         {/* Thumbnails */}
         {images.length > 1 && (
-          <div className="mobile-gallery-thumbnails" ref={thumbRef}>
-            <div className="flex gap-2.5">
+          <div className="w-full min-w-0 max-w-full mt-3 overflow-hidden box-border" ref={thumbRef} dir="ltr">
+            <div className="flex gap-2.5 w-full min-w-0 max-w-full">
               {images.map((img, idx) => (
                 <div 
                   key={idx} 

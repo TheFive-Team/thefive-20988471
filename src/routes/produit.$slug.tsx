@@ -130,7 +130,7 @@ function ProductPage() {
         <div className="block md:hidden mb-6">
           
           {/* 1. Gallery (Mobile) */}
-          <div className="mb-5 mx-auto w-full max-w-[520px]">
+          <div className="mb-5 mx-4 w-auto max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px] box-border min-w-0">
             <MobileImageGallery images={images} />
           </div>
 

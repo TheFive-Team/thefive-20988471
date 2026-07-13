@@ -171,3 +171,69 @@
     aspect-ratio: auto;
 }
 
+.mobile-gallery-root {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.mobile-gallery-viewport {
+  width: calc(100% - 32px);
+  max-width: 488px;
+  margin-inline: auto;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.mobile-gallery-track {
+  display: flex;
+  width: 100%;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.mobile-gallery-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.mobile-gallery-card {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  box-sizing: border-box;
+}
+
+.mobile-gallery-image {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  object-fit: contain;
+  object-position: center;
+  box-sizing: border-box;
+}
+
+.mobile-gallery-thumbnails {
+  width: calc(100% - 32px);
+  max-width: 488px;
+  margin: 12px auto 0;
+  padding: 0;
+  box-sizing: border-box;
+}

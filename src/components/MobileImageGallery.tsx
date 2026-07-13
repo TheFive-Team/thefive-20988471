@@ -7,8 +7,9 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
     align: "start",
     containScroll: "trimSnaps",
     loop: false,
+    dragFree: false,
     skipSnaps: false,
-    dragFree: false
+    direction: "ltr"
   });
   const [thumbRef, thumbApi] = useEmblaCarousel({ containScroll: "keepSnaps", dragFree: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -37,21 +38,21 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
   if (!images || images.length === 0) return null;
 
   return (
-    <div className="w-full max-w-[520px] mx-auto px-4 box-border bg-transparent flex flex-col pb-2" dir="ltr">
+    <div className="mobile-gallery-root" dir="ltr">
       
       {/* 1. MAIN GALLERY (Top Carousel + Thumbnails) */}
       <section className="w-full">
-        <div className="w-full max-w-full overflow-hidden m-0 p-0 relative box-border" ref={mainRef}>
-          <div className="flex m-0 p-0 gap-0 touch-pan-y">
+        <div className="mobile-gallery-viewport" ref={mainRef}>
+          <div className="mobile-gallery-track">
             {images.map((img, idx) => (
-              <div className="flex-[0_0_100%] w-full min-w-0 max-w-full m-0 p-0 box-border relative" key={idx}>
-                <div className="w-full max-w-full overflow-hidden rounded-[18px] box-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 bg-[#FCFCFC] relative">
+              <div className="mobile-gallery-slide" key={idx}>
+                <div className="mobile-gallery-card shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 bg-[#FCFCFC] relative">
                   <img 
                     src={getOptimizedShopifyImage(img.url, 800)} 
                     srcSet={getLocalSrcSet(img.url) || `${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
                     sizes="100vw"
                     alt={img.altText || `Product view ${idx + 1}`} 
-                    className="block w-full max-w-full h-auto object-contain object-center" 
+                    className="mobile-gallery-image" 
                     loading={idx === 0 ? "eager" : "lazy"}
                     decoding={idx === 0 ? "sync" : "async"}
                     fetchPriority={idx === 0 ? "high" : "auto"}
@@ -64,7 +65,7 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
         
         {/* Thumbnails */}
         {images.length > 1 && (
-          <div className="mt-3 overflow-hidden px-1 py-1" ref={thumbRef}>
+          <div className="mobile-gallery-thumbnails" ref={thumbRef}>
             <div className="flex gap-2.5">
               {images.map((img, idx) => (
                 <div 

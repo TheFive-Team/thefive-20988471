@@ -37,7 +37,7 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
   if (!images || images.length === 0) return null;
 
   return (
-    <div className="w-[calc(100%-32px)] max-w-[520px] mx-auto bg-transparent flex flex-col pb-2 box-border overflow-hidden">
+    <div className="w-[calc(100%-32px)] max-w-[520px] mx-auto bg-transparent flex flex-col pb-2 box-border overflow-hidden" dir="ltr">
       
       {/* 1. MAIN GALLERY (Top Carousel + Thumbnails) */}
       <section className="w-full">
@@ -45,13 +45,13 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
           <div className="flex touch-pan-y">
             {images.map((img, idx) => (
               <div className="flex-[0_0_100%] min-w-0 w-full box-border" key={idx}>
-                <div className="w-full overflow-hidden rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 bg-[#FCFCFC] relative box-border">
+                <div className="w-full overflow-hidden rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 bg-[#FCFCFC] relative box-border p-3 flex items-center justify-center">
                   <img 
                     src={getOptimizedShopifyImage(img.url, 800)} 
                     srcSet={getLocalSrcSet(img.url) || `${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
                     sizes="100vw"
                     alt={img.altText || `Product view ${idx + 1}`} 
-                    className="w-full max-w-full h-auto block object-contain" 
+                    className="block w-full max-w-full h-auto object-contain object-center" 
                     loading={idx === 0 ? "eager" : "lazy"}
                     decoding={idx === 0 ? "sync" : "async"}
                     fetchPriority={idx === 0 ? "high" : "auto"}

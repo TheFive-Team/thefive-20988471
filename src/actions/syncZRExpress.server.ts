@@ -307,22 +307,49 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
           const trackingNumber = zrData.trackingNumber || zrData.code || zrData.id || `ZRE-${order.id.substring(0,6)}`;
           const zrExpressId = zrData.id || zrData.parcelId || '';
 
-          console.log(`[ORDER_UPDATE_STARTED] Updating Supabase for ${order.id} with tracking: ${trackingNumber}`);
-          const { error: updateError } = await authSupabase.from('orders').update({
+          const updatePayload = {
              tracking_number: trackingNumber,
              zr_express_id: zrExpressId
-          }).eq('id', order.id);
+          };
+          
+          console.log(`[ORDER_UPDATE_STARTED] Updating Supabase for ${order.id} with payload:`, updatePayload);
+          const { error: updateError, count } = await authSupabase
+            .from('orders')
+            .update(updatePayload, { count: 'exact' })
+            .eq('id', order.id);
 
-          if (updateError) {
-             console.error(`[SYNC_FAILED_AT: ORDER_UPDATE_DONE] DB update failed for ${order.id}:`, updateError);
+          if (updateError || count === 0) {
+             console.error(`[SYNC_FAILED_AT: ORDER_UPDATE_DONE] DB update failed for ${order.id}:`, updateError, "Count:", count);
+             
+             let failReason = "";
+             const availableColumns = dbOrders && dbOrders.length > 0 ? Object.keys(dbOrders[0]).join(", ") : "unknown";
+             
+             if (updateError) {
+                failReason = `Supabase Error: Code=${updateError.code}, Message=${updateError.message}, Details=${updateError.details}, Hint=${updateError.hint}`;
+                if (updateError.code === '42703') {
+                   failReason += `\n[CRITICAL SCHEMA ERROR] The column does not exist! The ONLY columns that actually exist in your database table are: ${availableColumns}. You MUST run ALTER TABLE in Supabase to add tracking_number and zr_express_id!`;
+                }
+             } else if (count === 0) {
+                failReason = `Update returned count = 0. This means the WHERE clause (id = '${order.id}') matched no rows. This usually happens if the order ID is wrong, the row was deleted, or Row-Level Security (RLS) UPDATE policies blocked this user from modifying this row.`;
+             }
+             
              results.push({ 
                success: false, 
                id: order.id, 
                stage: "DB_UPDATE", 
-               code: "DATABASE_UPDATE_FAILED", 
-               message: "تم إنشاء الطرد في ZR ولكن فشل حفظ التتبع في قاعدة البيانات", 
-               trackingNumber,
-               zrExpressId
+               code: updateError?.code || (count === 0 ? "ZERO_ROWS" : "DATABASE_UPDATE_FAILED"), 
+               message: failReason, 
+               details: `Table: orders | WHERE: id = ${order.id} | Payload: ${JSON.stringify(updatePayload)}`,
+               payload: updatePayload,
+               responseBody: updateError ? JSON.stringify(updateError, null, 2) : "count = 0",
+               debugContext: {
+                 tableName: 'orders',
+                 whereClause: `id = '${order.id}'`,
+                 orderId: order.id,
+                 updatePayload,
+                 supabaseError: updateError,
+                 rowCount: count
+               }
              });
              continue;
           }

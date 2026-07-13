@@ -546,14 +546,39 @@ function OrdersDashboard() {
         if (failures.length > 0) {
            lines.push("\n--- الأخطاء ---");
            failures.forEach(f => {
-              lines.push(`الطلب #${f.id.substring(0,6)}`);
-              lines.push(`المرحلة: ${f.stage}`);
-              lines.push(`السبب: ${f.message}`);
-              if (f.details) lines.push(`تفاصيل إضافية: ${f.details}`);
+              lines.push(`\nOrder #${f.id}`);
+              lines.push(`Stage: ${f.stage}`);
+              lines.push(`Failure reason: ${f.message}`);
+              if (f.details) lines.push(`Details: ${f.details}`);
+              
+              if (f.debugContext) {
+                 lines.push(`\nContext:`);
+                 lines.push(`- customer name: ${f.debugContext.customerName || ''}`);
+                 lines.push(`- phone: ${f.debugContext.phoneStr || f.debugContext.phone || ''}`);
+                 lines.push(`- wilaya: ${f.debugContext.targetWilaya || f.debugContext.wilaya || ''}`);
+                 lines.push(`- commune: ${f.debugContext.targetCommune || f.debugContext.commune || ''}`);
+                 lines.push(`- delivery type: ${f.debugContext.deliveryType || f.debugContext.delivery_type || ''}`);
+                 lines.push(`- desk: ${f.debugContext.deskName || 'N/A'}`);
+              }
+              
+              if (f.payload) {
+                 lines.push(`\nPayload sent to ZR:`);
+                 lines.push(JSON.stringify(f.payload, null, 2));
+              }
+              
+              if (f.responseBody) {
+                 lines.push(`\nZR Response:`);
+                 lines.push(f.responseBody);
+              }
+              
               lines.push("----------------");
            });
+           
+           console.error("[SYNC FAILURES BREAKDOWN]", failures);
         }
         
+        // Output exactly to console for easy reading
+        console.log("FINAL ALERT:\n", lines.join("\n"));
         alert(lines.join("\n"));
       } else {
         alert("اكتملت المزامنة ولكن لم يتم إرجاع تفاصيل.");

@@ -236,6 +236,8 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             deliveryType: finalDeliveryType,
             externalId: order.id
           };
+          
+          const sanitizedPayload = { ...payload };
 
           let finalHubId = deskObj?.id;
           if (isStopDesk && !finalHubId && deskObj?.name) {
@@ -288,7 +290,12 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
               stage: "ZR_REQUEST", 
               code: response.status >= 500 ? "ZR_SERVER_ERROR" : "ZR_BAD_REQUEST", 
               message: "رفض ZR Express الطلب", 
-              details: sanitizedError.substring(0, 200)
+              details: sanitizedError,
+              payload: sanitizedPayload,
+              responseBody: errText,
+              debugContext: {
+                 customerName, phoneStr, targetWilaya, targetCommune, deliveryType: finalDeliveryType, deskName: deskObj?.name, deskId: deskObj?.id, finalHubId
+              }
             });
             continue; 
           }
@@ -339,7 +346,14 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             stage: "UNKNOWN", 
             code: "UNKNOWN_SYNC_ERROR", 
             message: "حدث خطأ غير متوقع", 
-            details: err?.message?.substring(0, 100) 
+            details: err?.message,
+            debugContext: {
+              customerName: order.fullname,
+              phone: order.phone,
+              wilaya: order.wilaya,
+              commune: order.commune,
+              delivery_type: order.delivery_type
+            }
           });
         }
       } 

@@ -2,26 +2,26 @@
   {
     "node": {
       "id": "gid://shopify/Product/8000957644848",
-      "title": "vetement lux ",
+      "title": "Ensemble d’Été Fille – Léger, Élégant et Confortable",
       "description": "",
       "descriptionHtml": "",
-      "handle": "vetement-lux",
+      "handle": "Ensemble d’Été Fille",
       "tags": [],
       "productType": "",
       "vendor": "My Store",
       "priceRange": {
         "minVariantPrice": {
-          "amount": "5900.0",
+          "amount": "5800.0",
           "currencyCode": "DZD"
         }
       },
       "compareAtPriceRange": {
         "minVariantPrice": {
-          "amount": "6500",
+          "amount": "6900",
           "currencyCode": "DZD"
         },
         "maxVariantPrice": {
-          "amount": "6500",
+          "amount": "6900",
           "currencyCode": "DZD"
         }
       },
@@ -149,24 +149,36 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/1783898446026",
+              "id": "gid://shopify/ProductVariant/17839673218680",
               "title": "Default Title",
               "availableForSale": true,
               "quantityAvailable": 10,
               "price": {
-                "amount": "5900.0",
+                "amount": "5800.0",
                 "currencyCode": "DZD"
               },
               "compareAtPrice": {
-                "amount": "6500",
+                "amount": "6900",
                 "currencyCode": "DZD"
               },
-              "selectedOptions": []
+              "selectedOptions": [
+                {
+                  "name": "size",
+                  "value": "Default Title"
+                }
+              ]
             }
           }
         ]
       },
-      "options": [],
+      "options": [
+        {
+          "name": "size",
+          "values": [
+            "Default Title"
+          ]
+        }
+      ],
       "offers": [],
       "pricingConfig": {
         "enabled": true,

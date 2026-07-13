@@ -149,37 +149,37 @@ function ProductPage() {
 
           {/* 2. Text Details below gallery */}
           <div className="mb-6 mx-4 w-auto max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px] box-border">
-            <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-[24px_20px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 w-full max-w-full min-w-0 m-0 box-border overflow-hidden">
+            <div className="flex flex-col items-start text-left bg-white rounded-[22px] p-[22px_20px] shadow-[0_4px_16px_rgba(16,42,67,0.04)] border border-[#E4DAC7] w-full max-w-full min-w-0 m-0 box-border overflow-hidden">
             
             {/* Collection Label */}
-            <div className="mb-2">
-              <span className="text-[10px] uppercase font-bold tracking-[0.15em] text-[#D4AF37]">
+            <div className="mb-[8px] w-full text-left" dir="ltr">
+              <span className="text-[11px] font-bold tracking-[0.12em] uppercase text-[#D4AF37]">
                 NOUVELLE COLLECTION
               </span>
             </div>
             
             {/* Product Name & Subtitle */}
-            <div className="mb-2 w-full text-left" dir="ltr">
-              <h1 className="font-serif font-bold text-[#1A2530] text-[22px] sm:text-2xl leading-[1.25] drop-shadow-sm">
+            <div className="w-full text-left" dir="ltr">
+              <h1 className="font-serif font-semibold text-[#1A2530] text-[20px] leading-[1.3] m-0">
                 {displayTitle}
               </h1>
               {displaySubtitle && (
-                <h2 className="font-sans font-normal text-[#6E6E6E] text-[13.5px] leading-[1.5] mt-1">
+                <h2 className="font-sans font-normal text-[#7A8A9E] text-[13px] leading-[1.45] mt-[5px]">
                   {displaySubtitle}
                 </h2>
               )}
             </div>
             
             {/* Rating */}
-            <div className="flex items-center gap-2 mb-5">
-              <div className="flex text-[#D4AF37] text-[11px] tracking-wider">
+            <div className="flex items-center gap-[6px] mt-[12px] w-full text-left" dir="ltr">
+              <div className="flex text-[#D4AF37] text-[12px] tracking-widest leading-none">
                 <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
               </div>
-              <span className="text-[10px] font-medium text-[#1A2530]/60 mt-0.5">4.9</span>
+              <span className="text-[12px] font-medium text-[#7A8A9E] leading-none">4.9</span>
             </div>
             
             {/* Price Row */}
-            <div className="flex items-center w-full">
+            <div className="flex items-center flex-wrap gap-[8px] mt-[16px] w-full text-left" dir="ltr">
               {(() => {
                 const currentPrice = offers[0]?.price;
                 const compPrice = offers[0]?.comparePrice;
@@ -187,21 +187,21 @@ function ProductPage() {
                 if (compPrice && parseFloat(compPrice) > parseFloat(currentPrice)) {
                   const discount = Math.round(((parseFloat(compPrice) - parseFloat(currentPrice)) / parseFloat(compPrice)) * 100);
                   return (
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-3xl font-bold tracking-tight text-[#1A2530] leading-none">
+                    <>
+                      <span className="text-[30px] font-extrabold text-[#1A2530] leading-none whitespace-nowrap">
                         {formatMoney({ amount: currentPrice, currencyCode: "DZD" })}
                       </span>
-                      <span className="text-sm text-slate-400 line-through font-medium leading-none">
+                      <span className="text-[14px] font-medium text-[#7A8A9E]/80 line-through leading-none whitespace-nowrap">
                         {formatMoney({ amount: compPrice, currencyCode: "DZD" })}
                       </span>
-                      <span className="bg-[#1A2530] text-[#D4AF37] text-[10px] font-bold px-1.5 py-0.5 rounded-sm tracking-wide leading-none ml-1">
-                        وفر {discount}%
+                      <span className="inline-flex items-center h-[22px] px-[8px] rounded-[6px] bg-[#1A2530] text-[#D4AF37] text-[10px] font-bold whitespace-nowrap">
+                        -{discount}%
                       </span>
-                    </div>
+                    </>
                   );
                 }
                 return (
-                  <span className="text-3xl font-bold tracking-tight text-[#1A2530] leading-none">
+                  <span className="text-[30px] font-extrabold text-[#1A2530] leading-none whitespace-nowrap">
                     {formatMoney({ amount: currentPrice ?? 0, currencyCode: "DZD" })}
                   </span>
                 );

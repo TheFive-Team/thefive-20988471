@@ -269,3 +269,27 @@
   box-sizing: border-box;
   overflow: hidden;
 }
+
+.benefits-section {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  content-visibility: visible;
+  overflow: visible;
+  touch-action: pan-y;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  min-width: 0;
+}
+
+.benefit-card {
+  width: 100%;
+  min-width: 0;
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}

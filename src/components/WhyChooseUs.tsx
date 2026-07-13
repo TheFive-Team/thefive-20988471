@@ -26,15 +26,15 @@ export function WhyChooseUs() {
 
   return (
     <section 
-      className="w-full bg-[#F8F5EF] border-t border-[#E4DAC7] py-[32px] px-[24px] sm:px-[28px]" 
+      className="benefits-section bg-[#F8F5EF] border-t border-[#E4DAC7] py-[32px] px-[24px] sm:px-[28px]" 
       dir="rtl"
     >
       <div className="max-w-5xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-[12px]">
+        <div className="benefits-grid gap-[12px] md:grid-cols-4">
           {features.map((feature, idx) => (
             <div 
               key={idx} 
-              className="bg-[#FFFDF8] rounded-[18px] border border-[#E9DDC8] p-[24px] min-h-[156px] flex flex-col items-center text-center justify-start shadow-[0_2px_8px_rgba(16,42,67,0.02)] transition-all duration-300 ease-out md:hover:-translate-y-[3px] md:hover:shadow-[0_6px_20px_rgba(16,42,67,0.05)]"
+              className="benefit-card bg-[#FFFDF8] rounded-[18px] border border-[#E9DDC8] p-[24px] min-h-[156px] flex flex-col items-center text-center justify-start shadow-[0_2px_8px_rgba(16,42,67,0.02)]"
             >
               <div className="w-[56px] h-[56px] rounded-full bg-[#F8F5EF] flex items-center justify-center mb-[18px] border border-[#C9A34A]/30 shrink-0">
                 {feature.icon}

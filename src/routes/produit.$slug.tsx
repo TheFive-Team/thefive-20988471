@@ -7,8 +7,8 @@ import { formatMoney, getOptimizedShopifyImage, getLocalSrcSet } from "@/lib/sho
 import { MobileImageGallery } from "@/components/MobileImageGallery";
 import { CodForm } from "@/components/CodForm";
 import { LazySection } from "@/components/LazySection";
+import { WhyChooseUs } from "@/components/WhyChooseUs";
 
-const WhyChooseUs = lazy(() => import("@/components/WhyChooseUs").then(m => ({ default: m.WhyChooseUs })));
 const Reviews = lazy(() => import("@/components/Reviews").then(m => ({ default: m.Reviews })));
 const StickyCheckoutBar = lazy(() => import("@/components/StickyCheckoutBar").then(m => ({ default: m.StickyCheckoutBar })));
 
@@ -330,11 +330,7 @@ function ProductPage() {
       )}
 
       <div className="mt-8 mb-4">
-        <LazySection minHeight="128px">
-          <Suspense fallback={<div className="h-32 w-full animate-pulse bg-secondary/30 mt-8 rounded-2xl" />}>
-            <WhyChooseUs />
-          </Suspense>
-        </LazySection>
+        <WhyChooseUs />
       </div>
 
       <LazySection minHeight="400px">

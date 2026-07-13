@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getCookie } from "@tanstack/react-start/server";
 import { z } from "zod";
-import { supabase } from "@/lib/supabase";
+import { supabase as defaultSupabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 
 const API_KEY = process.env.ZR_API_KEY || process.env.ZR_EXPRESS_SECRET_KEY || '';
@@ -78,17 +80,44 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
       }
       console.log("[AUTH_OK] Credentials found.");
 
-      const { data: orders, error } = await supabase
+      const token = getCookie("sb-access-token");
+      if (!token) {
+        console.error("[AUTH_ERROR] No auth token found for server action.");
+        return {
+          success: false,
+          message: "جلسة غير صالحة. يرجى تسجيل الدخول مجدداً.",
+          results: []
+        };
+      }
+
+      const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
+      const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
+      
+      const authSupabase = createClient(supabaseUrl, supabaseAnonKey, {
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      });
+
+      const { data: orders, error } = await authSupabase
         .from('orders')
         .select('*')
         .in('id', data.ordersToSync);
         
-      if (error || !orders) {
-        console.error("[DATABASE_ERROR] Failed to load orders:", error);
+      if (error || !orders || orders.length === 0) {
+        console.error("[DATABASE_ERROR] Failed to load orders or empty array returned:", error);
         return {
           success: false,
-          message: "فشل تحميل الطلبات من قاعدة البيانات.",
-          results: []
+          message: `لم يتم العثور على الطلبات في قاعدة البيانات (ربما بسبب صلاحيات RLS). تم طلب ${data.ordersToSync.length} طلبات، وتم إيجاد ${orders?.length || 0}.`,
+          results: data.ordersToSync.map(id => ({
+            success: false,
+            id,
+            stage: "DB_LOAD",
+            code: "RLS_BLOCK",
+            message: "الطلب غير موجود أو محجوب بصلاحيات RLS"
+          }))
         };
       }
       console.log(`[ORDER_LOADED] Loaded ${orders.length} orders from Supabase.`);
@@ -271,7 +300,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
           const zrExpressId = zrData.id || zrData.parcelId || '';
 
           console.log(`[ORDER_UPDATE_STARTED] Updating Supabase for ${order.id} with tracking: ${trackingNumber}`);
-          const { error: updateError } = await supabase.from('orders').update({
+          const { error: updateError } = await authSupabase.from('orders').update({
              tracking_number: trackingNumber,
              zr_express_id: zrExpressId
           }).eq('id', order.id);

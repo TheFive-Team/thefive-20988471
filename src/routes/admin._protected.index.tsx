@@ -483,14 +483,12 @@ function OrdersDashboard() {
 
   const syncZRExpress = async () => {
     setIsSyncing(true);
-    // Find confirmed orders that don't have a tracking number
-    const ordersToSync = orders.filter(o => 
-      (o.status === 'مؤكد' || getStatusConfig(o.status).label === 'مؤكد') && 
-      !o.tracking_number
+    const ordersToSync = filteredOrders.filter(
+      (o) => selectedOrders.has(o.id) && o.status === "confirmed" && (!o.tracking_number || !String(o.tracking_number).startsWith("ZRE"))
     );
 
     if (ordersToSync.length === 0) {
-      alert("لا يوجد طلبات مؤكدة بانتظار المزامنة.");
+      alert("لا يوجد طلبات مؤكدة وغير مزامنة بانتظار المزامنة.");
       setIsSyncing(false);
       return;
     }
@@ -500,15 +498,38 @@ function OrdersDashboard() {
         data: { ordersToSync: ordersToSync.map(o => o.id) }
       });
 
-      if (response.success && response.results) {
-        // Update local state and supabase
-        for (const result of response.results) {
-          setOrders(prev => prev.map(o => o.id === result.id ? { ...o, tracking_number: result.tracking_number, zr_express_id: result.zr_express_id } : o));
-          await supabase.from('orders').update({ tracking_number: result.tracking_number, zr_express_id: result.zr_express_id }).eq('id', result.id);
-        }
+      if (!response.success && !response.results?.length) {
+        alert(response.message);
+        return;
       }
-      // Always alert the server's message, whether success or fail
-      alert(response.message);
+
+      if (response.results) {
+        // Update local state for successful ones
+        for (const result of response.results) {
+          if (result.success && result.trackingNumber) {
+            setOrders(prev => prev.map(o => o.id === result.id ? { ...o, tracking_number: result.trackingNumber, zr_express_id: result.zrExpressId } : o));
+          }
+        }
+
+        // Build a detailed feedback string
+        const lines = [`نجحت مزامنة ${response.successCount} من ${response.successCount! + response.failedCount!} طلب.`];
+        
+        const failures = response.results.filter(r => !r.success);
+        if (failures.length > 0) {
+           lines.push("\n--- الأخطاء ---");
+           failures.forEach(f => {
+              lines.push(`الطلب #${f.id.substring(0,6)}`);
+              lines.push(`المرحلة: ${f.stage}`);
+              lines.push(`السبب: ${f.message}`);
+              if (f.details) lines.push(`تفاصيل إضافية: ${f.details}`);
+              lines.push("----------------");
+           });
+        }
+        
+        alert(lines.join("\n"));
+      } else {
+        alert("اكتملت المزامنة ولكن لم يتم إرجاع تفاصيل.");
+      }
     } catch (error) {
       console.error("Sync error:", error);
       alert("حدث خطأ أثناء المزامنة.");

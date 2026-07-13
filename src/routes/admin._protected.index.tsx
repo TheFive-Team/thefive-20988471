@@ -490,24 +490,23 @@ function OrdersDashboard() {
     
     orders.forEach(o => {
       // Evaluate conditions
-      const isSelected = selectedOrders.has(o.id);
       const rawStatus = o.status;
       const isConfirmed = rawStatus === 'مؤكد' || getStatusConfig(rawStatus).label === 'مؤكد';
       const hasTracking = o.tracking_number && String(o.tracking_number).startsWith("ZRE");
       
-      const include = isSelected && isConfirmed && !hasTracking;
+      const include = isConfirmed && !hasTracking;
       
       if (include) {
         eligibleOrders.push(o);
-      } else if (isSelected) { // Only log details for selected orders that were excluded to avoid spam, or log all if needed
-        console.log(`[SYNC DEBUG] Excluded Order #${o.id}`);
-        console.log(`  - status = ${rawStatus} (isConfirmed: ${isConfirmed})`);
-        console.log(`  - tracking_number = ${o.tracking_number || "null"} (hasTracking: ${!!hasTracking})`);
-        console.log(`  - zr_express_id = ${o.zr_express_id || "null"}`);
-        let reason = [];
-        if (!isConfirmed) reason.push(`Status is '${rawStatus}' not 'مؤكد'`);
-        if (hasTracking) reason.push(`Already has tracking number: ${o.tracking_number}`);
-        console.log(`  - Excluded because: ${reason.join(' AND ')}`);
+      } else {
+        // Log skipped confirmed orders to debug
+        if (isConfirmed) {
+           console.log(`[SYNC DEBUG] Excluded Confirmed Order #${o.id}`);
+           console.log(`  - status = ${rawStatus} (isConfirmed: ${isConfirmed})`);
+           console.log(`  - tracking_number = ${o.tracking_number || "null"} (hasTracking: ${!!hasTracking})`);
+           console.log(`  - zr_express_id = ${o.zr_express_id || "null"}`);
+           console.log(`  - Excluded because: hasTracking is ${hasTracking}`);
+        }
       }
     });
     

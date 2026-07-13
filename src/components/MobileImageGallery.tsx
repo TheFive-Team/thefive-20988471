@@ -38,64 +38,53 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
   if (!images || images.length === 0) return null;
 
   return (
-    <div className="w-full min-w-0 max-w-full box-border">
-      
-      {/* 1. MAIN GALLERY (Top Carousel + Thumbnails) */}
-      <section className="w-full min-w-0 max-w-full box-border">
-        <div
-          ref={mainRef}
-          dir="ltr"
-          className="w-full min-w-0 max-w-full overflow-hidden box-border"
-        >
-          <div className="flex w-full min-w-0 max-w-full m-0 p-0 gap-0 touch-pan-y">
+    <div className="mobile-gallery-root" dir="ltr">
+      <div ref={mainRef} className="mobile-gallery-viewport">
+        <div className="mobile-gallery-track">
+          {images.map((img, idx) => (
+            <div className="mobile-gallery-slide" key={idx}>
+              <div className="mobile-gallery-card shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 bg-[#FCFCFC]">
+                <img 
+                  src={getOptimizedShopifyImage(img.url, 800)} 
+                  srcSet={getLocalSrcSet(img.url) || `${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
+                  sizes="100vw"
+                  alt={img.altText || `Product view ${idx + 1}`} 
+                  className="mobile-gallery-image" 
+                  loading={idx === 0 ? "eager" : "lazy"}
+                  decoding={idx === 0 ? "sync" : "async"}
+                  fetchPriority={idx === 0 ? "high" : "auto"}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+        
+      {/* Thumbnails */}
+      {images.length > 1 && (
+        <div className="mobile-gallery-thumbnails" ref={thumbRef} dir="ltr">
+          <div className="flex gap-2.5 w-full min-w-0 max-w-full">
             {images.map((img, idx) => (
-              <div
-                key={idx}
-                className="flex-[0_0_100%] w-full min-w-0 max-w-full box-border"
+              <div 
+                key={idx} 
+                className={`flex-[0_0_22%] min-w-0 cursor-pointer rounded-xl overflow-hidden transition-all duration-300 ${idx === selectedIndex ? 'border-2 border-[#D4AF37] opacity-100 shadow-md scale-105' : 'border-2 border-transparent hover:border-slate-200 opacity-70 hover:opacity-100'}`}
+                onClick={() => onThumbClick(idx)}
               >
-                <div className="w-full min-w-0 max-w-full overflow-hidden rounded-[18px] box-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 bg-[#FCFCFC]">
-                  <img 
-                    src={getOptimizedShopifyImage(img.url, 800)} 
-                    srcSet={getLocalSrcSet(img.url) || `${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
-                    sizes="100vw"
-                    alt={img.altText || `Product view ${idx + 1}`} 
-                    className="block w-full min-w-0 max-w-full h-auto object-contain object-center" 
-                    loading={idx === 0 ? "eager" : "lazy"}
-                    decoding={idx === 0 ? "sync" : "async"}
-                    fetchPriority={idx === 0 ? "high" : "auto"}
-                  />
-                </div>
+                <img 
+                  src={img.url.endsWith("-800w.webp") ? img.url.replace("-800w.webp", "-160w.webp") : getOptimizedShopifyImage(img.url, 200)} 
+                  alt={`Thumbnail ${idx + 1}`} 
+                  className="w-full h-auto object-cover aspect-[4/5]" 
+                  loading={idx === 0 ? "eager" : "lazy"}
+                  decoding={idx === 0 ? "sync" : "async"}
+                  fetchPriority={idx === 0 ? "high" : "auto"}
+                  width={200}
+                  height={250}
+                />
               </div>
             ))}
           </div>
         </div>
-        
-        {/* Thumbnails */}
-        {images.length > 1 && (
-          <div className="w-full min-w-0 max-w-full mt-3 overflow-hidden box-border" ref={thumbRef} dir="ltr">
-            <div className="flex gap-2.5 w-full min-w-0 max-w-full">
-              {images.map((img, idx) => (
-                <div 
-                  key={idx} 
-                  className={`flex-[0_0_22%] min-w-0 cursor-pointer rounded-xl overflow-hidden transition-all duration-300 ${idx === selectedIndex ? 'border-2 border-[#D4AF37] opacity-100 shadow-md scale-105' : 'border-2 border-transparent hover:border-slate-200 opacity-70 hover:opacity-100'}`}
-                  onClick={() => onThumbClick(idx)}
-                >
-                  <img 
-                    src={img.url.endsWith("-800w.webp") ? img.url.replace("-800w.webp", "-160w.webp") : getOptimizedShopifyImage(img.url, 200)} 
-                    alt={`Thumbnail ${idx + 1}`} 
-                    className="w-full h-auto object-cover aspect-[4/5]" 
-                    loading={idx === 0 ? "eager" : "lazy"}
-                    decoding={idx === 0 ? "sync" : "async"}
-                    fetchPriority={idx === 0 ? "high" : "auto"}
-                    width={200}
-                    height={250}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </section>
+      )}
 
     </div>
   );

@@ -172,18 +172,24 @@
 }
 
 .mobile-gallery-root {
+  display: block;
   width: 100%;
   max-width: 100%;
-  padding: 0;
+  min-width: 0;
   margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
 .mobile-gallery-viewport {
-  width: calc(100% - 32px);
-  max-width: 488px;
-  margin-inline: auto;
-  padding: 0;
+  display: block;
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0;
+  margin-left: 16px !important;
+  margin-right: 16px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
   overflow: hidden;
   position: relative;
   box-sizing: border-box;
@@ -192,6 +198,8 @@
 .mobile-gallery-track {
   display: flex;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   gap: 0;
   margin: 0;
   padding: 0;
@@ -209,8 +217,10 @@
 }
 
 .mobile-gallery-card {
+  display: block;
   width: 100%;
   max-width: 100%;
+  min-width: 0;
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -222,6 +232,7 @@
   display: block;
   width: 100%;
   max-width: 100%;
+  min-width: 0;
   height: auto;
   margin: 0;
   padding: 0;
@@ -231,9 +242,11 @@
 }
 
 .mobile-gallery-thumbnails {
-  width: calc(100% - 32px);
-  max-width: 488px;
-  margin: 12px auto 0;
-  padding: 0;
+  display: flex;
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0;
+  margin: 12px 16px 0 !important;
+  padding: 0 !important;
   box-sizing: border-box;
 }

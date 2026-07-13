@@ -149,8 +149,8 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17839685555270",
-              "title": "Default Title",
+              "id": "gid://shopify/ProductVariant/17839730646860",
+              "title": "6,8,10,12",
               "availableForSale": true,
               "quantityAvailable": 100,
               "price": {
@@ -164,7 +164,7 @@
               "selectedOptions": [
                 {
                   "name": "size",
-                  "value": "Default Title"
+                  "value": "6,8,10,12"
                 }
               ]
             }
@@ -175,7 +175,7 @@
         {
           "name": "size",
           "values": [
-            "Default Title"
+            "6,8,10,12"
           ]
         }
       ],

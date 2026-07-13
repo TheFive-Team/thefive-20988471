@@ -123,19 +123,19 @@ function ProductPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-10 sm:py-24 box-border overflow-x-clip">
-      <div className="grid gap-0 md:grid-cols-2 md:gap-10 lg:gap-12 w-full">
+    <div className="mx-auto max-w-7xl py-8 sm:px-10 sm:py-24 overflow-x-clip">
+      <div className="grid gap-0 md:grid-cols-2 md:gap-10 lg:gap-12">
         
         {/* Mobile View: Gallery first, then Text */}
-        <div className="block md:hidden mb-6 w-full box-border">
+        <div className="block md:hidden mb-6">
           
           {/* 1. Gallery (Mobile) */}
-          <div className="mb-5 mx-auto w-full max-w-[520px] box-border">
+          <div className="mb-5 mx-auto w-full max-w-[520px]">
             <MobileImageGallery images={images} />
           </div>
 
           {/* 2. Text Details below gallery */}
-          <div className="mb-6 mx-auto w-full max-w-[520px] box-border">
+          <div className="mb-6 mx-4 w-auto max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px] box-border">
             <div className="flex flex-col items-start text-left bg-[#FCFCFC] rounded-[20px] p-[24px_20px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80 w-full max-w-full min-w-0 m-0 box-border overflow-hidden">
             
             {/* Collection Label */}
@@ -201,7 +201,7 @@ function ProductPage() {
                 sizes="(max-width: 768px) 100vw, 50vw"
                 alt={image.altText ?? p.title} 
                 width={800} height={1000} 
-                className="w-full h-auto block object-contain aspect-auto" 
+                className="h-full w-full object-cover aspect-[4/5]" 
                 fetchPriority="high" loading="eager" decoding="sync" 
               />
             )}
@@ -286,7 +286,7 @@ function ProductPage() {
           </div>
 
           {/* 8 & 9: Size / Quantity / COD Form */}
-          <div className="mb-8 mx-auto w-full max-w-[520px] relative z-10 box-border">
+          <div className="mb-8 mx-4 w-auto max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px] relative z-10 box-border">
             <CodForm 
               productName={p?.title}
               offers={offers}
@@ -304,7 +304,7 @@ function ProductPage() {
       {p.descriptionHtml && (
         <section className="mt-16 sm:mt-24 w-full">
           <div
-            className="shopify-rte mx-auto max-w-3xl text-foreground/85 text-center [&_img]:!block [&_img]:!mx-auto [&_img]:!my-10 [&_img]:!w-full [&_img]:!max-w-2xl [&_img]:!rounded-2xl [&_img]:!shadow-md [&_h1]:font-serif [&_h2]:font-serif [&_h3]:font-serif [&_h1]:text-3xl [&_h2]:text-2xl [&_h3]:text-xl [&_h1]:mt-10 [&_h2]:mt-10 [&_h3]:mt-8 [&_h1]:mb-4 [&_h2]:mb-4 [&_h3]:mb-3 [&_p]:my-4 [&_p]:leading-relaxed [&_ul]:my-4 [&_ul]:list-none [&_ul]:p-0 [&_li]:py-2 [&_li]:border-b [&_li]:border-border/50 [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_a]:underline [&_iframe]:mx-auto [&_iframe]:my-6 [&_iframe]:w-full [&_iframe]:max-w-2xl [&_iframe]:rounded-2xl"
+            className="shopify-rte mx-auto max-w-3xl text-foreground/85 text-center [&_img]:!block [&_img]:!mx-auto [&_img]:!my-10 [&_img]:!w-full [&_img]:!max-w-2xl [&_img]:!rounded-2xl [&_img]:!shadow-md [&_img]:!object-cover [&_h1]:font-serif [&_h2]:font-serif [&_h3]:font-serif [&_h1]:text-3xl [&_h2]:text-2xl [&_h3]:text-xl [&_h1]:mt-10 [&_h2]:mt-10 [&_h3]:mt-8 [&_h1]:mb-4 [&_h2]:mb-4 [&_h3]:mb-3 [&_p]:my-4 [&_p]:leading-relaxed [&_ul]:my-4 [&_ul]:list-none [&_ul]:p-0 [&_li]:py-2 [&_li]:border-b [&_li]:border-border/50 [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_a]:underline [&_iframe]:mx-auto [&_iframe]:my-6 [&_iframe]:w-full [&_iframe]:max-w-2xl [&_iframe]:rounded-2xl"
             dangerouslySetInnerHTML={{ __html: p.descriptionHtml }}
           />
         </section>
@@ -312,14 +312,15 @@ function ProductPage() {
 
       {/* Middle Detail Images */}
       {p.detailImages?.edges && p.detailImages.edges.length > 0 && (
-        <section className="mx-auto w-full max-w-[520px] flex flex-col items-center justify-center mt-6 mb-6 space-y-4 box-border">
+        <section className="mx-4 w-auto max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px] flex flex-col items-center justify-center mt-6 mb-6 space-y-4 box-border">
           {p.detailImages.edges.map((e, idx) => (
-            <div key={idx} className="detail-image-card">
+            <div key={idx} className="w-full rounded-[18px] overflow-hidden box-border bg-transparent">
               <img 
                 src={getOptimizedShopifyImage(e.node.url, 800)} 
                 srcSet={getLocalSrcSet(e.node.url) || `${getOptimizedShopifyImage(e.node.url, 400)} 400w, ${getOptimizedShopifyImage(e.node.url, 800)} 800w`}
                 sizes="(max-width: 520px) 100vw, 520px"
                 alt={e.node.altText || `${p.title} detail view ${idx + 1}`} 
+                className="w-full h-auto block object-contain object-center aspect-auto" 
                 loading="lazy"
                 decoding="async"
               />

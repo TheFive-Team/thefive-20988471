@@ -154,3 +154,20 @@
 }
 .marquee-track > * { flex: 0 0 auto; }
 
+.detail-image-card {
+    width: calc(100% - 32px);
+    margin: 16px auto;
+    border-radius: 18px;
+    overflow: hidden;
+    background: transparent;
+}
+
+.detail-image-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    object-position: center;
+    aspect-ratio: auto;
+}
+

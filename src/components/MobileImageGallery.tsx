@@ -3,7 +3,13 @@ import useEmblaCarousel from "embla-carousel-react";
 import { getOptimizedShopifyImage, getLocalSrcSet } from "@/lib/shopify";
 
 export function MobileImageGallery({ images }: { images: { url: string; altText?: string | null }[] }) {
-  const [mainRef, mainApi] = useEmblaCarousel({ loop: true });
+  const [mainRef, mainApi] = useEmblaCarousel({ 
+    align: "start",
+    containScroll: "trimSnaps",
+    loop: false,
+    skipSnaps: false,
+    dragFree: false
+  });
   const [thumbRef, thumbApi] = useEmblaCarousel({ containScroll: "keepSnaps", dragFree: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -35,22 +41,25 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
       
       {/* 1. MAIN GALLERY (Top Carousel + Thumbnails) */}
       <section className="w-full">
-        <div className="overflow-hidden rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 bg-[#FCFCFC]" ref={mainRef}>
-          <div className="flex">
+        <div className="bg-red-500 text-white font-bold p-2 text-center">MOBILE GALLERY UPDATED</div>
+        <div className="overflow-hidden w-full relative box-border" ref={mainRef}>
+          <div className="flex touch-pan-y">
             {images.map((img, idx) => (
-              <div className="flex-[0_0_100%] min-w-0" key={idx}>
-                <img 
-                  src={getOptimizedShopifyImage(img.url, 800)} 
-                  srcSet={getLocalSrcSet(img.url) || `${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
-                  sizes="100vw"
-                  alt={img.altText || `Product view ${idx + 1}`} 
-                  className="w-full h-auto object-cover aspect-[4/5]" 
-                  loading={idx === 0 ? "eager" : "lazy"}
-                  decoding={idx === 0 ? "sync" : "async"}
-                  fetchPriority={idx === 0 ? "high" : "auto"}
-                  width={800}
-                  height={1000}
-                />
+              <div className="flex-[0_0_100%] min-w-0 w-full box-border" key={idx}>
+                <div className="w-full overflow-hidden rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 bg-[#FCFCFC] relative box-border">
+                  <img 
+                    src={getOptimizedShopifyImage(img.url, 800)} 
+                    srcSet={getLocalSrcSet(img.url) || `${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
+                    sizes="100vw"
+                    alt={img.altText || `Product view ${idx + 1}`} 
+                    className="block w-full h-auto object-contain max-w-full" 
+                    loading={idx === 0 ? "eager" : "lazy"}
+                    decoding={idx === 0 ? "sync" : "async"}
+                    fetchPriority={idx === 0 ? "high" : "auto"}
+                    width={800}
+                    height={1000}
+                  />
+                </div>
               </div>
             ))}
           </div>

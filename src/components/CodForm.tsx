@@ -334,7 +334,7 @@ export function CodForm({
             </div>
           </div>
           
-          <div className="grid grid-cols-1 max-[359px]:grid-cols-1 min-[360px]:grid-cols-2 gap-[12px] w-full min-w-0">
+          <div className="grid grid-cols-1 min-[376px]:grid-cols-2 gap-[12px] w-full min-w-0">
             <div>
               <label htmlFor="fullname" className={labelClasses}>الاسم الكامل</label>
               <input 
@@ -403,7 +403,7 @@ export function CodForm({
             </div>
           </div>
           
-          <div className="grid grid-cols-1 max-[359px]:grid-cols-1 min-[360px]:grid-cols-2 gap-[12px] w-full min-w-0">
+          <div className="grid grid-cols-1 min-[376px]:grid-cols-2 gap-[12px] w-full min-w-0">
             <label className={`relative flex items-center px-4 h-[52px] border rounded-[11px] cursor-pointer transition-all duration-300 min-w-0 ${form.shippingMethod === 'home' ? 'border-[#D7AE57] border-[1.5px] bg-[#FFF8E8]' : 'border-[#DDE2E7] hover:bg-slate-50 bg-[#FFFFFF]'}`}>
               <input type="radio" name="shippingMethod" value="home" checked={form.shippingMethod === 'home'} onChange={() => { setForm({...form, shippingMethod: 'home'}); setShippingError(false); }} className="sr-only" />
               <div className="flex items-center gap-3 w-full min-w-0">

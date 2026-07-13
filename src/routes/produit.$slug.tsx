@@ -286,7 +286,7 @@ function ProductPage() {
           </div>
 
           {/* 8 & 9: Size / Quantity / COD Form */}
-          <div className="mb-8 mx-4 w-auto max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px] relative z-10 box-border">
+          <div className="cod-form-wrapper mb-8 min-[553px]:mx-auto min-[553px]:w-[520px] min-[553px]:max-w-[520px] relative z-10">
             <CodForm 
               productName={p?.title}
               offers={offers}

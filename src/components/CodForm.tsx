@@ -226,11 +226,11 @@ export function CodForm({
     );
   }
 
-  const inputClasses = "w-full px-3 h-[46px] bg-[#FCFAF6] border border-[#DDD7CB] rounded-[10px] text-[#102A43] text-sm focus:ring-[3px] focus:ring-[#D7AE57]/15 focus:border-[#D7AE57] transition-all duration-300 outline-none shadow-none placeholder:text-[#B0B4BA]";
+  const inputClasses = "w-full max-w-full min-w-0 box-border px-3 h-[46px] bg-[#FCFAF6] border border-[#DDD7CB] rounded-[10px] text-[#102A43] text-sm focus:ring-[3px] focus:ring-[#D7AE57]/15 focus:border-[#D7AE57] transition-all duration-300 outline-none shadow-none placeholder:text-[#B0B4BA]";
   const labelClasses = "block text-[12px] font-semibold text-[#20364B] mb-[5px] tracking-wide";
 
   return (
-    <div className="bg-[#FFFDF8] rounded-[20px] shadow-[0_8px_24px_rgba(13,35,56,0.06)] border border-[#E8E0D2] p-[20px_16px] font-arabic transition-all duration-500 w-full max-w-full min-w-0 m-0 box-border overflow-hidden" id="checkout-form" dir="rtl">
+    <div className="cod-form-card bg-[#FFFDF8] rounded-[20px] shadow-[0_8px_24px_rgba(13,35,56,0.06)] border border-[#E8E0D2] p-[20px_16px] font-arabic transition-all duration-500" id="checkout-form" dir="rtl">
       
       {formError && (
         <div className="mb-[22px] p-4 bg-[#B94A48]/10 border border-[#B94A48]/20 rounded-xl flex items-center gap-2 text-[#B94A48] text-xs sm:text-sm font-bold animate-in fade-in">
@@ -242,7 +242,7 @@ export function CodForm({
       <form onSubmit={handleSubmit} className="space-y-0" onFocus={handleFormInteraction} onClick={handleFormInteraction}>
         
         {/* Section 1: Quantity */}
-        <section className="animate-in fade-in duration-500">
+        <section className="animate-in fade-in duration-500 w-full max-w-full min-w-0 box-border">
           <div className="flex items-center justify-between mb-[10px]">
             <div className="flex items-start gap-3 w-full min-w-0">
               <span className="flex items-center justify-center w-[18px] h-[18px] flex-[0_0_18px] rounded-full bg-[#102A43] text-[#D7AE57] font-serif text-[12px] pt-[1px] static transform-none mt-1 shrink-0">1</span>
@@ -264,7 +264,7 @@ export function CodForm({
         {/* Section 2: Sizes */}
         {variants.length > 1 && (
           <>
-            <section id="size-selector" className="animate-in fade-in slide-in-from-top-4 duration-500">
+            <section id="size-selector" className="animate-in fade-in slide-in-from-top-4 duration-500 w-full max-w-full min-w-0 box-border">
               <div className="flex items-start gap-3 w-full min-w-0 mb-[10px]">
                 <span className="flex items-center justify-center w-[18px] h-[18px] flex-[0_0_18px] rounded-full bg-[#102A43] text-[#D7AE57] font-serif text-[12px] pt-[1px] static transform-none mt-1 shrink-0">2</span>
                 <div className="flex flex-col text-right w-full min-w-0">
@@ -323,7 +323,7 @@ export function CodForm({
         )}
 
         {/* Section 3: Customer Info */}
-        <section className="animate-in fade-in slide-in-from-top-4 duration-500">
+        <section className="animate-in fade-in slide-in-from-top-4 duration-500 w-full max-w-full min-w-0 box-border">
           <div className="flex items-start gap-3 w-full min-w-0 mb-[10px]">
             <span className="flex items-center justify-center w-[18px] h-[18px] flex-[0_0_18px] rounded-full bg-[#102A43] text-[#D7AE57] font-serif text-[12px] pt-[1px] static transform-none mt-1 shrink-0">
                {variants.length > 1 ? '3' : '2'}
@@ -388,7 +388,7 @@ export function CodForm({
         </section>
 
         {/* Section 4: Delivery */}
-        <section id="shipping-method" className="animate-in fade-in slide-in-from-top-4 duration-500">
+        <section id="shipping-method" className="animate-in fade-in slide-in-from-top-4 duration-500 w-full max-w-full min-w-0 box-border">
           <div className="h-px bg-[#EEE8DE] my-[22px]"></div>
           <div className="flex items-start gap-3 w-full min-w-0 mb-[10px]">
             <span className="flex items-center justify-center w-[18px] h-[18px] flex-[0_0_18px] rounded-full bg-[#102A43] text-[#D7AE57] font-serif text-[12px] pt-[1px] static transform-none mt-1 shrink-0">
@@ -435,7 +435,7 @@ export function CodForm({
         </section>
 
         {/* Section 5: Order Summary */}
-        <section className="animate-in fade-in slide-in-from-top-4 duration-500 bg-[#FBF8F2] border border-[#E8E0D2] rounded-[14px] p-[14px] mt-4">
+        <section className="animate-in fade-in slide-in-from-top-4 duration-500 bg-[#FBF8F2] border border-[#E8E0D2] rounded-[14px] p-[14px] mt-4 w-full max-w-full min-w-0 box-border">
           <div className="flex items-start gap-3 w-full min-w-0 mb-[10px]">
             <span className="flex items-center justify-center w-[18px] h-[18px] flex-[0_0_18px] rounded-full bg-[#102A43] text-[#D7AE57] font-serif text-[12px] pt-[1px] static transform-none mt-1 shrink-0">
                {variants.length > 1 ? '5' : '4'}

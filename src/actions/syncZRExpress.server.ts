@@ -143,167 +143,200 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
              continue;
           }
 
-          const deliveryTypeStr = (order.delivery_type || "").toLowerCase();
-          const isStopDesk = /استلام|desk|pickup|office/i.test(deliveryTypeStr);
-          const finalDeliveryType = isStopDesk ? "pickup-point" : "home";
-
-          let deskNameFromType = "";
-          if (isStopDesk && order.delivery_type && order.delivery_type.includes(" - ")) {
-            deskNameFromType = order.delivery_type.split(" - ").slice(1).join(" - ").trim();
-          }
-
-          const deskObj = order.selectedDesk || (order.selectedDeskName ? { 
-            name: order.selectedDeskName, 
-            wilaya: order.selectedDeskWilaya,
-            commune: order.selectedDeskCommune,
-            address: order.selectedDeskAddress,
-            id: order.selectedDeskId
-          } : deskNameFromType ? { name: deskNameFromType } : null);
-
-          // Validation
-          const customerName = order.fullname || "Client";
-          const phoneStr = normalizePhone(order.phone || "");
-          if (!phoneStr) {
-            console.warn(`[ORDER_VALIDATION_FAILED] Invalid phone for order ${order.id}`);
-            results.push({ success: false, id: order.id, stage: "VALIDATION", code: "INVALID_PHONE", message: "رقم الهاتف غير صالح" });
-            continue;
-          }
-
-          const targetWilaya = isStopDesk && deskObj?.wilaya ? deskObj.wilaya : order.wilaya;
-          if (!targetWilaya) {
-            console.warn(`[ORDER_VALIDATION_FAILED] Missing wilaya for order ${order.id}`);
-            results.push({ success: false, id: order.id, stage: "VALIDATION", code: "INVALID_WILAYA", message: "الولاية مفقودة" });
-            continue;
-          }
-
-          const targetCommune = isStopDesk && deskObj?.commune ? deskObj.commune : order.commune;
-          if (!targetCommune) {
-            console.warn(`[ORDER_VALIDATION_FAILED] Missing commune for order ${order.id}`);
-            results.push({ success: false, id: order.id, stage: "VALIDATION", code: "INVALID_COMMUNE", message: "البلدية مفقودة" });
-            continue;
-          }
-
-          if (isStopDesk && !deskObj?.name && !deskObj?.id) {
-             console.warn(`[ORDER_VALIDATION_FAILED] Missing desk info for Stop Desk order ${order.id}`);
-             results.push({ success: false, id: order.id, stage: "VALIDATION", code: "INVALID_DESK", message: "يرجى اختيار مكتب التوصيل" });
-             continue;
-          }
-
-          console.log("[ORDER_VALIDATED] Payload data appears valid.");
-
-          let wilayaUuid = await searchTerritory(targetWilaya, "wilaya");
-          let communeUuid = await searchTerritory(targetCommune, "commune");
-
-          if (!wilayaUuid) {
-            wilayaUuid = crypto.randomUUID();
-            console.log(`[ZR_MAPPING_WARNING] Random UUID used for Wilaya: ${targetWilaya}`);
-          }
-          if (!communeUuid) {
-            communeUuid = crypto.randomUUID();
-            console.log(`[ZR_MAPPING_WARNING] Random UUID used for Commune: ${targetCommune}`);
-          }
-
-          const targetStreet = isStopDesk && deskObj?.address ? deskObj.address : (order.address || order.commune || "");
-          let productDescription = order.product_name || "Produit";
-          if (order.selected_offer_title) productDescription += ` - ${order.selected_offer_title}`;
-          if (order.selected_sizes && Array.isArray(order.selected_sizes) && order.selected_sizes.length > 0) {
-            productDescription += ` - المقاسات: ${order.selected_sizes.join(', ')}`;
-          } else if (order.variant_title) {
-            productDescription += ` - ${order.variant_title}`;
-          }
-          if (order.notes) productDescription += ` | ملاحظات: ${order.notes}`;
-
-          const payload: any = {
-            customer: {
-              customerId: crypto.randomUUID(),
-              name: customerName,
-              phone: { number1: phoneStr }
+          // 1. Check if ZR Express parcel already exists to prevent duplicates
+          console.log(`[ZR_REQUEST_SENT] Checking if shipment already exists for order ${order.id}...`);
+          const searchRes = await fetch(`${API_BASE}/api/v1/parcels/search`, {
+            method: 'POST',
+            headers: {
+              'X-Api-Key': API_KEY,
+              'X-Tenant': TENANT_ID,
+              'Authorization': `Bearer ${API_KEY}`,
+              'Content-Type': 'application/json'
             },
-            deliveryAddress: {
-              cityTerritoryId: wilayaUuid,
-              districtTerritoryId: communeUuid,
-              street: targetStreet
-            },
-            orderedProducts: [
-              {
-                productName: order.product_name || "Produit",
-                unitPrice: Number(order.total_amount) || 0,
-                quantity: 1,
-                stockType: "none"
-              }
-            ],
-            amount: Number(order.total_amount) || 0,
-            description: productDescription,
-            deliveryType: finalDeliveryType,
-            externalId: order.id
-          };
+            body: JSON.stringify({ keyword: order.id })
+          });
           
-          const sanitizedPayload = { ...payload };
-
-          let finalHubId = deskObj?.id;
-          if (isStopDesk && !finalHubId && deskObj?.name) {
-            try {
-              const fs = await import('fs');
-              const path = await import('path');
-              const officesPath = path.resolve(process.cwd(), 'src/lib/zr_offices.json');
-              if (fs.existsSync(officesPath)) {
-                const offices = JSON.parse(fs.readFileSync(officesPath, 'utf8'));
-                const match = offices.find((o: any) => o.name === deskObj.name);
-                if (match?.id) finalHubId = match.id;
+          let existingParcel = null;
+          if (searchRes.ok) {
+            const searchData = await searchRes.json();
+            if (searchData && searchData.items && searchData.items.length > 0) {
+              existingParcel = searchData.items.find((i: any) => i.externalId === order.id || i.description?.includes(order.id));
+              if (!existingParcel) {
+                existingParcel = searchData.items[0]; // fallback to first match
               }
-            } catch (e) {
-              console.error('[ZR_MAPPING_ERROR] Failed to map desk name to Hub ID:', e);
+              console.log(`[ZR_DUPLICATE_PREVENTED] Found existing shipment for order ${order.id} (ZR ID: ${existingParcel.id}, Tracking: ${existingParcel.trackingNumber})`);
             }
           }
 
-          if (isStopDesk && finalHubId) {
-            payload.hubId = finalHubId;
-          }
+          let zrData: any = null;
 
-          console.log(`[ZR_PAYLOAD_BUILT] Prepared payload for ${order.id}. Keys: ${Object.keys(payload).join(', ')}`);
-          
-          console.log(`[ZR_REQUEST_SENT] Sending request to ${API_BASE}/api/v1/parcels`);
-          const response = await fetch(`${API_BASE}/api/v1/parcels`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${API_KEY}`,
-              'X-Api-Key': API_KEY,
-              'X-Tenant': TENANT_ID,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-          });
+          if (existingParcel) {
+             zrData = existingParcel;
+          } else {
+            const deliveryTypeStr = (order.delivery_type || "").toLowerCase();
+            const isStopDesk = /استلام|desk|pickup|office/i.test(deliveryTypeStr);
+            const finalDeliveryType = isStopDesk ? "pickup-point" : "home";
 
-          if (!response.ok) {
-            const errText = await response.text();
-            console.error(`[SYNC_FAILED_AT: ZR_RESPONSE_RECEIVED] Status: ${response.status}`);
-            console.error(`[ZR ERROR] ${errText}`);
+            let deskNameFromType = "";
+            if (isStopDesk && order.delivery_type && order.delivery_type.includes(" - ")) {
+              deskNameFromType = order.delivery_type.split(" - ").slice(1).join(" - ").trim();
+            }
+
+            const deskObj = order.selectedDesk || (order.selectedDeskName ? { 
+              name: order.selectedDeskName, 
+              wilaya: order.selectedDeskWilaya,
+              commune: order.selectedDeskCommune,
+              address: order.selectedDeskAddress,
+              id: order.selectedDeskId
+            } : deskNameFromType ? { name: deskNameFromType } : null);
+
+            // Validation
+            const customerName = order.fullname || "Client";
+            const phoneStr = normalizePhone(order.phone || "");
+            if (!phoneStr) {
+              console.warn(`[ORDER_VALIDATION_FAILED] Invalid phone for order ${order.id}`);
+              results.push({ success: false, id: order.id, stage: "VALIDATION", code: "INVALID_PHONE", message: "رقم الهاتف غير صالح" });
+              continue;
+            }
+
+            const targetWilaya = isStopDesk && deskObj?.wilaya ? deskObj.wilaya : order.wilaya;
+            if (!targetWilaya) {
+              console.warn(`[ORDER_VALIDATION_FAILED] Missing wilaya for order ${order.id}`);
+              results.push({ success: false, id: order.id, stage: "VALIDATION", code: "INVALID_WILAYA", message: "الولاية مفقودة" });
+              continue;
+            }
+
+            const targetCommune = isStopDesk && deskObj?.commune ? deskObj.commune : order.commune;
+            if (!targetCommune) {
+              console.warn(`[ORDER_VALIDATION_FAILED] Missing commune for order ${order.id}`);
+              results.push({ success: false, id: order.id, stage: "VALIDATION", code: "INVALID_COMMUNE", message: "البلدية مفقودة" });
+              continue;
+            }
+
+            if (isStopDesk && !deskObj?.name && !deskObj?.id) {
+               console.warn(`[ORDER_VALIDATION_FAILED] Missing desk info for Stop Desk order ${order.id}`);
+               results.push({ success: false, id: order.id, stage: "VALIDATION", code: "INVALID_DESK", message: "يرجى اختيار مكتب التوصيل" });
+               continue;
+            }
+
+            console.log("[ORDER_VALIDATED] Payload data appears valid.");
+
+            let wilayaUuid = await searchTerritory(targetWilaya, "wilaya");
+            let communeUuid = await searchTerritory(targetCommune, "commune");
+
+            if (!wilayaUuid) {
+              wilayaUuid = crypto.randomUUID();
+              console.log(`[ZR_MAPPING_WARNING] Random UUID used for Wilaya: ${targetWilaya}`);
+            }
+            if (!communeUuid) {
+              communeUuid = crypto.randomUUID();
+              console.log(`[ZR_MAPPING_WARNING] Random UUID used for Commune: ${targetCommune}`);
+            }
+
+            const targetStreet = isStopDesk && deskObj?.address ? deskObj.address : (order.address || order.commune || "");
+            let productDescription = order.product_name || "Produit";
+            if (order.selected_offer_title) productDescription += ` - ${order.selected_offer_title}`;
+            if (order.selected_sizes && Array.isArray(order.selected_sizes) && order.selected_sizes.length > 0) {
+              productDescription += ` - المقاسات: ${order.selected_sizes.join(', ')}`;
+            } else if (order.variant_title) {
+              productDescription += ` - ${order.variant_title}`;
+            }
+            if (order.notes) productDescription += ` | ملاحظات: ${order.notes}`;
+
+            const payload: any = {
+              customer: {
+                customerId: crypto.randomUUID(),
+                name: customerName,
+                phone: { number1: phoneStr }
+              },
+              deliveryAddress: {
+                cityTerritoryId: wilayaUuid,
+                districtTerritoryId: communeUuid,
+                street: targetStreet
+              },
+              orderedProducts: [
+                {
+                  productName: order.product_name || "Produit",
+                  unitPrice: Number(order.total_amount) || 0,
+                  quantity: 1,
+                  stockType: "none"
+                }
+              ],
+              amount: Number(order.total_amount) || 0,
+              description: productDescription,
+              deliveryType: finalDeliveryType,
+              externalId: order.id
+            };
             
-            let sanitizedError = errText;
-            try {
-               const parsedErr = JSON.parse(errText);
-               sanitizedError = parsedErr.message || JSON.stringify(parsedErr);
-            } catch (e) {}
-
-            results.push({ 
-              success: false, 
-              id: order.id, 
-              stage: "ZR_REQUEST", 
-              code: response.status >= 500 ? "ZR_SERVER_ERROR" : "ZR_BAD_REQUEST", 
-              message: "رفض ZR Express الطلب", 
-              details: sanitizedError,
-              payload: sanitizedPayload,
-              responseBody: errText,
-              debugContext: {
-                 customerName, phoneStr, targetWilaya, targetCommune, deliveryType: finalDeliveryType, deskName: deskObj?.name, deskId: deskObj?.id, finalHubId
+            let finalHubId = deskObj?.id;
+            if (isStopDesk && !finalHubId && deskObj?.name) {
+              try {
+                const fs = await import('fs');
+                const path = await import('path');
+                const officesPath = path.resolve(process.cwd(), 'src/lib/zr_offices.json');
+                if (fs.existsSync(officesPath)) {
+                  const offices = JSON.parse(fs.readFileSync(officesPath, 'utf8'));
+                  const match = offices.find((o: any) => o.name === deskObj.name);
+                  if (match?.id) finalHubId = match.id;
+                }
+              } catch (e) {
+                console.error('[ZR_MAPPING_ERROR] Failed to map desk name to Hub ID:', e);
               }
+            }
+
+            if (isStopDesk && finalHubId) {
+              payload.hubId = finalHubId;
+            }
+
+            console.log(`[ZR_PAYLOAD_BUILT] Prepared payload for ${order.id}. Keys: ${Object.keys(payload).join(', ')}`);
+            
+            console.log(`[ZR_REQUEST_SENT] Sending request to ${API_BASE}/api/v1/parcels`);
+            const response = await fetch(`${API_BASE}/api/v1/parcels`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${API_KEY}`,
+                'X-Api-Key': API_KEY,
+                'X-Tenant': TENANT_ID,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(payload)
             });
-            continue; 
-          }
+            
+            console.log(`[ZR_RESPONSE_RECEIVED] Status: ${response.status} ${response.statusText} for order ${order.id}`);
+            
+            const rawBody = await response.text();
+            
+            if (!response.ok) {
+              console.error(`[SYNC_FAILED_AT: ZR_REQUEST] ZR API Error for ${order.id}:`, rawBody);
+              let errorMsg = "حدث خطأ غير معروف في واجهة ZR Express";
+              try {
+                const errObj = JSON.parse(rawBody);
+                errorMsg = errObj.message || errObj.error || errorMsg;
+              } catch (e) {}
+              
+              results.push({ 
+                success: false, 
+                id: order.id, 
+                stage: "ZR_REQUEST", 
+                code: `HTTP_${response.status}`, 
+                message: "رفض ZR Express الطلب",
+                details: errorMsg,
+                payload: payload,
+                responseBody: rawBody,
+                debugContext: {
+                   status: response.status,
+                   statusText: response.statusText,
+                   body: rawBody
+                }
+              });
+              continue;
+            }
+  
+            zrData = JSON.parse(rawBody);
+            console.log(`[ZR_SUCCESS] Successfully synced order ${order.id}`);
+          } // End of else (create new shipment)
 
-          const zrData = await response.json();
-          console.log(`[ZR_RESPONSE_RECEIVED] Success for order ${order.id}. HTTP 200/201`);
-
+          // 3. Update Supabase with Tracking Info
           const trackingNumber = zrData.trackingNumber || zrData.code || zrData.id || `ZRE-${order.id.substring(0,6)}`;
           const zrExpressId = zrData.id || zrData.parcelId || '';
 

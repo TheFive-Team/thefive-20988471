@@ -1,28 +1,6 @@
 import { ShieldCheck, Truck, Banknote, RotateCcw } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 
 export function WhyChooseUs() {
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
   const features = [
     {
       icon: <ShieldCheck className="w-[32px] h-[32px] text-[#C9A34A]" strokeWidth={1.5} />,
@@ -48,8 +26,7 @@ export function WhyChooseUs() {
 
   return (
     <section 
-      ref={sectionRef}
-      className={`w-full bg-[#F8F5EF] border-t border-[#E4DAC7] py-[32px] px-[24px] sm:px-[28px] transition-opacity duration-700 ease-out ${isVisible ? 'opacity-100' : 'opacity-0'}`} 
+      className="w-full bg-[#F8F5EF] border-t border-[#E4DAC7] py-[32px] px-[24px] sm:px-[28px]" 
       dir="rtl"
     >
       <div className="max-w-5xl mx-auto">
@@ -57,8 +34,7 @@ export function WhyChooseUs() {
           {features.map((feature, idx) => (
             <div 
               key={idx} 
-              className={`bg-[#FFFDF8] rounded-[18px] border border-[#E9DDC8] p-[24px] min-h-[156px] flex flex-col items-center text-center justify-start shadow-[0_2px_8px_rgba(16,42,67,0.02)] transition-all duration-300 ease-out md:hover:-translate-y-[3px] md:hover:shadow-[0_6px_20px_rgba(16,42,67,0.05)] ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
-              style={{ transitionDelay: `${idx * 75}ms` }}
+              className="bg-[#FFFDF8] rounded-[18px] border border-[#E9DDC8] p-[24px] min-h-[156px] flex flex-col items-center text-center justify-start shadow-[0_2px_8px_rgba(16,42,67,0.02)] transition-all duration-300 ease-out md:hover:-translate-y-[3px] md:hover:shadow-[0_6px_20px_rgba(16,42,67,0.05)]"
             >
               <div className="w-[56px] h-[56px] rounded-full bg-[#F8F5EF] flex items-center justify-center mb-[18px] border border-[#C9A34A]/30 shrink-0">
                 {feature.icon}

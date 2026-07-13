@@ -90,8 +90,9 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
         };
       }
 
-      const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
-      const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
+      // Reuse the statically resolved URL and Key from the default client to avoid Vercel process.env undefined errors
+      const supabaseUrl = defaultSupabase.supabaseUrl;
+      const supabaseAnonKey = defaultSupabase.supabaseKey;
       
       const authSupabase = createClient(supabaseUrl, supabaseAnonKey, {
         global: {

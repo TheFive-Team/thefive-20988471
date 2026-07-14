@@ -48,10 +48,13 @@ function LeadFormPage() {
         const w = window as unknown as { fbq?: (...args: unknown[]) => void };
         const contentIds = items.map((i) => i.variantId.split("/").pop() ?? i.variantId);
         const contents = items.map((i) => ({ id: i.variantId.split("/").pop() ?? i.variantId, quantity: i.quantity }));
-        w.fbq?.("track", "Lead", { value: total, currency, content_ids: contentIds, contents, content_type: "product" });
+        
+        const metaValue = Number(total);
+        if (Number.isFinite(metaValue)) {
+          w.fbq?.("track", "Lead", { value: metaValue, currency: "DZD", content_ids: contentIds, contents, content_type: "product" });
+        }
         
         const metaCurrency = "DZD";
-        const metaValue = Number(total);
         if (!Number.isFinite(metaValue)) {
           console.error("[Meta Pixel] Invalid Purchase value", {
             valuePresent: total !== undefined && total !== null

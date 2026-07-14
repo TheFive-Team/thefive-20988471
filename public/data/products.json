@@ -63,31 +63,31 @@
         "edges": [
           {
             "node": {
-              "url": "/images/product-detail-1783890947194-13-800w.webp",
+              "url": "/images/product-detail-1784058313936-13-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-detail-1783890951700-14-800w.webp",
+              "url": "/images/product-detail-1784058318635-14-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-detail-1783890961836-15-800w.webp",
+              "url": "/images/product-detail-1784058323123-15-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-detail-1783890966334-16-800w.webp",
+              "url": "/images/product-detail-1784058327460-16-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-detail-1783890971036-17-800w.webp",
+              "url": "/images/product-detail-1784058331860-17-800w.webp",
               "altText": null
             }
           }
@@ -149,7 +149,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17839731687350",
+              "id": "gid://shopify/ProductVariant/17840583358990",
               "title": "6",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -171,7 +171,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17839731687351",
+              "id": "gid://shopify/ProductVariant/17840583358991",
               "title": "8",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -193,7 +193,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17839731687352",
+              "id": "gid://shopify/ProductVariant/17840583358992",
               "title": "10",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -215,7 +215,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17839731687353",
+              "id": "gid://shopify/ProductVariant/17840583358993",
               "title": "12",
               "availableForSale": true,
               "quantityAvailable": 100,

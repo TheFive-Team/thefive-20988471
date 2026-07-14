@@ -1261,12 +1261,24 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const [replaceTargetId, setReplaceTargetId] = useState<string | null>(null);
 
+  const getActiveToken = () => {
+    let activeToken = token || import.meta.env.VITE_GITHUB_TOKEN || localStorage.getItem("github_token");
+    if (!activeToken) {
+      activeToken = prompt("الرجاء إدخال رمز جيت هاب (GitHub PAT) لحفظ التعديلات:");
+      if (activeToken) {
+        localStorage.setItem("github_token", activeToken);
+      }
+    }
+    return activeToken;
+  };
+
   const cleanUnusedImages = async () => {
-    if (!token) return;
+    const activeToken = getActiveToken();
+    if (!activeToken) return;
     setIsCleaning(true);
     try {
       // 1. Fetch all files from public/images
-      const allFiles = await listFiles("public/images", token);
+      const allFiles = await listFiles("public/images", activeToken);
       
       // 2. Parse products.json to collect all used filenames
       const usedUrls = new Set<string>();
@@ -1302,7 +1314,7 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       // 4. Delete orphans sequentially
       let deleted = 0;
       for (const orphan of orphans) {
-        await deleteFile(`public/images/${orphan.name}`, `Clean unused image ${orphan.name}`, token);
+        await deleteFile(`public/images/${orphan.name}`, `Clean unused image ${orphan.name}`, activeToken);
         deleted++;
       }
       
@@ -1565,7 +1577,8 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
   };
 
   const saveProduct = async () => {
-    if (!token) return;
+    const activeToken = getActiveToken();
+    if (!activeToken) return;
     if (!editForm.title || !editForm.price) {
       alert("الرجاء إدخال اسم المنتج والسعر / Please enter title and price");
       return;
@@ -1583,15 +1596,15 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
         
         if (img.base64_800 && img.base64_400 && img.base64_160) {
           const baseName = `product-${img.group}-${Date.now()}-${i}`;
-          await commitFile(`public/images/${baseName}-800w.webp`, img.base64_800, `Upload 800w image for ${editForm.title}`, token, true);
-          await commitFile(`public/images/${baseName}-400w.webp`, img.base64_400, `Upload 400w image for ${editForm.title}`, token, true);
-          await commitFile(`public/images/${baseName}-160w.webp`, img.base64_160, `Upload 160w image for ${editForm.title}`, token, true);
+          await commitFile(`public/images/${baseName}-800w.webp`, img.base64_800, `Upload 800w image for ${editForm.title}`, activeToken, true);
+          await commitFile(`public/images/${baseName}-400w.webp`, img.base64_400, `Upload 400w image for ${editForm.title}`, activeToken, true);
+          await commitFile(`public/images/${baseName}-160w.webp`, img.base64_160, `Upload 160w image for ${editForm.title}`, activeToken, true);
           finalUrl = `/images/${baseName}-800w.webp`;
         } else if (img.base64) {
           // Fallback for any legacy unoptimized upload logic
           const fileName = `product-${img.group}-${Date.now()}-${i}.png`;
           const imagePath = `public/images/${fileName}`;
-          await commitFile(imagePath, img.base64, `Upload image for ${editForm.title}`, token, true);
+          await commitFile(imagePath, img.base64, `Upload image for ${editForm.title}`, activeToken, true);
           finalUrl = `/images/${fileName}`;
         }
         
@@ -1622,7 +1635,7 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
         "public/data/products.json",
         JSON.stringify(updatedProducts, null, 2),
         `${mode === "create" ? "Create" : "Update"} product: ${editForm.title}`,
-        token,
+        activeToken,
         false
       );
       
@@ -1639,6 +1652,9 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
   const deleteProduct = async (id: string, title: string) => {
     if (!confirm(`هل أنت متأكد من حذف المنتج: ${title}؟\nAre you sure you want to delete this product?`)) return;
     
+    const activeToken = getActiveToken();
+    if (!activeToken) return;
+    
     setIsSaving(true);
     try {
       const updatedProducts = products.filter(p => p.node.id !== id);
@@ -1646,7 +1662,7 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
         "public/data/products.json",
         JSON.stringify(updatedProducts, null, 2),
         `Delete product: ${title}`,
-        token,
+        activeToken,
         false
       );
       alert("تم حذف المنتج بنجاح!");

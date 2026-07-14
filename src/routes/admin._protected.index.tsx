@@ -1272,6 +1272,14 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
     return activeToken;
   };
 
+  const handleGitHubError = (err: any, prefix = "Error") => {
+    alert(`${prefix}: ${err.message}`);
+    if (err.message?.includes("Bad credentials") || err.message?.includes("401") || err.message?.includes("Not Found") || err.message?.includes("404")) {
+      localStorage.removeItem("github_token");
+      alert("تم مسح رمز GitHub غير الصالح. يرجى المحاولة مرة أخرى وإدخال رمز صالح مع صلاحيات (repo).");
+    }
+  };
+
   const cleanUnusedImages = async () => {
     const activeToken = getActiveToken();
     if (!activeToken) return;
@@ -1320,7 +1328,7 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       
       alert(`تم تنظيف ${deleted} صور بنجاح / Successfully cleaned ${deleted} images`);
     } catch (err: any) {
-      alert("Error cleaning images: " + err.message);
+      handleGitHubError(err, "Error cleaning images");
     } finally {
       setIsCleaning(false);
     }
@@ -1643,7 +1651,7 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       setMode("list");
       onRefresh();
     } catch (err: any) {
-      alert("Error: " + err.message);
+      handleGitHubError(err, "Error saving product");
     } finally {
       setIsSaving(false);
     }
@@ -1668,7 +1676,7 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       alert("تم حذف المنتج بنجاح!");
       onRefresh();
     } catch (err: any) {
-      alert("Error deleting product: " + err.message);
+      handleGitHubError(err, "Error deleting product");
     } finally {
       setIsSaving(false);
     }

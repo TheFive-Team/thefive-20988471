@@ -15,7 +15,8 @@ export async function getFileSha(path: string, token: string): Promise<string | 
   });
   if (!res.ok) {
     if (res.status === 404) return null; // File doesn't exist yet
-    throw new Error(`GitHub API error: ${res.statusText}`);
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(`GitHub API error: ${errorData.message || res.statusText || res.status}`);
   }
   const data = await res.json();
   return data.sha;
@@ -108,7 +109,8 @@ export async function listFiles(
   });
   if (!res.ok) {
     if (res.status === 404) return [];
-    throw new Error(`GitHub API error: ${res.statusText}`);
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(`GitHub API error: ${errorData.message || res.statusText || res.status}`);
   }
   return await res.json();
 }

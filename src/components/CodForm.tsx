@@ -178,13 +178,45 @@ export function CodForm({
       if (response.success) {
         localStorage.setItem("thefive_last_order", Date.now().toString());
         setSubmitted(true);
-        trackPurchase({
-          productName: productName || "Produit inconnu",
-          productId: "default",
-          value: finalProductTotal + (calculatedDeliveryFee || 0),
-          currency: 'DZD',
-          eventId
+        
+        console.warn("[PIXEL DEBUG BUILD 2026-07-14-A] CodForm success handler reached");
+        
+        const finalPurchasePayload = {
+          value: Number(finalProductTotal + (calculatedDeliveryFee || 0)),
+          currency: "DZD",
+          content_type: "product",
+          content_ids: ["default"],
+          contents: [
+            {
+              id: "default",
+              quantity: Number(quantity) || 1,
+              item_price: Number(basePriceNum),
+            },
+          ],
+        };
+
+        console.warn("[PIXEL DEBUG FINAL PURCHASE]", {
+          payload: finalPurchasePayload,
+          currency: finalPurchasePayload?.currency,
+          currencyType: typeof finalPurchasePayload?.currency,
+          currencyLength: String(finalPurchasePayload?.currency).length,
+          currencyCharCodes: Array.from(String(finalPurchasePayload?.currency)).map((c) =>
+            c.charCodeAt(0)
+          ),
+          value: finalPurchasePayload?.value,
+          valueType: typeof finalPurchasePayload?.value,
+          isFiniteValue: Number.isFinite(finalPurchasePayload?.value),
         });
+
+        if (typeof window !== "undefined") {
+          const w = window as unknown as { fbq?: (...args: unknown[]) => void };
+          w.fbq?.(
+            "track",
+            "Purchase",
+            finalPurchasePayload,
+            { eventID: eventId }
+          );
+        }
       } else {
         setFormError("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى");
       }

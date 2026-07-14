@@ -49,7 +49,23 @@ function LeadFormPage() {
         const contentIds = items.map((i) => i.variantId.split("/").pop() ?? i.variantId);
         const contents = items.map((i) => ({ id: i.variantId.split("/").pop() ?? i.variantId, quantity: i.quantity }));
         w.fbq?.("track", "Lead", { value: total, currency, content_ids: contentIds, contents, content_type: "product" });
-        w.fbq?.("track", "Purchase", { value: total, currency, content_ids: contentIds, contents, content_type: "product", num_items: items.reduce((s, i) => s + i.quantity, 0) });
+        
+        const metaCurrency = "DZD";
+        const metaValue = Number(total);
+        if (!Number.isFinite(metaValue)) {
+          console.error("[Meta Pixel] Invalid Purchase value", {
+            valuePresent: total !== undefined && total !== null
+          });
+        } else {
+          console.info("[Meta Pixel] Purchase payload", {
+            currency: metaCurrency,
+            value: metaValue,
+            eventIdPresent: false
+          });
+          const payload = { value: metaValue, currency: metaCurrency, content_ids: contentIds, contents, content_type: "product", num_items: items.reduce((s, i) => s + i.quantity, 0) };
+          console.log("PURCHASE EVENT #1", payload);
+          // w.fbq?.("track", "Purchase", payload); // TEMPORARILY DISABLED for debugging CodForm
+        }
       }
       console.log("[Lead]", { ...form, items, ref, total });
       setDone(ref);

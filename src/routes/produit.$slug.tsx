@@ -136,7 +136,7 @@ function ProductPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl py-8 sm:px-10 sm:py-24 overflow-x-clip">
+    <div className="mx-auto max-w-7xl py-8 sm:px-10 sm:py-24">
       <div className="grid gap-0 md:grid-cols-2 md:gap-10 lg:gap-12">
         
         {/* Mobile View: Gallery first, then Text */}
@@ -313,7 +313,7 @@ function ProductPage() {
           </div>
 
           {/* 8 & 9: Size / Quantity / COD Form */}
-          <div className="cod-form-wrapper mb-8 min-[553px]:mx-auto min-[553px]:w-[520px] min-[553px]:max-w-[520px] relative z-10">
+          <div className="cod-form-wrapper mb-8 mx-4 min-[553px]:mx-auto min-[553px]:w-[520px] min-[553px]:max-w-[520px] relative z-10">
             <CodForm 
               productName={p?.title}
               offers={offers}

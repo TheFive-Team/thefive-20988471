@@ -94,7 +94,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1.0, maximum-scale=1.0" },
       { title: "The Five A — Vêtements raffinés pour enfants · Algérie" },
       { name: "description", content: "Maison algérienne de vêtements raffinés pour enfants. Inspirations old money, livraison à domicile dans les 48 wilayas, paiement à la livraison." },
       { name: "author", content: "The Five A" },

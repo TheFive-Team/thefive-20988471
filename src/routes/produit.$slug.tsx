@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useEffect, lazy, Suspense } from "react";
-import { useLCPDebugger } from "@/hooks/useLCPDebugger";
 import { useI18n } from "@/lib/i18n";
 import { productQueryOptions } from "@/hooks/useShopifyProducts";
 import { useCartStore } from "@/stores/cartStore";
@@ -49,7 +48,6 @@ export const Route = createFileRoute("/produit/$slug")({
 });
 
 function ProductPage() {
-  useLCPDebugger();
   const { slug } = Route.useParams();
   const { tr } = useI18n();
   const product = Route.useLoaderData();

@@ -46,8 +46,8 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
               <div className="mobile-gallery-card shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 bg-[#FCFCFC]">
                 <img 
                   src={getOptimizedShopifyImage(img.url, 800)} 
-                  srcSet={getLocalSrcSet(img.url) || `${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
-                  sizes="100vw"
+                  srcSet={getLocalSrcSet(img.url) || `${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w, ${getOptimizedShopifyImage(img.url, 1200)} 1200w`}
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   alt={img.altText || `Product view ${idx + 1}`} 
                   className="mobile-gallery-image aspect-[4/5] object-cover" 
                   loading={idx === 0 ? "eager" : "lazy"}
@@ -55,6 +55,11 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
                   fetchPriority={idx === 0 ? "high" : "auto"}
                   width={800}
                   height={1000}
+                  onLoad={() => {
+                    if (idx === 0 && process.env.NODE_ENV === 'development') {
+                      performance.mark('hero-img-loaded');
+                    }
+                  }}
                 />
               </div>
             </div>

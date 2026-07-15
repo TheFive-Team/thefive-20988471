@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useEffect, lazy, Suspense } from "react";
+import { useLCPDebugger } from "@/hooks/useLCPDebugger";
 import { useI18n } from "@/lib/i18n";
 import { productQueryOptions } from "@/hooks/useShopifyProducts";
 import { useCartStore } from "@/stores/cartStore";
@@ -37,7 +38,7 @@ export const Route = createFileRoute("/produit/$slug")({
         { 
           rel: "preload", 
           as: "image", 
-          imageSrcSet: getLocalSrcSet(mainImg.url) || `${getOptimizedShopifyImage(mainImg.url, 400)} 400w, ${getOptimizedShopifyImage(mainImg.url, 800)} 800w`,
+          imageSrcSet: getLocalSrcSet(mainImg.url) || `${getOptimizedShopifyImage(mainImg.url, 400)} 400w, ${getOptimizedShopifyImage(mainImg.url, 800)} 800w, ${getOptimizedShopifyImage(mainImg.url, 1200)} 1200w`,
           imageSizes: "(max-width: 768px) 100vw, 50vw",
           fetchPriority: "high" 
         }
@@ -48,6 +49,7 @@ export const Route = createFileRoute("/produit/$slug")({
 });
 
 function ProductPage() {
+  useLCPDebugger();
   const { slug } = Route.useParams();
   const { tr } = useI18n();
   const product = Route.useLoaderData();

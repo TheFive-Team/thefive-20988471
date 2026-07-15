@@ -467,8 +467,8 @@ export function CodForm({
         </section>
 
         {/* Section 5: Order Summary */}
-        <section className="animate-in fade-in slide-in-from-top-4 duration-500 bg-[#FBF8F2] border border-[#E8E0D2] rounded-[14px] py-[14px] px-[16px] mt-4 w-full max-w-full min-w-0 box-border">
-          <div className="flex items-start gap-3 w-full min-w-0 mb-[12px]">
+        <section className="animate-in fade-in slide-in-from-top-4 duration-500 bg-[#FBF8F2] border border-[#E8E0D2] rounded-[14px] p-[14px] mt-4 w-full max-w-full min-w-0 box-border">
+          <div className="flex items-start gap-3 w-full min-w-0 mb-[10px]">
             <span className="flex items-center justify-center w-[18px] h-[18px] flex-[0_0_18px] rounded-full bg-[#102A43] text-[#D7AE57] font-serif text-[12px] pt-[1px] static transform-none mt-1 shrink-0">
                {variants.length > 1 ? '5' : '4'}
             </span>
@@ -477,38 +477,38 @@ export function CodForm({
             </div>
           </div>
           
-          <div className="space-y-1">
-             <div className="flex justify-between items-center min-w-0 gap-4 text-[12px] font-semibold text-[#68737F]">
-               <span className="shrink-0 text-right">الكمية</span>
-               <span className="text-[#102A43] font-bold text-left truncate" dir="ltr">{quantity}</span>
+          <div className="space-y-0">
+             <div className="flex justify-between items-center h-[28px] text-[12px] font-semibold text-[#68737F]">
+               <span>الكمية</span>
+               <span className="text-[#102A43] font-bold">{quantity}</span>
              </div>
 
              {variants.length > 1 && selectedSizes.some(s => s !== "") && (
-               <div className="flex justify-between items-center min-w-0 gap-4 text-[12px] font-semibold text-[#68737F]">
-                 <span className="shrink-0 text-right">المقاسات</span>
-                 <span className="text-[#102A43] font-bold text-left truncate" dir="ltr">
+               <div className="flex justify-between items-center h-[28px] text-[12px] font-semibold text-[#68737F]">
+                 <span>المقاسات</span>
+                 <span className="text-[#102A43] font-bold dir-ltr">
                    {selectedSizes.map(id => variants.find((v: any) => v.node.id === id)?.node.title || "").filter(Boolean).join(" • ")}
                  </span>
                </div>
              )}
 
-             <div className="flex justify-between items-center min-w-0 gap-4 text-[12px] font-semibold text-[#68737F]">
-               <span className="shrink-0 text-right">المنتجات</span>
-               <span className="font-sans font-bold tracking-tight text-left truncate text-[#102A43]" dir="ltr">
+             <div className="flex justify-between items-center h-[28px] text-[12px] font-semibold text-[#68737F]">
+               <span>المنتجات</span>
+               <span className="font-sans font-bold tracking-tight dir-ltr text-[#102A43]">
                  {discountAmount > 0 ? (
-                   <div className="flex items-center justify-end gap-2 w-full">
-                     <span className="line-through text-[#9A9A9A] font-medium">{subtotal.toLocaleString()} د.ج</span>
+                   <>
+                     <span className="line-through text-[#9A9A9A] mr-2 font-medium">{subtotal.toLocaleString()} د.ج</span>
                      <span>{(subtotal - discountAmount).toLocaleString()} د.ج</span>
-                   </div>
+                   </>
                  ) : (
                    <span>{subtotal.toLocaleString()} د.ج</span>
                  )}
                </span>
              </div>
 
-             <div className="flex justify-between items-center min-w-0 gap-4 text-[12px] font-semibold text-[#68737F]">
-               <span className="shrink-0 text-right">التوصيل</span>
-               <span className="font-sans font-bold tracking-tight text-left truncate text-[#102A43]" dir="ltr">
+             <div className="flex justify-between items-center h-[28px] text-[12px] font-semibold text-[#68737F]">
+               <span>التوصيل</span>
+               <span className="font-sans font-bold tracking-tight dir-ltr text-[#102A43]">
                  {form.wilaya && form.shippingMethod ? (
                    `${(form.shippingMethod === 'home' ? selectedWilayaObj?.home : selectedWilayaObj?.stop)?.toLocaleString()} د.ج`
                  ) : (
@@ -517,11 +517,11 @@ export function CodForm({
                </span>
              </div>
              
-             <div className="h-px bg-[#E4DAC7] my-[12px]"></div>
+             <div className="h-px bg-[#E4DAC7] my-[10px]"></div>
              
-             <div className="flex justify-between items-center min-w-0 gap-4">
-               <span className="text-[16px] font-bold text-[#102A43] shrink-0 text-right">المجموع الكلي</span>
-               <span className="font-sans tracking-tight text-left truncate text-[#C99B37] text-[25px] font-extrabold leading-none" dir="ltr">
+             <div className="flex justify-between items-center mt-2">
+               <span className="text-[16px] font-bold text-[#102A43]">المجموع الكلي</span>
+               <span className="font-sans tracking-tight dir-ltr text-[#C99B37] text-[25px] font-extrabold leading-none">
                  {form.wilaya && form.shippingMethod ? (
                    `${(finalProductTotal + ((form.shippingMethod === 'home' ? selectedWilayaObj?.home : selectedWilayaObj?.stop) || 0)).toLocaleString()} د.ج`
                  ) : (

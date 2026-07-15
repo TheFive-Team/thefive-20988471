@@ -118,26 +118,44 @@ export const trackPurchase = (orderData: {
   orderId?: string;
   productName: string;
   productId: string | undefined;
-  value: number;
+  value: number | string;
   currency?: string;
   eventId?: string;
 }) => {
   if (typeof window === 'undefined' || !window.fbq) return;
   
+  const metaCurrency = "DZD";
+  const metaValue = Number(orderData.value);
+
+  if (!Number.isFinite(metaValue)) {
+    console.error("[Meta Pixel] Invalid Purchase value", {
+      valuePresent: orderData.value !== undefined && orderData.value !== null
+    });
+    return;
+  }
+
   const payload = {
     content_name: orderData.productName,
     content_ids: orderData.productId ? [orderData.productId] : [],
     content_type: 'product',
-    value: orderData.value,
-    currency: orderData.currency || 'DZD',
+    value: metaValue,
+    currency: metaCurrency,
     ...(orderData.orderId && { order_id: orderData.orderId }),
   };
 
   const options = orderData.eventId ? { eventID: orderData.eventId } : undefined;
   
+  console.info("[Meta Pixel] Purchase payload", {
+    currency: metaCurrency,
+    value: metaValue,
+    eventIdPresent: Boolean(orderData.eventId)
+  });
+
   if (options) {
+    console.log("PURCHASE EVENT #2", payload);
     window.fbq('track', 'Purchase', payload, options);
   } else {
+    console.log("PURCHASE EVENT #2", payload);
     window.fbq('track', 'Purchase', payload);
   }
 

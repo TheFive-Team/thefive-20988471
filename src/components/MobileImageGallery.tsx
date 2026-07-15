@@ -49,10 +49,12 @@ export function MobileImageGallery({ images }: { images: { url: string; altText?
                   srcSet={getLocalSrcSet(img.url) || `${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w`}
                   sizes="100vw"
                   alt={img.altText || `Product view ${idx + 1}`} 
-                  className="mobile-gallery-image" 
+                  className="mobile-gallery-image aspect-[4/5] object-cover" 
                   loading={idx === 0 ? "eager" : "lazy"}
                   decoding={idx === 0 ? "sync" : "async"}
                   fetchPriority={idx === 0 ? "high" : "auto"}
+                  width={800}
+                  height={1000}
                 />
               </div>
             </div>

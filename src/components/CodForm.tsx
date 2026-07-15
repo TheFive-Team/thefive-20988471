@@ -551,6 +551,7 @@ export function CodForm({
         {/* Submit Button */}
         <div>
           <button 
+            id="submit-order-btn"
             type="submit"
             disabled={isSubmitting}
             className="w-full bg-[#102A43] text-[#F2C75C] h-[52px] rounded-[12px] shadow-[0_8px_18px_rgba(16,42,67,0.18)] transition-all duration-300 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.985]"

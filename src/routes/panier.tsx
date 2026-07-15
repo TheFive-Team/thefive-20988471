@@ -111,6 +111,7 @@ function CartPage() {
               </div>
             </dl>
             <button
+              id="cart-checkout-btn"
               onClick={handleCheckout}
               disabled={isLoading}
               className="mt-6 block w-full bg-foreground py-4 text-center text-xs uppercase tracking-[0.28em] text-background hover:bg-accent disabled:opacity-50"

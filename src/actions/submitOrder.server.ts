@@ -136,6 +136,21 @@ export const submitOrderFn = createServerFn({ method: "POST" })
           const phoneClean = data.phone.replace(/\s+/g, '');
           const phone = phoneClean.startsWith('0') ? `213${phoneClean.substring(1)}` : phoneClean;
 
+          const metaCurrency = "DZD";
+          const metaValue = Number(totalAmount);
+
+          if (!Number.isFinite(metaValue)) {
+            console.error("[Meta Pixel] Invalid Purchase value", {
+              valuePresent: totalAmount !== undefined && totalAmount !== null
+            });
+          }
+
+          console.info("[Meta Pixel] Purchase payload", {
+            currency: metaCurrency,
+            value: metaValue,
+            eventIdPresent: Boolean(data.eventId)
+          });
+
           const payload = {
             data: [{
               event_name: 'Purchase',
@@ -150,8 +165,8 @@ export const submitOrderFn = createServerFn({ method: "POST" })
                 ln: [hashData(lastName)],
               },
               custom_data: {
-                currency: 'DZD',
-                value: totalAmount,
+                currency: metaCurrency,
+                value: metaValue,
                 order_id: orderId,
                 content_name: data.productName || '',
                 content_ids: data.selectedSizes || [],
@@ -162,6 +177,8 @@ export const submitOrderFn = createServerFn({ method: "POST" })
               }
             }]
           };
+          
+          console.log("PURCHASE EVENT #3", payload);
 
           const graphApiEndpoint = `https://graph.facebook.com/v20.0/${pixelId}/events`;
           console.log(`[Meta CAPI] Graph API endpoint: ${graphApiEndpoint}`);

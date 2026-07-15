@@ -34,7 +34,7 @@ export function LazySection({
   }, [rootMargin]);
 
   return (
-    <div ref={ref} style={{ minHeight: inView ? "auto" : minHeight }} className="w-full">
+    <div ref={ref} style={{ minHeight }} className="w-full">
       {inView ? children : null}
     </div>
   );

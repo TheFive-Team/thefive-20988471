@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useEffect, lazy, Suspense } from "react";
+import { useCLSDebugger } from "@/hooks/useCLSDebugger";
 import { useI18n } from "@/lib/i18n";
 import { productQueryOptions } from "@/hooks/useShopifyProducts";
 import { useCartStore } from "@/stores/cartStore";
@@ -48,6 +49,7 @@ export const Route = createFileRoute("/produit/$slug")({
 });
 
 function ProductPage() {
+  useCLSDebugger();
   const { slug } = Route.useParams();
   const { tr } = useI18n();
   const product = Route.useLoaderData();
@@ -347,7 +349,10 @@ function ProductPage() {
                 srcSet={getLocalSrcSet(e.node.url) || `${getOptimizedShopifyImage(e.node.url, 400)} 400w, ${getOptimizedShopifyImage(e.node.url, 800)} 800w`}
                 sizes="(max-width: 520px) 100vw, 520px"
                 alt={e.node.altText || `${p.title} detail view ${idx + 1}`} 
-                className="w-full h-auto block object-contain object-center aspect-auto" 
+                className="w-full h-auto block object-contain object-center" 
+                width={e.node.width || 800}
+                height={e.node.height || 1000}
+                style={{ aspectRatio: e.node.width && e.node.height ? `${e.node.width}/${e.node.height}` : '4/5' }}
                 loading="lazy"
                 decoding="async"
               />

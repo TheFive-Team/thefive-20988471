@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useEffect, lazy, Suspense } from "react";
+import { useCLSDebugger } from "@/hooks/useCLSDebugger";
 import { useI18n } from "@/lib/i18n";
 import { productQueryOptions } from "@/hooks/useShopifyProducts";
 import { useCartStore } from "@/stores/cartStore";
@@ -48,6 +49,7 @@ export const Route = createFileRoute("/produit/$slug")({
 });
 
 function ProductPage() {
+  useCLSDebugger();
   const { slug } = Route.useParams();
   const { tr } = useI18n();
   const product = Route.useLoaderData();
@@ -148,7 +150,7 @@ function ProductPage() {
           </div>
 
           {/* 2. Text Details below gallery */}
-          <div className="mb-6 mx-4 w-auto max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px] box-border">
+          <div className="mb-6 w-full max-w-[calc(100%-32px)] mx-auto min-[553px]:w-[520px] min-[553px]:max-w-[520px] box-border">
             <div className="flex flex-col items-start text-left bg-white rounded-[22px] p-[22px_20px] shadow-[0_4px_16px_rgba(16,42,67,0.04)] border border-[#E4DAC7] w-full max-w-full min-w-0 m-0 box-border overflow-hidden">
             
             {/* Collection Label */}
@@ -313,7 +315,7 @@ function ProductPage() {
           </div>
 
           {/* 8 & 9: Size / Quantity / COD Form */}
-          <div className="cod-form-wrapper mb-8 mx-4 min-[553px]:mx-auto min-[553px]:w-[520px] min-[553px]:max-w-[520px] relative z-10">
+          <div className="cod-form-wrapper mb-8 w-full max-w-[calc(100%-32px)] mx-auto min-[553px]:w-[520px] min-[553px]:max-w-[520px] min-w-0 relative z-10">
             <CodForm 
               productName={p?.title}
               offers={offers}
@@ -339,7 +341,7 @@ function ProductPage() {
 
       {/* Middle Detail Images */}
       {p.detailImages?.edges && p.detailImages.edges.length > 0 && (
-        <section className="mx-4 w-auto max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px] flex flex-col items-center justify-center mt-6 mb-6 space-y-4 box-border">
+        <section className="w-full max-w-[calc(100%-32px)] mx-auto min-[553px]:w-[520px] min-[553px]:max-w-[520px] min-w-0 flex flex-col items-center justify-center mt-6 mb-6 space-y-4 box-border">
           {p.detailImages.edges.map((e, idx) => (
             <div key={idx} className="w-full rounded-[18px] overflow-hidden box-border bg-transparent">
               <img 

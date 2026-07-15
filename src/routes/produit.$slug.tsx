@@ -149,7 +149,7 @@ function ProductPage() {
 
           {/* 2. Text Details below gallery */}
           <div className="mb-6 w-full mx-auto max-w-lg min-[553px]:max-w-[520px] box-border">
-            <div className="flex flex-col items-start text-left bg-white rounded-[22px] p-[22px_20px] shadow-[0_4px_16px_rgba(16,42,67,0.04)] border border-[#E4DAC7] w-full max-w-full min-w-0 m-0 box-border overflow-hidden">
+            <div className="flex flex-col items-start text-left bg-white rounded-[20px] p-[20px_16px] shadow-[0_4px_16px_rgba(16,42,67,0.04)] border border-[#E8E0D2] w-full max-w-full min-w-0 m-0 box-border overflow-hidden">
             
             {/* Collection Label */}
             <div className="mb-[8px] w-full text-left" dir="ltr">
@@ -313,7 +313,7 @@ function ProductPage() {
           </div>
 
           {/* 8 & 9: Size / Quantity / COD Form */}
-          <div className="cod-form-wrapper mb-8 w-full mx-auto max-w-lg min-[553px]:max-w-[520px] min-w-0 relative z-10">
+          <div className="mb-8 w-full mx-auto max-w-lg min-[553px]:max-w-[520px] min-w-0 relative z-10">
             <CodForm 
               productName={p?.title}
               offers={offers}

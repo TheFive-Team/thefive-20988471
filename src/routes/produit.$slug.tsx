@@ -15,6 +15,8 @@ const StickyCheckoutBar = lazy(() => import("@/components/StickyCheckoutBar").th
 const numericId = (gid: string) => gid.split("/").pop() ?? gid;
 import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
 
+import { trackViewContentCapiFn } from "@/actions/trackViewContentCapi";
+
 export const Route = createFileRoute("/produit/$slug")({
   loader: async ({ context, params }) => {
     const t0 = performance.now();
@@ -90,15 +92,35 @@ function ProductPage() {
   const [activeImg, setActiveImg] = useState(0);
   const image = images[activeImg] ?? images[0];
 
-  // Meta Pixel — ViewContent
+  // Meta Pixel & CAPI — ViewContent
   useEffect(() => {
     if (!product || offers.length === 0) return;
+    
+    const eventId = crypto.randomUUID();
+    const price = parseFloat(offers[0].price || 0);
+
+    // 1. Frontend Meta Pixel
     trackViewContent({
       productName: product.node.title,
       productId: product.node.id,
-      price: parseFloat(offers[0].price || 0),
+      price,
       currency: "DZD",
+      eventId,
     });
+
+    // 2. Backend CAPI
+    trackViewContentCapiFn({
+      data: {
+        productName: product.node.title,
+        productId: product.node.id,
+        price,
+        currency: "DZD",
+        eventId,
+        clientUserAgent: navigator.userAgent,
+        eventSourceUrl: window.location.href,
+      }
+    }).catch(err => console.error("Failed to send ViewContent CAPI:", err));
+
   }, [product, offers]);
 
 

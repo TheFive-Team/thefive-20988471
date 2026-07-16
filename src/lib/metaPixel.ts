@@ -69,6 +69,7 @@ export const trackViewContent = (productData: {
   productId: string;
   price: number;
   currency?: string;
+  eventId?: string;
 }) => {
   if (typeof window === 'undefined' || !window.fbq) return;
   const payload = {
@@ -78,10 +79,17 @@ export const trackViewContent = (productData: {
     value: productData.price,
     currency: productData.currency || 'DZD',
   };
-  window.fbq('track', 'ViewContent', payload);
+  
+  const options = productData.eventId ? { eventID: productData.eventId } : undefined;
+  
+  if (options) {
+    window.fbq('track', 'ViewContent', payload, options);
+  } else {
+    window.fbq('track', 'ViewContent', payload);
+  }
   
   if (import.meta.env.DEV) {
-    console.log('✅ [Meta Pixel] ViewContent fired:', payload);
+    console.log('✅ [Meta Pixel] ViewContent fired:', { payload, options });
   }
 };
 

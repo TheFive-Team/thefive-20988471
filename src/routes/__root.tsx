@@ -136,7 +136,7 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: `document.querySelectorAll('link[media="print"]').forEach(function(l){l.media='all'});` }} />
       </head>
-      <body>
+      <body className="font-sans antialiased bg-background text-foreground">
         {children}
         <Scripts />
       </body>

@@ -108,6 +108,11 @@
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
+    font-family: var(--font-sans) !important;
+  }
+  [dir="rtl"] body,
+  [lang="ar"] body {
+    font-family: var(--font-arabic) !important;
   }
   * {
     border-color: var(--color-border);

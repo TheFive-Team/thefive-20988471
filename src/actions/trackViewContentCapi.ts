@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getCookie, getHeaders } from "@tanstack/react-start/server";
+import { getCookie, getRequestHeader, getRequestIP } from "@tanstack/react-start/server";
 import { z } from "zod";
 
 export const trackViewContentCapiFn = createServerFn({ method: "POST" })
@@ -36,8 +36,11 @@ export const trackViewContentCapiFn = createServerFn({ method: "POST" })
       let fbc = '';
 
       try {
-        const headers = getHeaders();
-        clientIpAddress = headers?.get('cf-connecting-ip') || headers?.get('x-forwarded-for')?.split(',')[0]?.trim() || '';
+        const directIp = getRequestIP();
+        const cfIp = getRequestHeader('cf-connecting-ip');
+        const xForwarded = getRequestHeader('x-forwarded-for');
+        
+        clientIpAddress = directIp || cfIp || (xForwarded ? xForwarded.split(',')[0].trim() : '') || '';
         
         fbp = getCookie('_fbp') || '';
         fbc = getCookie('_fbc') || '';

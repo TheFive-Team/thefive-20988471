@@ -63,30 +63,6 @@
         "edges": [
           {
             "node": {
-              "url": "/images/product-detail-1784058313936-13-800w.webp",
-              "altText": null
-            }
-          },
-          {
-            "node": {
-              "url": "/images/product-detail-1784058318635-14-800w.webp",
-              "altText": null
-            }
-          },
-          {
-            "node": {
-              "url": "/images/product-detail-1784058323123-15-800w.webp",
-              "altText": null
-            }
-          },
-          {
-            "node": {
-              "url": "/images/product-detail-1784058327460-16-800w.webp",
-              "altText": null
-            }
-          },
-          {
-            "node": {
               "url": "/images/product-detail-1784252418463-17-800w.webp",
               "altText": null
             }
@@ -149,7 +125,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842572428060",
+              "id": "gid://shopify/ProductVariant/17842577440060",
               "title": "6",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -171,7 +147,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842572428061",
+              "id": "gid://shopify/ProductVariant/17842577440061",
               "title": "8",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -193,7 +169,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842572428062",
+              "id": "gid://shopify/ProductVariant/17842577440062",
               "title": "10",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -215,7 +191,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842572428063",
+              "id": "gid://shopify/ProductVariant/17842577440063",
               "title": "12",
               "availableForSale": true,
               "quantityAvailable": 0,

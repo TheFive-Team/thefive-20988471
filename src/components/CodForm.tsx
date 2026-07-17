@@ -551,9 +551,10 @@ export function CodForm({
           </button>
           
           {/* Trust Box */}
-          <div className="mt-3 bg-gray-50/50 rounded-xl p-4 flex items-center justify-center">
-             <span className="text-sm text-gray-500 text-center font-medium">
-               🚚 توصيل سريع لجميع الولايات | 📦 استبدال وإرجاع متاح
+          <div className="mt-3 bg-slate-50 rounded-xl p-3 flex justify-center items-center gap-2">
+             <RefreshCw className="w-4 h-4 text-[#D7AE57]" strokeWidth={2.5} />
+             <span className="text-sm font-semibold text-slate-800 tracking-wide">
+               استبدال وإرجاع بكل سهولة
              </span>
           </div>
         </div>

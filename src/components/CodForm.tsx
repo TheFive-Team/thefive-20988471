@@ -327,7 +327,7 @@ export function CodForm({
                               type="button"
                               onClick={() => setSizeForPiece(pieceIndex, v.node.id)}
                               disabled={!isAvailable && !isSelected}
-                              className={`rounded-[9px] min-w-[42px] h-[38px] px-3 text-[13px] transition-all duration-300 font-bold ${
+                              className={`rounded-[9px] min-w-[42px] h-[38px] px-3 text-[14px] font-sans font-semibold tracking-wide transition-all duration-300 ${
                                 !isAvailable && !isSelected
                                   ? "opacity-35 border border-[#F2F2F2] bg-[#F2F2F2] text-[#A6A6A6] cursor-not-allowed line-through" 
                                   : isSelected
@@ -350,7 +350,7 @@ export function CodForm({
                 ))}
               </div>
             </section>
-            <div className="h-px bg-[#EEE8DE] my-[22px]"></div>
+            <div className="h-px bg-[#EEE8DE] my-[32px] sm:my-[40px]"></div>
           </>
         )}
 
@@ -366,7 +366,7 @@ export function CodForm({
             </div>
           </div>
           
-          <div className="grid grid-cols-1 min-[376px]:grid-cols-2 gap-[12px] w-full min-w-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-3 w-full min-w-0">
             <div>
               <label htmlFor="fullname" className={labelClasses}>الاسم الكامل</label>
               <input 
@@ -421,7 +421,7 @@ export function CodForm({
 
         {/* Section 4: Delivery */}
         <section id="shipping-method" className="animate-in fade-in slide-in-from-top-4 duration-500 w-full max-w-full min-w-0 box-border">
-          <div className="h-px bg-[#EEE8DE] my-[22px]"></div>
+          <div className="h-px bg-[#EEE8DE] my-[32px] sm:my-[40px]"></div>
           <div className="flex items-start gap-3 w-full min-w-0 mb-[10px]">
             <span className="flex items-center justify-center w-[18px] h-[18px] flex-[0_0_18px] rounded-full bg-[#102A43] text-[#D7AE57] font-serif text-[12px] pt-[1px] static transform-none mt-1 shrink-0">
                {variants.length > 1 ? '4' : '3'}
@@ -467,7 +467,7 @@ export function CodForm({
         </section>
 
         {/* Section 5: Order Summary */}
-        <section className="animate-in fade-in slide-in-from-top-4 duration-500 bg-[#FBF8F2] border border-[#E8E0D2] rounded-[14px] p-[14px] mt-4 w-full max-w-full min-w-0 box-border">
+        <section className="animate-in fade-in slide-in-from-top-4 duration-500 bg-[#FBF8F2] border border-[#E8E0D2] rounded-[14px] p-[16px] sm:p-[20px] mt-8 sm:mt-10 w-full max-w-full min-w-0 box-border">
           <div className="flex items-start gap-3 w-full min-w-0 mb-[10px]">
             <span className="flex items-center justify-center w-[18px] h-[18px] flex-[0_0_18px] rounded-full bg-[#102A43] text-[#D7AE57] font-serif text-[12px] pt-[1px] static transform-none mt-1 shrink-0">
                {variants.length > 1 ? '5' : '4'}
@@ -511,9 +511,9 @@ export function CodForm({
                <span className="font-sans font-bold tracking-tight dir-ltr text-[#102A43]">
                  {form.wilaya && form.shippingMethod ? (
                    `${(form.shippingMethod === 'home' ? selectedWilayaObj?.home : selectedWilayaObj?.stop)?.toLocaleString()} د.ج`
-                 ) : (
-                   "يحدد لاحقاً"
-                 )}
+                  ) : (
+                    <span className="text-gray-400 italic text-sm font-normal">يحدد لاحقاً</span>
+                  )}
                </span>
              </div>
              
@@ -554,12 +554,15 @@ export function CodForm({
             id="submit-order-btn"
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-[#102A43] text-[#F2C75C] h-[52px] rounded-[12px] shadow-[0_8px_18px_rgba(16,42,67,0.18)] transition-all duration-300 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.985]"
+            className="w-full bg-[#102A43] text-[#F2C75C] py-4 sm:py-5 rounded-[12px] shadow-[0_8px_18px_rgba(16,42,67,0.18)] transition-all duration-300 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.985]"
           >
             {isSubmitting ? (
-              <span className="w-5 h-5 border-2 border-[#F2C75C]/30 border-t-[#F2C75C] rounded-full animate-spin"></span>
+              <span className="w-6 h-6 border-2 border-[#F2C75C]/30 border-t-[#F2C75C] rounded-full animate-spin"></span>
             ) : (
-              <span className="text-[15px] font-bold tracking-wide">اطلب الآن · الدفع عند الاستلام</span>
+              <span className="flex flex-col items-center">
+                <span className="text-lg sm:text-xl font-bold tracking-wide leading-tight">اطلب الآن</span>
+                <span className="text-[12px] font-medium opacity-90 mt-1">الدفع عند الاستلام</span>
+              </span>
             )}
           </button>
           <div className="mt-3.5 w-full">

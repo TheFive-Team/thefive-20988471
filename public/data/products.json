@@ -63,6 +63,30 @@
         "edges": [
           {
             "node": {
+              "url": "/images/product-detail-1784058313936-13-800w.webp",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "/images/product-detail-1784058318635-14-800w.webp",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "/images/product-detail-1784058323123-15-800w.webp",
+              "altText": null
+            }
+          },
+          {
+            "node": {
+              "url": "/images/product-detail-1784058327460-16-800w.webp",
+              "altText": null
+            }
+          },
+          {
+            "node": {
               "url": "/images/product-detail-1784252418463-17-800w.webp",
               "altText": null
             }
@@ -125,7 +149,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842533451920",
+              "id": "gid://shopify/ProductVariant/17842564707510",
               "title": "6",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -147,7 +171,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842533451921",
+              "id": "gid://shopify/ProductVariant/17842564707511",
               "title": "8",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -169,7 +193,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842533451922",
+              "id": "gid://shopify/ProductVariant/17842564707512",
               "title": "10",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -191,10 +215,10 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842533451923",
+              "id": "gid://shopify/ProductVariant/17842564707513",
               "title": "12",
               "availableForSale": true,
-              "quantityAvailable": 100,
+              "quantityAvailable": 0,
               "price": {
                 "amount": "5800.0",
                 "currencyCode": "DZD"

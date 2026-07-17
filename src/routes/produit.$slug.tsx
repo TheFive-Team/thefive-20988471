@@ -183,15 +183,15 @@ function ProductPage() {
       <div className="grid gap-0 md:grid-cols-2 md:gap-10 lg:gap-12">
         
         {/* Mobile View: Gallery first, then Text */}
-        <div className="block md:hidden mb-6">
+        <div className="block md:hidden mb-6 w-full max-w-lg mx-auto flex flex-col gap-5">
           
           {/* 1. Gallery (Mobile) */}
-          <div className="mb-5 w-full max-w-[520px] min-[553px]:mx-auto min-[553px]:w-[520px] box-border min-w-0">
+          <div className="w-full box-border min-w-0">
             <MobileImageGallery images={images} />
           </div>
 
           {/* 2. Text Details below gallery */}
-          <div className="mb-6 w-full mx-auto max-w-lg min-[553px]:max-w-[520px] box-border">
+          <div className="w-full box-border">
             <div className="flex flex-col items-start text-left bg-white rounded-[20px] p-[20px_16px] shadow-[0_4px_16px_rgba(16,42,67,0.04)] border border-[#E8E0D2] w-full max-w-full min-w-0 m-0 box-border overflow-hidden">
             
             {/* Collection Label */}
@@ -292,7 +292,7 @@ function ProductPage() {
         </div>
 
         {/* Desktop Details + COD Form */}
-        <div className="mt-2 md:mt-0">
+        <div className="mt-0 md:mt-0 w-full max-w-lg mx-auto md:max-w-none md:mx-0">
           
           {/* Desktop Only Details (Hidden on Mobile) */}
           <div className="hidden md:block mb-4 bg-[#FCFCFC] rounded-[22px] p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80">

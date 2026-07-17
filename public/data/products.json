@@ -5,7 +5,7 @@
       "title": "Ensemble d’Été Fille – Léger, Élégant et Confortable",
       "description": "",
       "descriptionHtml": "",
-      "handle": "Ensemble–Ete–Fille",
+      "handle": "Ensemble–d’Été–Fille",
       "tags": [],
       "productType": "",
       "vendor": "My Store",
@@ -149,7 +149,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842570004630",
+              "id": "gid://shopify/ProductVariant/17842572428060",
               "title": "6",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -171,7 +171,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842570004631",
+              "id": "gid://shopify/ProductVariant/17842572428061",
               "title": "8",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -193,7 +193,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842570004632",
+              "id": "gid://shopify/ProductVariant/17842572428062",
               "title": "10",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -215,7 +215,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842570004633",
+              "id": "gid://shopify/ProductVariant/17842572428063",
               "title": "12",
               "availableForSale": true,
               "quantityAvailable": 0,

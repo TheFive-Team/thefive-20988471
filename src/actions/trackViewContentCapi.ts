@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getCookie, getHeaders } from "@tanstack/react-start/server";
 import { z } from "zod";
 
 export const trackViewContentCapiFn = createServerFn({ method: "POST" })
@@ -30,6 +31,28 @@ export const trackViewContentCapiFn = createServerFn({ method: "POST" })
       const metaCurrency = data.currency || "DZD";
       const metaValue = Number(data.price);
 
+      let clientIpAddress = '';
+      let fbp = '';
+      let fbc = '';
+
+      try {
+        const headers = getHeaders();
+        clientIpAddress = headers?.get('cf-connecting-ip') || headers?.get('x-forwarded-for')?.split(',')[0]?.trim() || '';
+        
+        fbp = getCookie('_fbp') || '';
+        fbc = getCookie('_fbc') || '';
+      } catch (e) {
+        console.warn("[Meta CAPI - ViewContent] Could not extract headers/cookies:", e);
+      }
+
+      const userData: any = {
+        client_user_agent: clientUserAgent,
+      };
+
+      if (clientIpAddress) userData.client_ip_address = clientIpAddress;
+      if (fbp) userData.fbp = fbp;
+      if (fbc) userData.fbc = fbc;
+
       const payload = {
         data: [{
           event_name: 'ViewContent',
@@ -37,11 +60,7 @@ export const trackViewContentCapiFn = createServerFn({ method: "POST" })
           event_id: data.eventId,
           action_source: 'website',
           event_source_url: eventSourceUrl,
-          user_data: {
-            client_user_agent: clientUserAgent,
-            // ViewContent usually doesn't have user PII unless they are logged in.
-            // PII is omitted here.
-          },
+          user_data: userData,
           custom_data: {
             currency: metaCurrency,
             value: metaValue,
@@ -58,20 +77,28 @@ export const trackViewContentCapiFn = createServerFn({ method: "POST" })
 
       const graphApiEndpoint = `https://graph.facebook.com/v20.0/${pixelId}/events`;
       
-      const capiResponse = await fetch(`${graphApiEndpoint}?access_token=${accessToken}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      
-      const responseBody = await capiResponse.text();
-      
-      if (!capiResponse.ok) {
-        console.error('[Meta CAPI - ViewContent] Error:', responseBody);
-        return { success: false, message: "Failed to send event to Meta CAPI" };
-      } else {
-        console.log('✅ Successfully sent ViewContent event to Meta CAPI');
-        return { success: true };
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      try {
+        const capiResponse = await fetch(`${graphApiEndpoint}?access_token=${accessToken}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
+        
+        const responseBody = await capiResponse.text();
+        
+        if (!capiResponse.ok) {
+          console.error('[Meta CAPI - ViewContent] Error:', responseBody);
+          return { success: false, message: "Failed to send event to Meta CAPI" };
+        } else {
+          console.log('✅ Successfully sent ViewContent event to Meta CAPI');
+          return { success: true };
+        }
+      } finally {
+        clearTimeout(timeoutId);
       }
     } catch (error) {
       console.error('[Meta CAPI - ViewContent] Exception:', error);

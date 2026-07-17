@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo, useEffect, lazy, Suspense } from "react";
+import { useState, useMemo, useEffect, useRef, lazy, Suspense } from "react";
 import { useI18n } from "@/lib/i18n";
 import { productQueryOptions } from "@/hooks/useShopifyProducts";
 import { useCartStore } from "@/stores/cartStore";
@@ -14,8 +14,19 @@ const StickyCheckoutBar = lazy(() => import("@/components/StickyCheckoutBar").th
 
 const numericId = (gid: string) => gid.split("/").pop() ?? gid;
 import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
-
 import { trackViewContentCapiFn } from "@/actions/trackViewContentCapi";
+
+function generateSafeId() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    return ([1e7].toString() + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c: any) =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+  }
+  return Date.now().toString(36) + Math.random().toString(36).substring(2);
+}
 
 export const Route = createFileRoute("/produit/$slug")({
   loader: async ({ context, params }) => {
@@ -59,10 +70,10 @@ function ProductPage() {
   const variants = p?.variants?.edges ?? [];
   const totalStock = variants.reduce((sum: number, v: any) => sum + (v.node.quantityAvailable || 10), 0);
   
-  const rawOffersList = Array.isArray((p as any)?.offers) ? (p as any).offers : [];
-  const rawOffers = rawOffersList.filter((o: any) => o && o.active !== false);
-  
   const offers = useMemo(() => {
+    const rawOffersList = Array.isArray((p as any)?.offers) ? (p as any).offers : [];
+    const rawOffers = rawOffersList.filter((o: any) => o && o.active !== false);
+
     if (rawOffers.length > 0) return rawOffers;
     return [{
       id: "default-1",
@@ -72,7 +83,7 @@ function ProductPage() {
       pieces: 1,
       badge: ""
     }];
-  }, [rawOffers, p]);
+  }, [(p as any)?.offers, p?.priceRange?.minVariantPrice?.amount, p?.compareAtPriceRange?.minVariantPrice?.amount]);
 
   const pricingConfig = (p as any)?.pricingConfig || {
     enabled: false,
@@ -92,27 +103,37 @@ function ProductPage() {
   const [activeImg, setActiveImg] = useState(0);
   const image = images[activeImg] ?? images[0];
 
+  const trackedProductIdRef = useRef<string | null>(null);
+
   // Meta Pixel & CAPI — ViewContent
   useEffect(() => {
-    if (!product || offers.length === 0) return;
+    const currentProductId = p?.id;
+    if (!currentProductId || offers.length === 0) return;
     
-    const eventId = crypto.randomUUID();
+    if (trackedProductIdRef.current === currentProductId) return;
+    trackedProductIdRef.current = currentProductId;
+    
+    const eventId = generateSafeId();
     const price = parseFloat(offers[0].price || 0);
 
     // 1. Frontend Meta Pixel
-    trackViewContent({
-      productName: product.node.title,
-      productId: product.node.id,
-      price,
-      currency: "DZD",
-      eventId,
-    });
+    try {
+      trackViewContent({
+        productName: p.title || "Product",
+        productId: currentProductId,
+        price,
+        currency: "DZD",
+        eventId,
+      });
+    } catch (err) {
+      console.error("Meta Pixel ViewContent Error:", err);
+    }
 
     // 2. Backend CAPI
     trackViewContentCapiFn({
       data: {
-        productName: product.node.title,
-        productId: product.node.id,
+        productName: p.title || "Product",
+        productId: currentProductId,
         price,
         currency: "DZD",
         eventId,
@@ -121,7 +142,7 @@ function ProductPage() {
       }
     }).catch(err => console.error("Failed to send ViewContent CAPI:", err));
 
-  }, [product, offers]);
+  }, [p?.id, p?.title, offers[0]?.price]);
 
 
   if (!product || !p) {

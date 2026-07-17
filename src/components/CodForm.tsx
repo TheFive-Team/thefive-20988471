@@ -458,7 +458,7 @@ export function CodForm({
                  </div>
                  <div className="flex flex-col min-w-0 overflow-hidden">
                     <span className={`text-[13px] font-semibold flex items-center gap-1.5 transition-colors duration-300 truncate ${form.shippingMethod === 'stopdesk' ? 'text-[#102A43]' : 'text-[#68737F]'}`}>
-                       استلام من المكتب
+                       التوصيل للمكتب
                     </span>
                  </div>
               </div>

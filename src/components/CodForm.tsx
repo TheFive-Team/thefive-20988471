@@ -532,46 +532,29 @@ export function CodForm({
           </div>
         </section>
 
-        {/* Trust Badges */}
-        <div className="flex justify-center gap-4 pt-5 pb-3">
-          <div className="flex items-center gap-1.5">
-            <Check className="w-3.5 h-3.5 text-[#D7AE57]" strokeWidth={3} />
-            <span className="text-[11px] font-bold text-[#102A43]">الدفع عند الاستلام</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Check className="w-3.5 h-3.5 text-[#D7AE57]" strokeWidth={3} />
-            <span className="text-[11px] font-bold text-[#102A43]">توصيل سريع</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Check className="w-3.5 h-3.5 text-[#D7AE57]" strokeWidth={3} />
-            <span className="text-[11px] font-bold text-[#102A43]">استبدال متاح</span>
-          </div>
-        </div>
-
         {/* Submit Button */}
-        <div>
+        <div className="mt-6">
           <button 
             id="submit-order-btn"
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-[#102A43] text-[#F2C75C] py-4 sm:py-5 rounded-[12px] shadow-[0_8px_18px_rgba(16,42,67,0.18)] transition-all duration-300 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.985]"
+            className="w-full bg-[#102A43] py-4 sm:py-5 rounded-[12px] shadow-[0_8px_18px_rgba(16,42,67,0.18)] transition-all duration-300 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.985]"
           >
             {isSubmitting ? (
               <span className="w-6 h-6 border-2 border-[#F2C75C]/30 border-t-[#F2C75C] rounded-full animate-spin"></span>
             ) : (
               <span className="flex flex-col items-center">
-                <span className="text-lg sm:text-xl font-bold tracking-wide leading-tight">اطلب الآن</span>
-                <span className="text-[12px] font-medium opacity-90 mt-1">الدفع عند الاستلام</span>
+                <span className="text-xl font-bold tracking-wide leading-tight text-white">تأكيد الطلب</span>
+                <span className="text-sm font-medium text-[#F2C75C]/90 mt-1">الدفع عند الاستلام</span>
               </span>
             )}
           </button>
-          <div className="mt-3.5 w-full">
-             <div className="flex items-center justify-center gap-[8px] bg-[#F9F6EF] border border-[#E9DDC8] rounded-full py-[8px] px-[12px] w-full max-w-none shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-               <ShieldCheck className="w-[18px] h-[18px] text-[#C9A34A] shrink-0" strokeWidth={1.8} />
-               <span className="text-[14px] font-semibold text-[#102A43] leading-[1.3] whitespace-normal sm:whitespace-nowrap text-center">
-                 الاستبدال والإرجاع متاح لضمان تجربة تسوق مريحة.
-               </span>
-             </div>
+          
+          {/* Trust Box */}
+          <div className="mt-3 bg-gray-50/50 rounded-xl p-4 flex items-center justify-center">
+             <span className="text-sm text-gray-500 text-center font-medium">
+               🚚 توصيل سريع لجميع الولايات | 📦 استبدال وإرجاع متاح
+             </span>
           </div>
         </div>
       </form>

@@ -113,13 +113,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "preload", as: "style", href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500&family=Noto+Kufi+Arabic:wght@400;700&display=swap" },
       { 
         rel: "stylesheet", 
-        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500&family=Noto+Kufi+Arabic:wght@400;700&display=swap",
-        media: "print",
-        //@ts-ignore
-        onLoad: "this.media='all'"
+        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500&family=Noto+Kufi+Arabic:wght@400;700&display=swap"
       },
     ],
   }),
@@ -134,7 +130,6 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="fr">
       <head>
         <HeadContent />
-        <script dangerouslySetInnerHTML={{ __html: `document.querySelectorAll('link[media="print"]').forEach(function(l){l.media='all'});` }} />
       </head>
       <body className="font-sans antialiased bg-background text-foreground">
         {children}

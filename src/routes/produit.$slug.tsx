@@ -386,6 +386,11 @@ function ProductPage() {
           {p.detailImages.edges.map((e, idx) => (
             <img 
               key={idx}
+              width={e.node.width || 800}
+              height={e.node.height || 1000}
+              style={{ 
+                aspectRatio: e.node.width && e.node.height ? `${e.node.width}/${e.node.height}` : 'auto' 
+              }}
               src={getOptimizedShopifyImage(e.node.url, 800)} 
               srcSet={getLocalSrcSet(e.node.url) || `${getOptimizedShopifyImage(e.node.url, 400)} 400w, ${getOptimizedShopifyImage(e.node.url, 800)} 800w`}
               sizes="(max-width: 768px) 100vw, 50vw"

@@ -100,6 +100,8 @@ function ProductPage() {
 
 
   const images = product?.node?.images?.edges?.map((e: any) => e.node) ?? [];
+  const [activeImg, setActiveImg] = useState(0);
+  const image = images[activeImg] ?? images[0];
 
   const trackedProductIdRef = useRef<string | null>(null);
 
@@ -254,21 +256,39 @@ function ProductPage() {
 
         {/* Desktop View Gallery */}
         <div className="hidden md:block">
-          <div className="flex flex-col w-full">
-            {images.map((img: any, i: number) => (
+          <div className="bg-[#FCFCFC] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
+            {image && (
               <img 
-                key={i}
-                src={getOptimizedShopifyImage(img.url, 800)} 
-                srcSet={getLocalSrcSet(img.url) || `${getOptimizedShopifyImage(img.url, 400)} 400w, ${getOptimizedShopifyImage(img.url, 800)} 800w, ${getOptimizedShopifyImage(img.url, 1200)} 1200w`}
+                src={getOptimizedShopifyImage(image.url, 800)} 
+                srcSet={getLocalSrcSet(image.url) || `${getOptimizedShopifyImage(image.url, 400)} 400w, ${getOptimizedShopifyImage(image.url, 800)} 800w, ${getOptimizedShopifyImage(image.url, 1200)} 1200w`}
                 sizes="(max-width: 768px) 100vw, 50vw"
-                alt={img.altText ?? `${p?.title} ${i + 1}`} 
-                className="w-full h-auto rounded-xl object-contain mb-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 bg-[#FCFCFC]" 
-                loading={i === 0 ? "eager" : "lazy"}
-                decoding={i === 0 ? "sync" : "async"}
-                fetchPriority={i === 0 ? "high" : "auto"}
+                alt={image.altText ?? p.title} 
+                width={800} height={1000} 
+                className="h-full w-full object-cover aspect-[4/5]" 
+                fetchPriority="high" loading="eager" decoding="sync" 
               />
-            ))}
+            )}
           </div>
+          {images.length > 1 && (
+            <div className="mt-4 grid grid-cols-5 gap-3">
+              {images.map((img, i) => (
+                <button
+                  key={img.url}
+                  aria-label={img.altText ?? `الصورة ${i + 1} لـ ${p.title}`}
+                  onClick={() => setActiveImg(i)}
+                  className={`aspect-square rounded-xl overflow-hidden transition-all duration-300 ${i === activeImg ? "border-2 border-[#D4AF37] shadow-sm scale-[1.02]" : "border-2 border-transparent hover:border-slate-200 opacity-70 hover:opacity-100"}`}
+                >
+                  <img 
+                    src={img.url.endsWith("-800w.webp") ? img.url.replace("-800w.webp", "-160w.webp") : getOptimizedShopifyImage(img.url, 200)} 
+                    alt={img.altText ?? `${p.title} ${i + 1}`} 
+                    className="h-full w-full object-cover" 
+                    loading="lazy" decoding="async" 
+                    width={200} height={200}
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Desktop Details + COD Form */}
@@ -362,22 +382,18 @@ function ProductPage() {
 
       {/* Middle Detail Images */}
       {p.detailImages?.edges && p.detailImages.edges.length > 0 && (
-        <section className="w-full mx-auto max-w-lg min-[553px]:max-w-[520px] min-w-0 flex flex-col items-center justify-center mt-6 mb-6 space-y-4 box-border">
+        <section className="w-full max-w-lg mx-auto flex flex-col mt-6 mb-6">
           {p.detailImages.edges.map((e, idx) => (
-            <div key={idx} className="w-full rounded-[18px] overflow-hidden box-border bg-transparent">
-              <img 
-                src={getOptimizedShopifyImage(e.node.url, 800)} 
-                srcSet={getLocalSrcSet(e.node.url) || `${getOptimizedShopifyImage(e.node.url, 400)} 400w, ${getOptimizedShopifyImage(e.node.url, 800)} 800w`}
-                sizes="(max-width: 520px) 100vw, 520px"
-                alt={e.node.altText || `${p.title} detail view ${idx + 1}`} 
-                className="w-full h-auto block object-contain object-center" 
-                width={e.node.width || 800}
-                height={e.node.height || 1000}
-                style={{ aspectRatio: e.node.width && e.node.height ? `${e.node.width}/${e.node.height}` : '4/5' }}
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
+            <img 
+              key={idx}
+              src={getOptimizedShopifyImage(e.node.url, 800)} 
+              srcSet={getLocalSrcSet(e.node.url) || `${getOptimizedShopifyImage(e.node.url, 400)} 400w, ${getOptimizedShopifyImage(e.node.url, 800)} 800w`}
+              sizes="(max-width: 768px) 100vw, 50vw"
+              alt={e.node.altText || `${p.title} detail view ${idx + 1}`} 
+              className="w-full h-auto rounded-xl object-contain mb-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)]" 
+              loading="lazy"
+              decoding="async"
+            />
           ))}
         </section>
       )}

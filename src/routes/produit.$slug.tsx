@@ -142,7 +142,7 @@ function ProductPage() {
       }
     }).catch(err => console.error("Failed to send ViewContent CAPI:", err));
 
-  }, [p?.id, p?.title, offers[0]?.price]);
+  }, []); // Empty dependency array ensures it only fires once on mount
 
 
   if (!product || !p) {

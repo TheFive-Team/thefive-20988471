@@ -47,13 +47,13 @@
           },
           {
             "node": {
-              "url": "/images/product-gallery-1783896027227-17-800w.webp",
+              "url": "/images/product-gallery-1784334785381-13-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-gallery-1784334785381-13-800w.webp",
+              "url": "/images/product-gallery-1783896027227-17-800w.webp",
               "altText": null
             }
           }
@@ -63,7 +63,7 @@
         "edges": [
           {
             "node": {
-              "url": "/images/product-detail-1784252418463-17-800w.webp",
+              "url": "/images/product-detail-1784336063849-13-800w.webp",
               "altText": null
             }
           }
@@ -125,7 +125,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17843356873810",
+              "id": "gid://shopify/ProductVariant/17843360686390",
               "title": "6",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -147,7 +147,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17843356873811",
+              "id": "gid://shopify/ProductVariant/17843360686391",
               "title": "8",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -169,7 +169,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17843356873812",
+              "id": "gid://shopify/ProductVariant/17843360686392",
               "title": "10",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -191,7 +191,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17843356873813",
+              "id": "gid://shopify/ProductVariant/17843360686393",
               "title": "12",
               "availableForSale": true,
               "quantityAvailable": 0,

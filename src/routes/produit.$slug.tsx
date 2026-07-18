@@ -168,13 +168,8 @@ function ProductPage() {
   let displayTitle = p?.title || "";
   let displaySubtitle = (p as any)?.subtitle || "";
 
-  // Safe robust check for the old title variant 
-  if (
-    displayTitle === "Ensemble d’Été Fille – Léger, Élégant et Confortable" || 
-    displayTitle.includes("Élégant et Confortable") ||
-    slug === "Ensemble–d’Été–Fille"
-  ) {
-    displayTitle = "Ensemble d’été fille — léger et chic";
+  // Provide a default subtitle if none exists in the product data
+  if (slug === "Ensemble–d’Été–Fille" && !displaySubtitle) {
     displaySubtitle = "Confortable toute la journée";
   }
 

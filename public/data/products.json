@@ -2,7 +2,7 @@
   {
     "node": {
       "id": "gid://shopify/Product/8000957644848",
-      "title": "ggEnsemble d’été fillujytf et confortablegg",
+      "title": "Ensemble d’été fille 6–12 ans — léger et confortable",
       "description": "",
       "descriptionHtml": "",
       "handle": "Ensemble–d’Été–Fille",
@@ -125,7 +125,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17843374661000",
+              "id": "gid://shopify/ProductVariant/17843378922300",
               "title": "6",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -147,7 +147,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17843374661001",
+              "id": "gid://shopify/ProductVariant/17843378922301",
               "title": "8",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -169,7 +169,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17843374661002",
+              "id": "gid://shopify/ProductVariant/17843378922302",
               "title": "10",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -191,7 +191,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17843374661003",
+              "id": "gid://shopify/ProductVariant/17843378922303",
               "title": "12",
               "availableForSale": true,
               "quantityAvailable": 0,

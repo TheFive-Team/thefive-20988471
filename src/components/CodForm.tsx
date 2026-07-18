@@ -564,7 +564,7 @@ export function CodForm({
           <div className="mt-3 bg-slate-50 rounded-xl p-3 flex justify-center items-center gap-2">
              <RefreshCw className="w-4 h-4 text-[#D7AE57]" strokeWidth={2.5} />
              <span className="text-sm font-semibold text-slate-800 tracking-wide">
-               استبدال وإرجاع بكل سهولة
+               استبدال المقاس خلال 48 ساعة
              </span>
           </div>
         </div>

@@ -170,7 +170,7 @@ function ProductPage() {
 
   // Provide a default subtitle if none exists in the product data
   if (slug === "Ensemble–d’Été–Fille" && !displaySubtitle) {
-    displaySubtitle = "Confortable toute la journée";
+    displaySubtitle = "Gaze de coton + pantalon en lin";
   }
 
   return (

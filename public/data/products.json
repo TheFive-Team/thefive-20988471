@@ -2,7 +2,7 @@
   {
     "node": {
       "id": "gid://shopify/Product/8000957644848",
-      "title": "Ensemble d’Été Fille – Léger, Élégant et Confortable",
+      "title": "Ensemble d’été fille 6–12 ans — léger et confortable",
       "description": "",
       "descriptionHtml": "",
       "handle": "Ensemble–d’Été–Fille",
@@ -63,7 +63,7 @@
         "edges": [
           {
             "node": {
-              "url": "/images/product-detail-1784335334150-13-800w.webp",
+              "url": "/images/product-detail-1784252418463-17-800w.webp",
               "altText": null
             }
           }
@@ -125,7 +125,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17843353391430",
+              "id": "gid://shopify/ProductVariant/17843356873810",
               "title": "6",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -147,7 +147,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17843353391431",
+              "id": "gid://shopify/ProductVariant/17843356873811",
               "title": "8",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -169,7 +169,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17843353391432",
+              "id": "gid://shopify/ProductVariant/17843356873812",
               "title": "10",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -191,7 +191,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17843353391433",
+              "id": "gid://shopify/ProductVariant/17843356873813",
               "title": "12",
               "availableForSale": true,
               "quantityAvailable": 0,

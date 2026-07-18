@@ -47,13 +47,13 @@
           },
           {
             "node": {
-              "url": "/images/product-gallery-1783896023042-16-800w.webp",
+              "url": "/images/product-gallery-1783896027227-17-800w.webp",
               "altText": null
             }
           },
           {
             "node": {
-              "url": "/images/product-gallery-1783896027227-17-800w.webp",
+              "url": "/images/product-gallery-1784334785381-13-800w.webp",
               "altText": null
             }
           }
@@ -125,7 +125,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842577440060",
+              "id": "gid://shopify/ProductVariant/17843347895770",
               "title": "6",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -147,7 +147,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842577440061",
+              "id": "gid://shopify/ProductVariant/17843347895771",
               "title": "8",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -169,7 +169,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842577440062",
+              "id": "gid://shopify/ProductVariant/17843347895772",
               "title": "10",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -191,7 +191,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17842577440063",
+              "id": "gid://shopify/ProductVariant/17843347895773",
               "title": "12",
               "availableForSale": true,
               "quantityAvailable": 0,

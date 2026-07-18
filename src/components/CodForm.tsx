@@ -9,6 +9,13 @@ import ZR_OFFICES from "@/lib/zr_offices.json";
 
 const normalizeStr = (str: string) => str ? str.toLowerCase().replace(/[^a-z0-9]/g, "") : "";
 
+const ageMap: Record<string, string> = {
+  "6": "5-6 سنوات",
+  "8": "7-8 سنوات",
+  "10": "9-10 سنوات",
+  "12": "11-12 سنوات"
+};
+
 export function CodForm({ 
   productName, 
   offers = [],
@@ -327,15 +334,15 @@ export function CodForm({
                               type="button"
                               onClick={() => setSizeForPiece(pieceIndex, v.node.id)}
                               disabled={!isAvailable && !isSelected}
-                              className={`rounded-[9px] min-w-[42px] h-[38px] px-3 text-[14px] font-sans font-semibold tracking-wide transition-all duration-300 ${
+                              className={`rounded-[9px] min-w-[90px] h-[38px] px-4 text-[14px] font-sans font-semibold tracking-wide transition-all duration-300 ${
                                 !isAvailable && !isSelected
                                   ? "opacity-35 border border-[#F2F2F2] bg-[#F2F2F2] text-[#A6A6A6] cursor-not-allowed line-through" 
                                   : isSelected
-                                    ? "bg-[#D7AE57] text-[#0B1F33] border border-[#D7AE57]"
-                                    : "border border-[#D9DEE5] text-[#243B53] hover:bg-[#FCFAF6] bg-[#FFFFFF] active:scale-[0.98]"
+                                    ? "bg-[#0b1b3d] text-white border border-[#0b1b3d]"
+                                    : "border border-[#E2E8F0] text-[#1E293B] hover:bg-slate-50 bg-[#FFFFFF] active:scale-[0.98]"
                               }`}
                             >
-                               {v.node.title}
+                               {ageMap[v.node.title.trim()] || v.node.title}
                             </button>
                             {showScarcity && (
                               <span className="text-[9px] font-bold text-[#D7AE57]">
@@ -487,7 +494,10 @@ export function CodForm({
                <div className="flex justify-between items-center h-[28px] text-[12px] font-semibold text-[#68737F]">
                  <span>المقاسات</span>
                  <span className="text-[#102A43] font-bold dir-ltr">
-                   {selectedSizes.map(id => variants.find((v: any) => v.node.id === id)?.node.title || "").filter(Boolean).join(" • ")}
+                   {selectedSizes.map(id => {
+                     const title = variants.find((v: any) => v.node.id === id)?.node.title || "";
+                     return ageMap[title.trim()] || title;
+                   }).filter(Boolean).join(" • ")}
                  </span>
                </div>
              )}

@@ -191,18 +191,18 @@ function ProductPage() {
             
             {/* Collection Label */}
             <div className="mb-[8px] w-full text-left" dir="ltr">
-              <span className="text-[11px] font-bold tracking-[0.12em] uppercase text-[#D4AF37]">
+              <span className="font-sans font-semibold text-[11px] tracking-[1.5px] uppercase text-[#C99A24]">
                 NOUVELLE COLLECTION
               </span>
             </div>
             
             {/* Product Name & Subtitle */}
             <div className="w-full text-left" dir="ltr">
-              <h1 className="font-serif font-semibold text-[#1A2530] text-[20px] leading-[1.3] m-0">
+              <h1 className="font-serif font-medium text-[#102A4C] text-[21px] leading-[1.25] m-0">
                 {displayTitle}
               </h1>
               {displaySubtitle && (
-                <h2 className="font-sans font-normal text-[#7A8A9E] text-[13px] leading-[1.45] mt-[5px]">
+                <h2 className="font-sans font-normal text-[#737E91] text-[14px] mt-[5px]">
                   {displaySubtitle}
                 </h2>
               )}
@@ -210,10 +210,10 @@ function ProductPage() {
             
             {/* Rating */}
             <div className="flex items-center gap-[6px] mt-[12px] w-full text-left" dir="ltr">
-              <div className="flex text-[#D4AF37] text-[12px] tracking-widest leading-none">
+              <div className="flex text-[#D4AF37] text-[14px] tracking-widest leading-none">
                 <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
               </div>
-              <span className="text-[12px] font-medium text-[#7A8A9E] leading-none">4.9</span>
+              <span className="text-[13px] font-medium text-slate-600 leading-none">4.9 • 127 avis</span>
             </div>
             
             {/* Price Row */}
@@ -226,20 +226,20 @@ function ProductPage() {
                   const discount = Math.round(((parseFloat(compPrice) - parseFloat(currentPrice)) / parseFloat(compPrice)) * 100);
                   return (
                     <>
-                      <span className="text-[30px] font-extrabold text-[#1A2530] leading-none whitespace-nowrap">
+                      <span className="font-sans font-bold text-[32px] text-[#102A4C] leading-none whitespace-nowrap">
                         {formatMoney({ amount: currentPrice, currencyCode: "DZD" })}
                       </span>
-                      <span className="text-[14px] font-medium text-[#7A8A9E]/80 line-through leading-none whitespace-nowrap">
+                      <span className="font-sans font-normal text-[14px] text-slate-400 line-through leading-none whitespace-nowrap">
                         {formatMoney({ amount: compPrice, currencyCode: "DZD" })}
                       </span>
-                      <span className="inline-flex items-center h-[22px] px-[8px] rounded-[6px] bg-[#1A2530] text-[#D4AF37] text-[10px] font-bold whitespace-nowrap">
+                      <span className="inline-flex items-center h-[22px] px-[8px] rounded-[6px] bg-[#102A4C] text-white text-[11px] font-semibold whitespace-nowrap">
                         -{discount}%
                       </span>
                     </>
                   );
                 }
                 return (
-                  <span className="text-[30px] font-extrabold text-[#1A2530] leading-none whitespace-nowrap">
+                  <span className="font-sans font-bold text-[32px] text-[#102A4C] leading-none whitespace-nowrap">
                     {formatMoney({ amount: currentPrice ?? 0, currencyCode: "DZD" })}
                   </span>
                 );
@@ -294,18 +294,18 @@ function ProductPage() {
             
             {/* Collection Label */}
             <div className="mb-2">
-              <span className="text-[11px] uppercase font-bold tracking-[0.15em] text-[#D4AF37]">
+              <span className="font-sans font-semibold text-[11px] tracking-[1.5px] uppercase text-[#C99A24]">
                 NOUVELLE COLLECTION
               </span>
             </div>
             
             {/* Product Name & Subtitle */}
             <div className="mb-3 w-full text-left" dir="ltr">
-              <h1 className="font-serif font-bold text-[#1A2530] text-3xl md:text-4xl leading-[1.2] drop-shadow-sm">
+              <h1 className="font-serif font-medium text-[#102A4C] text-[21px] leading-[1.25] drop-shadow-sm">
                 {displayTitle}
               </h1>
               {displaySubtitle && (
-                <h2 className="font-sans font-normal text-[#6E6E6E] text-[15px] leading-[1.5] mt-1.5">
+                <h2 className="font-sans font-normal text-[#737E91] text-[14px] mt-1.5">
                   {displaySubtitle}
                 </h2>
               )}
@@ -313,10 +313,10 @@ function ProductPage() {
             
             {/* Rating */}
             <div className="flex items-center gap-2 mb-6">
-              <div className="flex text-[#D4AF37] text-xs tracking-widest">
+              <div className="flex text-[#D4AF37] text-[14px] tracking-widest">
                 <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
               </div>
-              <span className="text-[11px] font-medium text-[#1A2530]/60 mt-0.5">4.9</span>
+              <span className="text-[13px] font-medium text-slate-600 mt-0.5">4.9 • 127 avis</span>
             </div>
             
             {/* Price Row */}
@@ -329,20 +329,20 @@ function ProductPage() {
                   const discount = Math.round(((parseFloat(comparePrice) - parseFloat(currentPrice)) / parseFloat(comparePrice)) * 100);
                   return (
                     <div className="flex items-center gap-3">
-                      <span className="text-4xl font-bold tracking-tight text-[#1A2530] leading-none">
+                      <span className="font-sans font-bold text-[32px] text-[#102A4C] leading-none">
                         {formatMoney({ amount: currentPrice, currencyCode: "DZD" })}
                       </span>
-                      <span className="text-lg text-slate-400 line-through font-medium leading-none">
+                      <span className="font-sans font-normal text-[14px] text-slate-400 line-through leading-none">
                         {formatMoney({ amount: comparePrice, currencyCode: "DZD" })}
                       </span>
-                      <span className="bg-[#1A2530] text-[#D4AF37] text-xs font-bold px-2 py-0.5 rounded-sm tracking-wide leading-none ml-2">
-                        وفر {discount}%
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-[#102A4C] text-white text-[11px] font-semibold leading-none ml-2">
+                        -{discount}%
                       </span>
                     </div>
                   );
                 }
                 return (
-                  <span className="text-4xl font-bold tracking-tight text-[#1A2530] leading-none">
+                  <span className="font-sans font-bold text-[32px] text-[#102A4C] leading-none">
                     {formatMoney({ amount: currentPrice ?? 0, currencyCode: "DZD" })}
                   </span>
                 );

@@ -39,27 +39,41 @@ import productsData from "../../public/data/products.json";
 
 export async function fetchProducts(query?: string, first = 50): Promise<ShopifyProduct[]> {
   try {
-    const products = productsData as ShopifyProduct[];
+    let products = productsData as ShopifyProduct[];
+    if (typeof window !== "undefined") {
+      const res = await fetch(`/data/products.json?v=${new Date().getTime()}`);
+      if (res.ok) {
+        products = await res.json();
+      }
+    }
+    
     if (query) {
       return products.filter(p => p.node.title.toLowerCase().includes(query.toLowerCase()));
     }
     return products.slice(0, first);
   } catch (err) {
-    console.error("Error fetching local products", err);
-    return [];
+    console.error("Error fetching local products dynamically", err);
+    return (productsData as ShopifyProduct[]).slice(0, first);
   }
 }
 
 export async function fetchProductByHandle(handle: string): Promise<ShopifyProduct | null> {
   const t0 = performance.now();
   try {
-    const products = productsData as ShopifyProduct[];
+    let products = productsData as ShopifyProduct[];
+    if (typeof window !== "undefined") {
+      const res = await fetch(`/data/products.json?v=${new Date().getTime()}`);
+      if (res.ok) {
+        products = await res.json();
+      }
+    }
+    
     const result = products.find(p => p.node.handle === handle) || null;
     console.log(`[TTFB] JSON Lookup for ${handle}: ${(performance.now() - t0).toFixed(2)}ms`);
     return result;
   } catch (err) {
-    console.error("Error fetching local product", err);
-    return null;
+    console.error("Error fetching local product dynamically", err);
+    return (productsData as ShopifyProduct[]).find(p => p.node.handle === handle) || null;
   }
 }
 

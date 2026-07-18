@@ -151,7 +151,7 @@ function AdminDashboard() {
       {/* Main Content */}
       <main className="flex-1 p-4 sm:p-8 overflow-y-auto w-full">
         {activeTab === "orders" && <OrdersDashboard />}
-        {activeTab === "products" && <ProductsManager products={products} token={""} onRefresh={loadProducts} loading={loading} />}
+        {activeTab === "products" && <ProductsManager products={products} token={""} onRefresh={(newProducts?: ShopifyProduct[]) => newProducts ? setProducts(newProducts) : loadProducts()} loading={loading} />}
         {activeTab === "settings" && <div className="p-8 text-center text-slate-500 dark:text-[#9CA3AF] font-bold">إعدادات النظام (قيد التطوير)</div>}
       </main>
     </div>
@@ -1249,7 +1249,7 @@ type ProductImageObj = {
   group: 'gallery' | 'detail' | 'review'
 };
 
-function ProductsManager({ products, token, onRefresh, loading }: { products: ShopifyProduct[], token: string, onRefresh: () => void, loading: boolean }) {
+function ProductsManager({ products, token, onRefresh, loading }: { products: ShopifyProduct[], token: string, onRefresh: (newProducts?: ShopifyProduct[]) => void, loading: boolean }) {
   const [mode, setMode] = useState<"list" | "edit" | "create">("list");
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<any>({});
@@ -1649,7 +1649,7 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
       
       alert(mode === "create" ? "تمت إضافة المنتج بنجاح!" : "تم تحديث المنتج بنجاح!");
       setMode("list");
-      onRefresh();
+      onRefresh(updatedProducts);
     } catch (err: any) {
       handleGitHubError(err, "Error saving product");
     } finally {
@@ -1674,7 +1674,7 @@ function ProductsManager({ products, token, onRefresh, loading }: { products: Sh
         false
       );
       alert("تم حذف المنتج بنجاح!");
-      onRefresh();
+      onRefresh(updatedProducts);
     } catch (err: any) {
       handleGitHubError(err, "Error deleting product");
     } finally {

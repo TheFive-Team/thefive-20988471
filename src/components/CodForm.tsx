@@ -397,7 +397,7 @@ export function CodForm({
               <div className="relative">
                  <select
                    id="wilaya" required
-                   value={form.wilaya} onChange={(e) => setForm({ ...form, wilaya: e.target.value, commune: "" })}
+                   value={form.wilaya} onChange={(e) => setForm({ ...form, wilaya: e.target.value, commune: "", shippingMethod: "" })}
                    className={`${inputClasses} appearance-none pr-4`}
                  >
                    <option value="" disabled>اختر الولاية</option>
@@ -413,7 +413,7 @@ export function CodForm({
               <div className="relative">
                  <select
                    id="commune" required disabled={!form.wilaya}
-                   value={form.commune} onChange={(e) => setForm({ ...form, commune: e.target.value })}
+                   value={form.commune} onChange={(e) => setForm({ ...form, commune: e.target.value, shippingMethod: e.target.value ? form.shippingMethod : "" })}
                    className={`${inputClasses} appearance-none pr-4 ${!form.wilaya ? 'bg-slate-50 opacity-70 cursor-not-allowed' : ''}`}
                  >
                    <option value="" disabled>اختر البلدية</option>
@@ -426,7 +426,8 @@ export function CodForm({
           </div>
         </section>
 
-        {/* Section 4: Delivery */}
+        {/* Section 4: Delivery — Only revealed when both Wilaya and Commune are selected */}
+        {form.wilaya && form.commune && (
         <section id="shipping-method" className="animate-in fade-in slide-in-from-top-4 duration-500 w-full max-w-full min-w-0 box-border">
           <div className="h-px bg-[#EEE8DE] my-[32px] sm:my-[40px]"></div>
           <div className="flex items-start gap-3 w-full min-w-0 mb-[10px]">
@@ -472,6 +473,7 @@ export function CodForm({
             </label>
           </div>
         </section>
+        )}
 
         {/* Section 5: Order Summary */}
         <section className="animate-in fade-in slide-in-from-top-4 duration-500 bg-[#FBF8F2] border border-[#E8E0D2] rounded-[14px] p-[16px] sm:p-[20px] mt-8 sm:mt-10 w-full max-w-full min-w-0 box-border">

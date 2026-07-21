@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { CheckCircle2, Truck, ShieldCheck, Clock, MapPin, Building2, AlertCircle, ShoppingBag } from "lucide-react";
 import { submitOrderFn } from "@/actions/submitOrder.server";
 import { wilayas } from "@/lib/wilayas";
@@ -40,6 +40,9 @@ export function NewLeadForm({
   const [wilayaCode, setWilayaCode] = useState("");
   const [communeName, setCommuneName] = useState("");
   const [shippingMethod, setShippingMethod] = useState<"" | "home" | "stopdesk">("");
+
+  // Location completion check
+  const isLocationComplete = Boolean(wilayaCode && communeName);
 
   // Errors for field highlighting
   const [errors, setErrors] = useState<{
@@ -86,21 +89,30 @@ export function NewLeadForm({
   const homeFee = Number(selectedWilayaObj?.home ?? 0) || 0;
   const stopFee = Number(selectedWilayaObj?.stop ?? selectedWilayaObj?.home ?? 0) || 0;
 
-  // Delivery fee calculation
+  // Delivery fee calculation (0 until isLocationComplete & shippingMethod selected)
   const deliveryFee = useMemo(() => {
-    if (!selectedWilayaObj || !shippingMethod) return 0;
+    if (!isLocationComplete || !selectedWilayaObj || !shippingMethod) return 0;
     const fee = shippingMethod === "home" ? selectedWilayaObj?.home : (selectedWilayaObj?.stop ?? selectedWilayaObj?.home);
     return Number(fee ?? 0) || 0;
-  }, [selectedWilayaObj, shippingMethod]);
+  }, [isLocationComplete, selectedWilayaObj, shippingMethod]);
 
   const grandTotal = finalProductTotal + deliveryFee;
 
-  // Reset commune & shipping method safely when wilaya changes
+  // Handle Wilaya change & collapse delivery options
   const handleWilayaChange = (code: string) => {
     setWilayaCode(code);
     setCommuneName("");
     setShippingMethod("");
     setErrors(prev => ({ ...prev, wilaya: false, commune: false, shippingMethod: false }));
+  };
+
+  // Handle Commune change & collapse delivery options if cleared
+  const handleCommuneChange = (name: string) => {
+    setCommuneName(name);
+    if (!name) {
+      setShippingMethod("");
+    }
+    setErrors(prev => ({ ...prev, commune: false, shippingMethod: false }));
   };
 
   const validateForm = (): boolean => {
@@ -134,7 +146,7 @@ export function NewLeadForm({
       isValid = false;
     }
 
-    // Shipping method validation
+    // Shipping method validation (only if location is complete)
     if (!shippingMethod) {
       newErrors.shippingMethod = true;
       isValid = false;
@@ -381,10 +393,7 @@ export function NewLeadForm({
             <select
               value={communeName}
               disabled={!wilayaCode}
-              onChange={(e) => {
-                setCommuneName(e.target.value);
-                if (errors.commune) setErrors(prev => ({ ...prev, commune: false }));
-              }}
+              onChange={(e) => handleCommuneChange(e.target.value)}
               className={`w-full h-12 px-3 rounded-xl border text-sm transition-all outline-none bg-slate-50/50 cursor-pointer ${
                 !wilayaCode ? "opacity-50 cursor-not-allowed" : ""
               } ${
@@ -403,11 +412,14 @@ export function NewLeadForm({
           </div>
         </div>
 
-        {/* Shipping Method Options */}
-        {selectedWilayaObj && (
-          <div className="pt-2 animate-in fade-in duration-300">
+        {/* Shipping Method Options — Conditionally revealed ONLY when both Wilaya and Commune are selected */}
+        {isLocationComplete && selectedWilayaObj ? (
+          <div className="pt-2 animate-in fade-in slide-in-from-top-3 duration-300">
             <label className="block text-xs font-bold text-slate-700 mb-2">
               طريقة التوصيل <span className="text-rose-500">*</span>
+              {errors.shippingMethod && (
+                <span className="text-rose-600 font-normal mr-2 animate-pulse">* يرجى اختياره لإنهاء الطلب</span>
+              )}
             </label>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -431,7 +443,7 @@ export function NewLeadForm({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-xs font-bold text-slate-800 flex items-center gap-1">
+                    <span className="text-xs font-bold text-[#102A4C] flex items-center gap-1">
                       <MapPin size={13} className="text-[#C99A24]" />
                       توصيل للمنزل
                     </span>
@@ -463,7 +475,7 @@ export function NewLeadForm({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-xs font-bold text-slate-800 flex items-center gap-1">
+                    <span className="text-xs font-bold text-[#102A4C] flex items-center gap-1">
                       <Building2 size={13} className="text-[#C99A24]" />
                       استلام من المكتب
                     </span>
@@ -476,6 +488,10 @@ export function NewLeadForm({
               </button>
             </div>
           </div>
+        ) : (
+          <div className="pt-1 text-[11px] text-slate-400 font-medium italic">
+            * اختر الولاية والبلدية أولاً لإظهار خيارات وأسعار التوصيل المتاحة.
+          </div>
         )}
 
         {/* Total Summary */}
@@ -484,12 +500,16 @@ export function NewLeadForm({
             <span>سعر المنتجات ({quantity} قطعة):</span>
             <span className="font-semibold">{formatMoney({ amount: finalProductTotal, currencyCode: "DZD" })}</span>
           </div>
-          {shippingMethod && (
-            <div className="flex justify-between text-slate-600">
-              <span>مصاريف التوصيل:</span>
-              <span className="font-semibold">{deliveryFee} د.ج</span>
-            </div>
-          )}
+          <div className="flex justify-between text-slate-600">
+            <span>مصاريف التوصيل:</span>
+            <span className="font-semibold">
+              {!isLocationComplete
+                ? "اختر البلدية أولاً"
+                : !shippingMethod
+                ? "اختر طريقة التوصيل"
+                : `${deliveryFee} د.ج`}
+            </span>
+          </div>
           <div className="flex justify-between border-t border-slate-200 pt-2 text-sm font-extrabold text-[#102A4C]">
             <span>المبلغ الإجمالي عند الاستلام:</span>
             <span className="text-[#C99A24]">{formatMoney({ amount: grandTotal, currencyCode: "DZD" })}</span>

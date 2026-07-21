@@ -28,7 +28,16 @@ function generateSafeId() {
   return Date.now().toString(36) + Math.random().toString(36).substring(2);
 }
 
+import { NewLeadForm } from "@/components/NewLeadForm";
+import { trackInitiateCheckout } from "@/lib/metaPixel";
+
 export const Route = createFileRoute("/produit/$slug")({
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      variant: typeof search.variant === "string" ? search.variant : undefined,
+      v: typeof search.v === "string" ? search.v : undefined,
+    };
+  },
   loader: async ({ context, params }) => {
     const t0 = performance.now();
     const data = await context.queryClient.ensureQueryData(productQueryOptions(params.slug));
@@ -60,8 +69,16 @@ export const Route = createFileRoute("/produit/$slug")({
   component: ProductPage,
 });
 
+const ageMapVariantB: Record<string, string> = {
+  "6": "5-6 سنوات",
+  "8": "7-8 سنوات",
+  "10": "9-10 سنوات",
+  "12": "11-12 سنوات"
+};
+
 function ProductPage() {
   const { slug } = Route.useParams();
+  const search = Route.useSearch();
   const { tr } = useI18n();
   const product = Route.useLoaderData();
   const addItem = useCartStore((s) => s.addItem);
@@ -70,6 +87,58 @@ function ProductPage() {
   const variants = p?.variants?.edges ?? [];
   const totalStock = variants.reduce((sum: number, v: any) => sum + (v.node.quantityAvailable || 10), 0);
   
+  // A/B Testing Variant B detection
+  const urlParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const variantParam = search?.variant || search?.v || urlParams?.get("variant") || urlParams?.get("v") || "";
+  const isVariantB = variantParam.toLowerCase() === "b" || variantParam === "2" || (typeof window !== "undefined" && window.location.pathname.endsWith("/v2"));
+
+  // State for Variant B (2-Step Progressive Disclosure Flow)
+  const [variantBQty, setVariantBQty] = useState(1);
+  const [variantBSizes, setVariantBSizes] = useState<string[]>([""]);
+  const [variantBSizeError, setVariantBSizeError] = useState(false);
+  const [isStep2Revealed, setIsStep2Revealed] = useState(false);
+  const initiateCheckoutFiredRef = useRef(false);
+
+  useEffect(() => {
+    setVariantBSizes(Array(variantBQty).fill(""));
+    setVariantBSizeError(false);
+  }, [variantBQty]);
+
+  const setVariantBSizeForPiece = (index: number, variantId: string) => {
+    const newSizes = [...variantBSizes];
+    newSizes[index] = variantId;
+    setVariantBSizes(newSizes);
+    setVariantBSizeError(false);
+  };
+
+  const handleStep1CtaClick = () => {
+    const requireSize = variants.length > 1 && variantBSizes.some(s => s === "");
+    if (requireSize) {
+      setVariantBSizeError(true);
+      document.getElementById("variantB-size-selector")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    if (!initiateCheckoutFiredRef.current && p?.title) {
+      initiateCheckoutFiredRef.current = true;
+      try {
+        trackInitiateCheckout({
+          productName: p.title,
+          productId: p.id || "default",
+          price: Number(p?.priceRange?.minVariantPrice?.amount ?? 0),
+          currency: "DZD"
+        });
+      } catch (err) {
+        console.error("Meta Pixel InitiateCheckout Error:", err);
+      }
+    }
+
+    setIsStep2Revealed(true);
+    setTimeout(() => {
+      document.getElementById("new-lead-form-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  };
+
   const offers = useMemo(() => {
     const rawOffersList = Array.isArray((p as any)?.offers) ? (p as any).offers : [];
     const rawOffers = rawOffersList.filter((o: any) => o && o.active !== false);
@@ -96,8 +165,6 @@ function ProductPage() {
   
   const basePrice = p?.priceRange?.minVariantPrice?.amount ?? "0";
   const comparePrice = p?.compareAtPriceRange?.minVariantPrice?.amount;
-
-
 
   const images = product?.node?.images?.edges?.map((e: any) => e.node) ?? [];
   const [activeImg, setActiveImg] = useState(0);
@@ -144,7 +211,6 @@ function ProductPage() {
 
   }, []); // Empty dependency array ensures it only fires once on mount
 
-
   if (!product || !p) {
     return (
       <div className="px-6 py-32 text-center">
@@ -156,10 +222,7 @@ function ProductPage() {
     );
   }
 
-
-  const handleAdd = async () => {
-    // Legacy handleAdd, not fully used anymore with COD directly but kept for cart consistency
-  };
+  const handleAdd = async () => {};
 
   const scrollToCheckout = () => {
     document.getElementById("checkout-form")?.scrollIntoView({ behavior: "smooth" });
@@ -168,9 +231,419 @@ function ProductPage() {
   let displayTitle = p?.title || "";
   let displaySubtitle = (p as any)?.subtitle || "";
 
-  // Provide a default subtitle if none exists in the product data
   if (slug === "Ensemble–d’Été–Fille" && !displaySubtitle) {
     displaySubtitle = "Gaze de coton + pantalon en lin";
+  }
+
+  if (isVariantB) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-10 sm:py-24 w-full box-border">
+        {/* A/B Test Variant B Banner Indicator */}
+        <div className="mb-4 p-2.5 bg-[#C99A24]/10 border border-[#C99A24]/30 rounded-xl text-center text-xs font-bold text-[#C99A24]" dir="rtl">
+          ✨ تجربة الشراء السريعة (Variant B — 2 Step Flow)
+        </div>
+
+        <div className="grid gap-0 md:grid-cols-2 md:gap-10 lg:gap-12">
+          
+          {/* Mobile View */}
+          <div className="block md:hidden mb-6 w-full max-w-lg mx-auto flex flex-col gap-5">
+            {/* Gallery */}
+            <div className="w-full box-border min-w-0">
+              <MobileImageGallery images={images} />
+            </div>
+
+            {/* Product Details & Step 1 Controls */}
+            <div className="w-full box-border">
+              <div className="flex flex-col items-start text-left bg-white rounded-[20px] p-[20px_16px] shadow-[0_4px_16px_rgba(16,42,67,0.04)] border border-[#E8E0D2] w-full max-w-full min-w-0 m-0 box-border overflow-hidden">
+                <div className="mb-[10px] w-full text-left" dir="ltr">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#C99A24] text-white text-[10px] sm:text-[11px] font-semibold tracking-[1.5px] uppercase shadow-xs">
+                    NOUVELLE COLLECTION
+                  </span>
+                </div>
+                <div className="w-full text-left" dir="ltr">
+                  <h1 className="font-serif font-medium text-[#102A4C] text-[clamp(32px,8vw,40px)] leading-[1.12] tracking-tight m-0 break-words">
+                    {displayTitle}
+                  </h1>
+                  {displaySubtitle && (
+                    <h2 className="font-sans font-normal text-[#737E91] text-[14px] mt-[6px] leading-snug">
+                      {displaySubtitle}
+                    </h2>
+                  )}
+                </div>
+                <div className="flex items-center gap-[6px] mt-[12px] w-full text-left" dir="ltr">
+                  <div className="flex text-[#D4AF37] text-[14px] tracking-widest leading-none">
+                    <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                  </div>
+                  <span className="text-[13px] font-medium text-slate-600 leading-none">4.9 • 127 avis</span>
+                </div>
+                
+                {/* Price */}
+                <div className="flex items-center flex-wrap gap-[8px] mt-[16px] w-full text-left" dir="ltr">
+                  {(() => {
+                    const currentPrice = offers[0]?.price;
+                    const compPrice = offers[0]?.comparePrice;
+                    if (compPrice && parseFloat(compPrice) > parseFloat(currentPrice)) {
+                      const discount = Math.round(((parseFloat(compPrice) - parseFloat(currentPrice)) / parseFloat(compPrice)) * 100);
+                      return (
+                        <>
+                          <span className="font-sans font-bold text-[32px] text-[#102A4C] leading-none whitespace-nowrap">
+                            {formatMoney({ amount: currentPrice, currencyCode: "DZD" })}
+                          </span>
+                          <span className="font-sans font-normal text-[14px] text-slate-400 line-through leading-none whitespace-nowrap">
+                            {formatMoney({ amount: compPrice, currencyCode: "DZD" })}
+                          </span>
+                          <span className="inline-flex items-center h-[22px] px-[9px] rounded-full bg-[#C99A24] text-white text-[11px] font-semibold leading-none whitespace-nowrap shadow-xs">
+                            -{discount}%
+                          </span>
+                        </>
+                      );
+                    }
+                    return (
+                      <span className="font-sans font-bold text-[32px] text-[#102A4C] leading-none whitespace-nowrap">
+                        {formatMoney({ amount: currentPrice ?? 0, currencyCode: "DZD" })}
+                      </span>
+                    );
+                  })()}
+                </div>
+
+                {/* Step 1: Size & Quantity Selectors */}
+                <div className="w-full mt-5 pt-4 border-t border-slate-100" dir="rtl">
+                  {/* Quantity Counter */}
+                  <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200/80 mb-3">
+                    <span className="text-xs font-bold text-slate-700">الكمية:</span>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setVariantBQty(Math.max(1, variantBQty - 1))}
+                        className="w-8 h-8 rounded-lg bg-white border border-slate-200 font-bold text-slate-700 flex items-center justify-center hover:bg-slate-100 cursor-pointer"
+                      >
+                        -
+                      </button>
+                      <span className="font-bold text-base text-[#102A4C] w-6 text-center">{variantBQty}</span>
+                      <button
+                        type="button"
+                        onClick={() => setVariantBQty(Math.min(pricingConfig?.maxQuantity || 10, variantBQty + 1))}
+                        className="w-8 h-8 rounded-lg bg-white border border-slate-200 font-bold text-slate-700 flex items-center justify-center hover:bg-slate-100 cursor-pointer"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Size Selector */}
+                  {variants.length > 1 && (
+                    <div id="variantB-size-selector" className="space-y-2 text-right">
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs font-bold text-slate-700">
+                          اختاري المقاس {variantBQty > 1 ? "(لكل قطعة)" : ""}:
+                        </label>
+                        {variantBSizeError && (
+                          <span className="text-xs font-bold text-rose-600 animate-pulse">
+                            يرجى اختيار المقاس
+                          </span>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        {Array.from({ length: variantBQty }).map((_, pieceIndex) => (
+                          <div key={pieceIndex} className="p-2.5 bg-slate-50 rounded-xl border border-slate-200/80">
+                            {variantBQty > 1 && (
+                              <span className="text-[11px] font-bold text-[#102A4C] block mb-1">
+                                القطعة {pieceIndex + 1}:
+                              </span>
+                            )}
+                            <div className="flex flex-wrap gap-2">
+                              {variants.map((v: any) => {
+                                const stock = v.node.quantityAvailable ?? 0;
+                                const isAvailable = v.node.availableForSale && stock > 0;
+                                const titleClean = v.node.title.replace(/ans/gi, "").trim();
+                                const label = ageMapVariantB[titleClean] || v.node.title;
+                                const isSelected = variantBSizes[pieceIndex] === v.node.id;
+
+                                return (
+                                  <button
+                                    key={v.node.id}
+                                    type="button"
+                                    disabled={!isAvailable}
+                                    onClick={() => setVariantBSizeForPiece(pieceIndex, v.node.id)}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                                      isSelected
+                                        ? "bg-[#C99A24] text-white shadow-sm ring-2 ring-[#C99A24]/40"
+                                        : isAvailable
+                                        ? "bg-white text-slate-700 border border-slate-200 hover:border-[#C99A24]"
+                                        : "bg-slate-100 text-slate-400 border border-slate-100 cursor-not-allowed line-through"
+                                    }`}
+                                  >
+                                    {label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Primary Step 1 CTA Button */}
+                  <button
+                    type="button"
+                    onClick={handleStep1CtaClick}
+                    className="w-full h-14 mt-4 bg-[#102A4C] hover:bg-[#0a1e38] text-white font-bold text-base rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+                  >
+                    <span>التالي: أكملي معلومات التوصيل 📦</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop View */}
+          <div className="hidden md:block">
+            <div className="bg-[#FCFCFC] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
+              {image && (
+                <img 
+                  src={getOptimizedShopifyImage(image.url, 800)} 
+                  srcSet={getLocalSrcSet(image.url) || `${getOptimizedShopifyImage(image.url, 400)} 400w, ${getOptimizedShopifyImage(image.url, 800)} 800w, ${getOptimizedShopifyImage(image.url, 1200)} 1200w`}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  alt={image.altText ?? p.title} 
+                  width={800} height={1000} 
+                  className="h-full w-full object-cover aspect-[4/5]" 
+                  fetchPriority="high" loading="eager" decoding="sync" 
+                />
+              )}
+            </div>
+            {images.length > 1 && (
+              <div className="mt-4 grid grid-cols-5 gap-3">
+                {images.map((img, i) => (
+                  <button
+                    key={img.url}
+                    aria-label={img.altText ?? `الصورة ${i + 1} لـ ${p.title}`}
+                    onClick={() => setActiveImg(i)}
+                    className={`aspect-square rounded-xl overflow-hidden transition-all duration-300 ${i === activeImg ? "border-2 border-[#D4AF37] shadow-sm scale-[1.02]" : "border-2 border-transparent hover:border-slate-200 opacity-70 hover:opacity-100"}`}
+                  >
+                    <img 
+                      src={img.url.endsWith("-800w.webp") ? img.url.replace("-800w.webp", "-160w.webp") : getOptimizedShopifyImage(img.url, 200)} 
+                      alt={img.altText ?? `${p.title} ${i + 1}`} 
+                      className="h-full w-full object-cover" 
+                      loading="lazy" decoding="async" 
+                      width={200} height={200}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Right Column: Info & Step 1 CTA & Step 2 Form */}
+          <div className="mt-0 md:mt-0 w-full max-w-lg mx-auto md:max-w-none md:mx-0">
+            <div className="hidden md:block mb-4 bg-[#FCFCFC] rounded-[22px] p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80">
+              <div className="mb-2.5">
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#C99A24] text-white text-[11px] font-semibold tracking-[1.5px] uppercase shadow-xs">
+                  NOUVELLE COLLECTION
+                </span>
+              </div>
+              <div className="mb-3 w-full text-left" dir="ltr">
+                <h1 className="font-serif font-medium text-[#102A4C] text-[clamp(40px,4vw,54px)] leading-[1.1] tracking-tight drop-shadow-xs break-words">
+                  {displayTitle}
+                </h1>
+                {displaySubtitle && (
+                  <h2 className="font-sans font-normal text-[#737E91] text-[14px] mt-1.5 leading-snug">
+                    {displaySubtitle}
+                  </h2>
+                )}
+              </div>
+              <div className="flex items-center gap-2 mb-6">
+                <div className="flex text-[#D4AF37] text-[14px] tracking-widest">
+                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                </div>
+                <span className="text-[13px] font-medium text-slate-600 mt-0.5">4.9 • 127 avis</span>
+              </div>
+              <div className="flex items-center w-full mb-5">
+                {(() => {
+                  const currentPrice = offers[0]?.price;
+                  const comparePrice = offers[0]?.comparePrice;
+                  if (comparePrice && parseFloat(comparePrice) > parseFloat(currentPrice)) {
+                    const discount = Math.round(((parseFloat(comparePrice) - parseFloat(currentPrice)) / parseFloat(comparePrice)) * 100);
+                    return (
+                      <div className="flex items-center gap-3">
+                        <span className="font-sans font-bold text-[32px] text-[#102A4C] leading-none">
+                          {formatMoney({ amount: currentPrice, currencyCode: "DZD" })}
+                        </span>
+                        <span className="font-sans font-normal text-[14px] text-slate-400 line-through leading-none">
+                          {formatMoney({ amount: comparePrice, currencyCode: "DZD" })}
+                        </span>
+                        <span className="inline-flex items-center h-[22px] px-[9px] rounded-full bg-[#C99A24] text-white text-[11px] font-semibold leading-none ml-1 shadow-xs">
+                          -{discount}%
+                        </span>
+                      </div>
+                    );
+                  }
+                  return (
+                    <span className="font-sans font-bold text-[32px] text-[#102A4C] leading-none">
+                      {formatMoney({ amount: currentPrice ?? 0, currencyCode: "DZD" })}
+                    </span>
+                  );
+                })()}
+              </div>
+
+              {/* Step 1: Desktop Controls */}
+              <div className="pt-4 border-t border-slate-200/60" dir="rtl">
+                <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200/80 mb-3">
+                  <span className="text-xs font-bold text-slate-700">الكمية:</span>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setVariantBQty(Math.max(1, variantBQty - 1))}
+                      className="w-8 h-8 rounded-lg bg-white border border-slate-200 font-bold text-slate-700 flex items-center justify-center hover:bg-slate-100 cursor-pointer"
+                    >
+                      -
+                    </button>
+                    <span className="font-bold text-base text-[#102A4C] w-6 text-center">{variantBQty}</span>
+                    <button
+                      type="button"
+                      onClick={() => setVariantBQty(Math.min(pricingConfig?.maxQuantity || 10, variantBQty + 1))}
+                      className="w-8 h-8 rounded-lg bg-white border border-slate-200 font-bold text-slate-700 flex items-center justify-center hover:bg-slate-100 cursor-pointer"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                {variants.length > 1 && (
+                  <div id="variantB-size-selector-desktop" className="space-y-2 text-right mb-4">
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-bold text-slate-700">
+                        اختاري المقاس {variantBQty > 1 ? "(لكل قطعة)" : ""}:
+                      </label>
+                      {variantBSizeError && (
+                        <span className="text-xs font-bold text-rose-600 animate-pulse">
+                          يرجى اختيار المقاس
+                        </span>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      {Array.from({ length: variantBQty }).map((_, pieceIndex) => (
+                        <div key={pieceIndex} className="p-2.5 bg-slate-50 rounded-xl border border-slate-200/80">
+                          {variantBQty > 1 && (
+                            <span className="text-[11px] font-bold text-[#102A4C] block mb-1">
+                              القطعة {pieceIndex + 1}:
+                            </span>
+                          )}
+                          <div className="flex flex-wrap gap-2">
+                            {variants.map((v: any) => {
+                              const stock = v.node.quantityAvailable ?? 0;
+                              const isAvailable = v.node.availableForSale && stock > 0;
+                              const titleClean = v.node.title.replace(/ans/gi, "").trim();
+                              const label = ageMapVariantB[titleClean] || v.node.title;
+                              const isSelected = variantBSizes[pieceIndex] === v.node.id;
+
+                              return (
+                                <button
+                                  key={v.node.id}
+                                  type="button"
+                                  disabled={!isAvailable}
+                                  onClick={() => setVariantBSizeForPiece(pieceIndex, v.node.id)}
+                                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                                    isSelected
+                                      ? "bg-[#C99A24] text-[#ffffff] shadow-sm ring-2 ring-[#C99A24]/40"
+                                      : isAvailable
+                                      ? "bg-white text-slate-700 border border-slate-200 hover:border-[#C99A24]"
+                                      : "bg-slate-100 text-slate-400 border border-slate-100 cursor-not-allowed line-through"
+                                  }`}
+                                >
+                                  {label}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleStep1CtaClick}
+                  className="w-full h-14 mt-2 bg-[#102A4C] hover:bg-[#0a1e38] text-white font-bold text-base sm:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+                >
+                  <span>التالي: أكملي معلومات التوصيل 📦</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Step 2 Revealed Component */}
+            <div id="new-lead-form-section" className="mb-8 w-full mx-auto max-w-lg min-[553px]:max-w-[520px] min-w-0 relative z-10">
+              {isStep2Revealed ? (
+                <NewLeadForm 
+                  productName={p?.title}
+                  offers={offers}
+                  variants={variants}
+                  pricingConfig={pricingConfig}
+                  scarcityConfig={(p as any)?.scarcityConfig}
+                  basePrice={basePrice}
+                  comparePrice={comparePrice}
+                  selectedQuantity={variantBQty}
+                  selectedSizes={variantBSizes}
+                />
+              ) : (
+                <div className="p-6 bg-white rounded-[22px] border border-dashed border-[#C99A24]/40 text-center text-xs text-slate-500 font-medium shadow-xs" dir="rtl">
+                  انقري على زر <strong className="text-[#102A4C]">"التالي: أكملي معلومات التوصيل 📦"</strong> أعلاه لملء استمارة التوصيل الشفافة وسريعة التنفيذ.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {p.descriptionHtml && (
+          <section className="mt-16 sm:mt-24 w-full">
+            <div
+              className="shopify-rte mx-auto max-w-3xl text-foreground/85 text-center [&_img]:!block [&_img]:!mx-auto [&_img]:!my-10 [&_img]:!w-full [&_img]:!max-w-2xl [&_img]:!rounded-2xl [&_img]:!shadow-md [&_img]:!object-cover [&_h1]:font-serif [&_h2]:font-serif [&_h3]:font-serif [&_h1]:text-3xl [&_h2]:text-2xl [&_h3]:text-xl [&_h1]:mt-10 [&_h2]:mt-10 [&_h3]:mt-8 [&_h1]:mb-4 [&_h2]:mb-4 [&_h3]:mb-3 [&_p]:my-4 [&_p]:leading-relaxed [&_ul]:my-4 [&_ul]:list-none [&_ul]:p-0 [&_li]:py-2 [&_li]:border-b [&_li]:border-border/50 [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_a]:underline [&_iframe]:mx-auto [&_iframe]:my-6 [&_iframe]:w-full [&_iframe]:max-w-2xl [&_iframe]:rounded-2xl"
+              dangerouslySetInnerHTML={{ __html: p.descriptionHtml }}
+            />
+          </section>
+        )}
+
+        {/* Middle Detail Images */}
+        {p.detailImages?.edges && p.detailImages.edges.length > 0 && (
+          <section className="w-full max-w-lg mx-auto flex flex-col mt-6 mb-6">
+            {p.detailImages.edges.map((e, idx) => (
+              <img 
+                key={idx}
+                width={e.node.width || 800}
+                height={e.node.height || 1000}
+                style={{ 
+                  aspectRatio: e.node.width && e.node.height ? `${e.node.width}/${e.node.height}` : 'auto' 
+                }}
+                src={getOptimizedShopifyImage(e.node.url, 800)} 
+                srcSet={getLocalSrcSet(e.node.url) || `${getOptimizedShopifyImage(e.node.url, 400)} 400w, ${getOptimizedShopifyImage(e.node.url, 800)} 800w`}
+                sizes="(max-width: 768px) 100vw, 50vw"
+                alt={e.node.altText || `${p.title} detail view ${idx + 1}`} 
+                className="w-full h-auto rounded-xl object-contain mb-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)]" 
+                loading="lazy"
+                decoding="async"
+              />
+            ))}
+          </section>
+        )}
+
+        <div className="mt-8 mb-4">
+          <WhyChooseUs />
+        </div>
+
+        <LazySection minHeight="400px">
+          <Suspense fallback={<div className="h-32 w-full animate-pulse bg-secondary/30 mt-16 rounded-2xl" />}>
+            <Reviews customImages={p.reviewImages?.edges?.map((e: any) => e.node) || []} />
+          </Suspense>
+        </LazySection>
+
+        <LazySection minHeight="60px">
+          <Suspense fallback={null}>
+            <StickyCheckoutBar price={p?.priceRange?.minVariantPrice} />
+          </Suspense>
+        </LazySection>
+      </div>
+    );
   }
 
   return (

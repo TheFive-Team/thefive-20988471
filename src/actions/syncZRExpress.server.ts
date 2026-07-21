@@ -19,7 +19,7 @@ function cleanTerritoryName(name: string): string {
 function extractTerritoryName(value: any): string {
   if (!value) return "";
   if (typeof value === 'string') return value.trim();
-  if (typeof value === 'object') return String(value.name || value.nameAr || value.nameFr || value.code || "").trim();
+  if (typeof value === 'object') return String(value.name || value.nameAr || value.nameFr || value.title || value.code || "").trim();
   return String(value).trim();
 }
 
@@ -76,7 +76,6 @@ function normalizePhoneLocal(phoneInput: any): string | null {
     clean = '0' + clean;
   }
 
-  // Final check: must be a 10-digit number starting with 0
   if (!/^0[567]\d{8}$/.test(clean)) {
     if (/^0\d{9}$/.test(clean)) {
       return clean;
@@ -294,27 +293,55 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
               id: order.selectedDeskId
             } : deskNameFromType ? { name: deskNameFromType } : null);
 
-            // Validation & Phone Normalization as flat local string (e.g. 0724426898)
-            const customerName = typeof order.fullname === 'string' ? order.fullname.trim() : "Client";
-            const cleanPhone = normalizePhoneLocal(order.phone);
-            if (!cleanPhone) {
-              console.warn(`[ORDER_VALIDATION_FAILED] Invalid phone for order ${order.id}:`, order.phone);
-              results.push({ success: false, id: order.id, stage: "VALIDATION", code: "INVALID_PHONE", message: "رقم الهاتف غير صالح" });
-              continue;
-            }
+            // Customer Name & Phone Normalization
+            const customerName = typeof order.fullname === 'string' && order.fullname.trim() ? order.fullname.trim() : "Client";
+            const cleanPhone = normalizePhoneLocal(order.phone || order.customer_phone || order.phone_number);
 
-            // Wilaya & Commune Extraction Guard
-            const targetWilaya = extractTerritoryName(isStopDesk && deskObj?.wilaya ? deskObj.wilaya : order.wilaya);
-            if (!targetWilaya) {
-              console.warn(`[ORDER_VALIDATION_FAILED] Missing wilaya for order ${order.id}`);
-              results.push({ success: false, id: order.id, stage: "VALIDATION", code: "INVALID_WILAYA", message: "الولاية مفقودة" });
-              continue;
-            }
+            // Wilaya & Commune Extraction Guard with comprehensive fallback properties
+            const rawWilaya = (isStopDesk && (deskObj?.wilaya || deskObj?.wilaya_name))
+              || order.wilaya
+              || order.wilaya_name
+              || order.customer_wilaya
+              || order.shipping_wilaya
+              || order.selectedDeskWilaya
+              || order.wilayaName
+              || order.city
+              || "";
+            const targetWilaya = extractTerritoryName(rawWilaya);
 
-            const targetCommune = extractTerritoryName(isStopDesk && deskObj?.commune ? deskObj.commune : order.commune);
-            if (!targetCommune) {
-              console.warn(`[ORDER_VALIDATION_FAILED] Missing commune for order ${order.id}`);
-              results.push({ success: false, id: order.id, stage: "VALIDATION", code: "INVALID_COMMUNE", message: "البلدية مفقودة" });
+            const rawCommune = (isStopDesk && (deskObj?.commune || deskObj?.commune_name))
+              || order.commune
+              || order.commune_name
+              || order.customer_commune
+              || order.shipping_commune
+              || order.selectedDeskCommune
+              || order.communeName
+              || order.district
+              || order.address
+              || "";
+            const targetCommune = extractTerritoryName(rawCommune);
+
+            // Pre-Flight Payload Validation Guard (CRITICAL)
+            if (!targetWilaya || !targetCommune || !cleanPhone) {
+              const missingMsg = "Wilaya, Commune, and Phone are required for ZR Express sync.";
+              console.error(`[PRE_FLIGHT_VALIDATION_FAILED] Order ${order.id}: ${missingMsg}`, {
+                targetWilaya,
+                targetCommune,
+                cleanPhone
+              });
+              results.push({
+                success: false,
+                id: order.id,
+                stage: "PRE_FLIGHT_VALIDATION",
+                code: "MISSING_REQUIRED_FIELDS",
+                message: "الولاية، البلدية، ورقم الهاتف مطلوبة لمزامنة ZR Express.",
+                debugContext: {
+                  targetWilaya,
+                  targetCommune,
+                  phoneStr: cleanPhone || "",
+                  customerName
+                }
+              });
               continue;
             }
 
@@ -324,7 +351,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
                continue;
             }
 
-            console.log("[ORDER_VALIDATED] Payload data appears valid.");
+            console.log("[ORDER_VALIDATED] Pre-flight payload validation passed.");
 
             let wilayaUuid = await searchTerritory(targetWilaya, "wilaya");
             let communeUuid = await searchTerritory(targetCommune, "commune");
@@ -338,7 +365,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
               console.log(`[ZR_MAPPING_WARNING] Random UUID used for Commune: ${targetCommune}`);
             }
 
-            const targetStreet = isStopDesk && deskObj?.address ? String(deskObj.address) : String(order.address || order.commune || "");
+            const targetStreet = isStopDesk && deskObj?.address ? String(deskObj.address) : String(order.address || targetCommune || targetWilaya);
             
             const formattedProductName = safeFormatProductName(order.product_name, order.sizes || order.selected_sizes, order.variant_title);
             const productDescription = safeFormatDescription(order);
@@ -349,8 +376,8 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
 
             const finalPayload: any = {
               customer: {
-                customerId: crypto.randomUUID(),
-                name: String(customerName || "Client"),
+                customerId: crypto.randomUUID(), // strictly customerId with capital 'I'
+                name: String(customerName),
                 phone: String(cleanPhone)
               },
               phone: String(cleanPhone),
@@ -432,7 +459,12 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
                 debugContext: {
                    status: response.status,
                    statusText: response.statusText,
-                   body: rawBody
+                   body: rawBody,
+                   targetWilaya,
+                   targetCommune,
+                   phoneStr: cleanPhone,
+                   customerName,
+                   deliveryType: finalDeliveryType
                 }
               });
               continue;

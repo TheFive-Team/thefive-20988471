@@ -62,6 +62,84 @@ function normalizePhone(phone: string): string | null {
   return clean;
 }
 
+// Safely flattens size input (string, string[], object[], or JSON string) into a flat clean string
+function safeFormatSizes(sizesInput: any): string {
+  if (!sizesInput) return "";
+
+  if (Array.isArray(sizesInput)) {
+    return sizesInput
+      .map(item => (typeof item === 'object' && item !== null ? (item.title || item.name || JSON.stringify(item)) : String(item)))
+      .filter(Boolean)
+      .join(', ');
+  }
+
+  if (typeof sizesInput === 'string') {
+    const trimmed = sizesInput.trim();
+    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (Array.isArray(parsed)) {
+          return parsed
+            .map(item => (typeof item === 'object' && item !== null ? (item.title || item.name || JSON.stringify(item)) : String(item)))
+            .filter(Boolean)
+            .join(', ');
+        }
+      } catch (e) {
+        // Not a JSON array, return raw trimmed string
+      }
+    }
+    return trimmed;
+  }
+
+  if (typeof sizesInput === 'object') {
+    return sizesInput.title || sizesInput.name || String(sizesInput);
+  }
+
+  return String(sizesInput);
+}
+
+// Safely formats product name and sizes into a flat string
+function safeFormatProductName(rawProductName: any, rawSizes: any, rawVariantTitle: any): string {
+  const baseName = typeof rawProductName === 'string' 
+    ? rawProductName.trim() 
+    : (Array.isArray(rawProductName) ? rawProductName.join(' + ') : String(rawProductName || "Produit"));
+
+  const formattedSizes = safeFormatSizes(rawSizes) || safeFormatSizes(rawVariantTitle);
+
+  if (formattedSizes) {
+    if (baseName.includes(formattedSizes)) {
+      return baseName;
+    }
+    return `${baseName} (${formattedSizes})`;
+  }
+
+  return baseName;
+}
+
+// Safely formats description into a flat string
+function safeFormatDescription(order: any): string {
+  let parts: string[] = [];
+
+  const rawName = typeof order.product_name === 'string' ? order.product_name.trim() : String(order.product_name || "Produit");
+  parts.push(rawName);
+
+  if (order.selected_offer_title && typeof order.selected_offer_title === 'string') {
+    parts.push(order.selected_offer_title.trim());
+  }
+
+  const formattedSizes = safeFormatSizes(order.sizes || order.selected_sizes) || safeFormatSizes(order.variant_title);
+  if (formattedSizes) {
+    parts.push(`المقاسات: ${formattedSizes}`);
+  }
+
+  if (order.notes) {
+    const notesStr = typeof order.notes === 'string' ? order.notes.trim() : String(order.notes);
+    if (notesStr) parts.push(`ملاحظات: ${notesStr}`);
+  }
+
+  return parts.join(" - ");
+}
+
 export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
   .validator(z.object({
     ordersToSync: z.array(z.string())
@@ -233,39 +311,35 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
               console.log(`[ZR_MAPPING_WARNING] Random UUID used for Commune: ${targetCommune}`);
             }
 
-            const targetStreet = isStopDesk && deskObj?.address ? deskObj.address : (order.address || order.commune || "");
-            let productDescription = order.product_name || "Produit";
-            if (order.selected_offer_title) productDescription += ` - ${order.selected_offer_title}`;
-            if (order.selected_sizes && Array.isArray(order.selected_sizes) && order.selected_sizes.length > 0) {
-              productDescription += ` - المقاسات: ${order.selected_sizes.join(', ')}`;
-            } else if (order.variant_title) {
-              productDescription += ` - ${order.variant_title}`;
-            }
-            if (order.notes) productDescription += ` | ملاحظات: ${order.notes}`;
+            const targetStreet = isStopDesk && deskObj?.address ? String(deskObj.address) : String(order.address || order.commune || "");
+            
+            const formattedProductName = safeFormatProductName(order.product_name, order.sizes || order.selected_sizes, order.variant_title);
+            const productDescription = safeFormatDescription(order);
+            const itemQuantity = Math.max(1, Number(order.quantity || order.selected_offer_pieces) || 1);
 
             const payload: any = {
               customer: {
                 customerId: crypto.randomUUID(),
-                name: customerName,
-                phone: { number1: phoneStr }
+                name: String(customerName || "Client"),
+                phone: { number1: String(phoneStr) }
               },
               deliveryAddress: {
-                cityTerritoryId: wilayaUuid,
-                districtTerritoryId: communeUuid,
-                street: targetStreet
+                cityTerritoryId: String(wilayaUuid),
+                districtTerritoryId: String(communeUuid),
+                street: String(targetStreet)
               },
               orderedProducts: [
                 {
-                  productName: order.product_name || "Produit",
+                  productName: String(formattedProductName),
                   unitPrice: Number(order.total_amount) || 0,
-                  quantity: 1,
+                  quantity: itemQuantity,
                   stockType: "none"
                 }
               ],
               amount: Number(order.total_amount) || 0,
-              description: productDescription,
-              deliveryType: finalDeliveryType,
-              externalId: order.id
+              description: String(productDescription),
+              deliveryType: String(finalDeliveryType),
+              externalId: String(order.id)
             };
             
             let finalHubId = deskObj?.id;
@@ -285,10 +359,11 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             }
 
             if (isStopDesk && finalHubId) {
-              payload.hubId = finalHubId;
+              payload.hubId = String(finalHubId);
             }
 
-            console.log(`[ZR_PAYLOAD_BUILT] Prepared payload for ${order.id}. Keys: ${Object.keys(payload).join(', ')}`);
+            console.log(`[ZR_PAYLOAD_BUILT] Prepared payload for order ${order.id}.`);
+            console.log(`[ZR_PAYLOAD_SANITIZED] Sanitized payload for order ${order.id}:`, JSON.stringify(payload, null, 2));
             
             console.log(`[ZR_REQUEST_SENT] Sending request to ${API_BASE}/api/v1/parcels`);
             const response = await fetch(`${API_BASE}/api/v1/parcels`, {

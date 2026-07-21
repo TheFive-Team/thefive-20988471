@@ -198,7 +198,7 @@ function ProductPage() {
             
             {/* Product Name & Subtitle */}
             <div className="w-full text-left" dir="ltr">
-              <h1 className="font-serif font-semibold text-[#102A4C] text-[24px] sm:text-[26px] leading-[1.28] tracking-tight m-0">
+              <h1 className="font-serif font-medium text-[#102A4C] text-[clamp(32px,8vw,40px)] leading-[1.12] tracking-tight m-0 break-words">
                 {displayTitle}
               </h1>
               {displaySubtitle && (
@@ -301,7 +301,7 @@ function ProductPage() {
             
             {/* Product Name & Subtitle */}
             <div className="mb-3 w-full text-left" dir="ltr">
-              <h1 className="font-serif font-semibold text-[#102A4C] text-[26px] lg:text-[30px] leading-[1.25] tracking-tight drop-shadow-xs">
+              <h1 className="font-serif font-medium text-[#102A4C] text-[clamp(40px,4vw,54px)] leading-[1.1] tracking-tight drop-shadow-xs break-words">
                 {displayTitle}
               </h1>
               {displaySubtitle && (

@@ -1,9 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
-import { CheckCircle2, Truck, ShieldCheck, Clock, MapPin, Building2, AlertCircle, ShoppingBag, ArrowRight } from "lucide-react";
+import { CheckCircle2, Truck, ShieldCheck, Clock, MapPin, Building2, AlertCircle, ShoppingBag } from "lucide-react";
 import { submitOrderFn } from "@/actions/submitOrder.server";
 import { wilayas } from "@/lib/wilayas";
 import { communesByWilaya } from "@/lib/communes";
-import { trackPurchase } from "@/lib/metaPixel";
 import { formatMoney } from "@/lib/shopify";
 
 export interface NewLeadFormProps {
@@ -51,47 +50,57 @@ export function NewLeadForm({
     shippingMethod?: boolean;
   }>({});
 
-  const quantity = selectedQuantity > 0 ? selectedQuantity : 1;
+  const quantity = Math.max(1, Number(selectedQuantity) || 1);
 
-  // Selected Wilaya Object
+  // Selected Wilaya Object safely with fallback
   const selectedWilayaObj = useMemo(() => {
-    return wilayaCode ? wilayas.find(w => w.code === Number(wilayaCode)) || null : null;
+    if (!wilayaCode) return null;
+    const codeNum = Number(wilayaCode);
+    if (isNaN(codeNum)) return null;
+    return wilayas?.find(w => w?.code === codeNum) ?? null;
   }, [wilayaCode]);
 
-  // Communes list for selected Wilaya
+  // Communes list for selected Wilaya safely with fallback
   const availableCommunes = useMemo(() => {
     if (!wilayaCode) return [];
-    return communesByWilaya[Number(wilayaCode)] || [];
+    const codeNum = Number(wilayaCode);
+    if (isNaN(codeNum)) return [];
+    return communesByWilaya[codeNum] ?? [];
   }, [wilayaCode]);
 
-  // Pricing calculations
-  const basePriceNum = Number(basePrice || 0);
+  // Pricing calculations safely with nullish coalescing
+  const basePriceNum = Number(basePrice || 0) || 0;
   const subtotal = basePriceNum * quantity;
   
   let discountAmount = 0;
-  if (pricingConfig?.enabled && quantity >= pricingConfig.quantityRequired) {
+  if (pricingConfig?.enabled && quantity >= (Number(pricingConfig.quantityRequired) || 2)) {
     if (pricingConfig.discountType === "fixed") {
-      discountAmount = Number(pricingConfig.discountValue || 0);
+      discountAmount = Number(pricingConfig.discountValue || 0) || 0;
     } else if (pricingConfig.discountType === "percentage") {
-      discountAmount = (subtotal * Number(pricingConfig.discountValue || 0)) / 100;
+      discountAmount = (subtotal * (Number(pricingConfig.discountValue || 0) || 0)) / 100;
     }
   }
-  const finalProductTotal = subtotal - discountAmount;
+  const finalProductTotal = Math.max(0, subtotal - discountAmount);
 
-  // Delivery fee
+  // Home & Stop desk delivery fees safely
+  const homeFee = Number(selectedWilayaObj?.home ?? 0) || 0;
+  const stopFee = Number(selectedWilayaObj?.stop ?? selectedWilayaObj?.home ?? 0) || 0;
+
+  // Delivery fee calculation
   const deliveryFee = useMemo(() => {
     if (!selectedWilayaObj || !shippingMethod) return 0;
-    return shippingMethod === "home" ? selectedWilayaObj.home : selectedWilayaObj.stop;
+    const fee = shippingMethod === "home" ? selectedWilayaObj?.home : (selectedWilayaObj?.stop ?? selectedWilayaObj?.home);
+    return Number(fee ?? 0) || 0;
   }, [selectedWilayaObj, shippingMethod]);
 
   const grandTotal = finalProductTotal + deliveryFee;
 
-  // Reset commune & shipping method when wilaya changes
+  // Reset commune & shipping method safely when wilaya changes
   const handleWilayaChange = (code: string) => {
     setWilayaCode(code);
     setCommuneName("");
     setShippingMethod("");
-    setErrors(prev => ({ ...prev, wilaya: false }));
+    setErrors(prev => ({ ...prev, wilaya: false, commune: false, shippingMethod: false }));
   };
 
   const validateForm = (): boolean => {
@@ -100,21 +109,21 @@ export function NewLeadForm({
 
     // Full name validation
     const nameRegex = /^[a-zA-Z\u0600-\u06FF\s]{3,}$/;
-    if (!nameRegex.test(fullname.trim())) {
+    if (!fullname || !nameRegex.test(fullname.trim())) {
       newErrors.fullname = true;
       isValid = false;
     }
 
     // Phone validation (10 digits starting with 05, 06, 07)
     const phoneRegex = /^(05|06|07)[0-9]{8}$/;
-    const cleanPhone = phone.replace(/\s+/g, "");
-    if (!phoneRegex.test(cleanPhone)) {
+    const cleanPhone = (phone || "").replace(/\s+/g, "");
+    if (!cleanPhone || !phoneRegex.test(cleanPhone)) {
       newErrors.phone = true;
       isValid = false;
     }
 
     // Wilaya validation
-    if (!wilayaCode) {
+    if (!wilayaCode || !selectedWilayaObj) {
       newErrors.wilaya = true;
       isValid = false;
     }
@@ -172,40 +181,46 @@ export function NewLeadForm({
     try {
       const wilayaName = selectedWilayaObj ? `${selectedWilayaObj.code} - ${selectedWilayaObj.nameAr}` : wilayaCode;
       const finalDeliveryType = shippingMethod === "home" ? "توصيل للمنزل" : "استلام من المكتب (Stop Desk)";
-      const eventId = crypto.randomUUID ? crypto.randomUUID() : `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      const eventId = typeof crypto !== "undefined" && crypto.randomUUID 
+        ? crypto.randomUUID() 
+        : `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+      const formattedSizes = Array.isArray(selectedSizes) 
+        ? selectedSizes.map(id => variants?.find((v: any) => v?.node?.id === id)?.node?.title ?? "").filter(Boolean)
+        : [];
 
       const response = await submitOrderFn({
         data: {
-          fullname: fullname.trim(),
-          phone: phone.replace(/\s+/g, ""),
+          fullname: (fullname || "").trim(),
+          phone: (phone || "").replace(/\s+/g, ""),
           wilaya: wilayaName,
           commune: communeName,
           address: "",
           deliveryType: finalDeliveryType,
-          deliveryFee: deliveryFee,
-          productName,
+          deliveryFee: Number(deliveryFee) || 0,
+          productName: productName || "Product",
           offerId: "new-lead-form",
           offerTitle: `${quantity} ${quantity === 1 ? 'قطعة' : 'قطع'}`,
           offerPieces: quantity,
-          offerPrice: finalProductTotal,
+          offerPrice: Number(finalProductTotal) || 0,
           quantity: quantity,
-          discountAmount: discountAmount,
-          finalProductTotal: finalProductTotal,
-          finalTotal: grandTotal,
-          selectedSizes: selectedSizes.map(id => variants.find((v: any) => v.node.id === id)?.node.title || ""),
+          discountAmount: Number(discountAmount) || 0,
+          finalProductTotal: Number(finalProductTotal) || 0,
+          finalTotal: Number(grandTotal) || 0,
+          selectedSizes: formattedSizes,
           eventId,
-          clientUserAgent: navigator.userAgent,
-          eventSourceUrl: window.location.href
+          clientUserAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
+          eventSourceUrl: typeof window !== "undefined" ? window.location.href : ""
         }
       });
 
-      if (response.success) {
+      if (response?.success) {
         localStorage.setItem("thefive_last_order", Date.now().toString());
         setSubmitted(true);
         onOrderSuccess?.();
 
         const finalPurchasePayload = {
-          value: Number(grandTotal),
+          value: Number(grandTotal) || 0,
           currency: "DZD",
           content_type: "product",
           content_ids: ["default"],
@@ -213,7 +228,7 @@ export function NewLeadForm({
             {
               id: "default",
               quantity: Number(quantity) || 1,
-              item_price: Number(basePriceNum),
+              item_price: Number(basePriceNum) || 0,
             },
           ],
         };
@@ -412,7 +427,7 @@ export function NewLeadForm({
                 <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${
                   shippingMethod === "home" ? "border-[#C99A24] bg-[#C99A24] text-white" : "border-slate-300 bg-white"
                 }`}>
-                  {shippingMethod === "home" && <Check className="w-3 h-3 stroke-[3]" />}
+                  {shippingMethod === "home" && <span className="w-2 h-2 rounded-full bg-white block" />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1">
@@ -421,7 +436,7 @@ export function NewLeadForm({
                       توصيل للمنزل
                     </span>
                     <span className="text-xs font-extrabold text-[#C99A24]">
-                      {selectedWilayaObj.home} د.ج
+                      {homeFee} د.ج
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-500 mt-0.5">توصيل مباشرة إلى عنوانك الشخصي</p>
@@ -444,7 +459,7 @@ export function NewLeadForm({
                 <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${
                   shippingMethod === "stopdesk" ? "border-[#C99A24] bg-[#C99A24] text-white" : "border-slate-300 bg-white"
                 }`}>
-                  {shippingMethod === "stopdesk" && <Check className="w-3 h-3 stroke-[3]" />}
+                  {shippingMethod === "stopdesk" && <span className="w-2 h-2 rounded-full bg-white block" />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1">
@@ -453,7 +468,7 @@ export function NewLeadForm({
                       استلام من المكتب
                     </span>
                     <span className="text-xs font-extrabold text-[#C99A24]">
-                      {selectedWilayaObj.stop} د.ج
+                      {stopFee} د.ج
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-500 mt-0.5">استلام من أقرب مكتب ولاية</p>

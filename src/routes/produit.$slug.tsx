@@ -119,8 +119,14 @@ function ProductPage() {
       return;
     }
 
-    if (!initiateCheckoutFiredRef.current && p?.title) {
+    const sessionKey = `ic_fired_${p?.id || "default"}`;
+    const alreadyFiredInSession = typeof window !== "undefined" && sessionStorage.getItem(sessionKey) === "true";
+
+    if (!initiateCheckoutFiredRef.current && !alreadyFiredInSession && p?.title) {
       initiateCheckoutFiredRef.current = true;
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(sessionKey, "true");
+      }
       try {
         trackInitiateCheckout({
           productName: p.title,

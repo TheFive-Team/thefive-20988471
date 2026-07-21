@@ -521,6 +521,17 @@ function OrdersDashboard() {
       return;
     }
 
+    for (const o of ordersToSync) {
+      const wilaya = o.wilaya || (o as any).shipping_wilaya || (o as any).customer_info?.wilaya || (o as any).customer_wilaya || '';
+      const commune = o.commune || (o as any).shipping_commune || (o as any).customer_info?.commune || (o as any).customer_commune || '';
+      if (!wilaya || !commune) {
+        console.error('Missing location data in order:', o);
+        alert('عذراً، بيانات الولاية أو البلدية مفقودة لهذا الطلب في لوحة التحكم');
+        setIsSyncing(false);
+        return;
+      }
+    }
+
     try {
       const response = await syncConfirmedOrdersFn({
         data: { ordersToSync: ordersToSync.map(o => o.id) }

@@ -142,20 +142,32 @@ function safeFormatProductName(rawProductName: any, rawSizes: any, rawVariantTit
   return baseName;
 }
 
-// Safely formats description into a flat string
+// Multi-Item Aggregation for ZR Payload description
 function safeFormatDescription(order: any): string {
   let parts: string[] = [];
 
-  const rawName = typeof order.product_name === 'string' ? order.product_name.trim() : String(order.product_name || "Produit");
-  parts.push(rawName);
+  // Check if order has items or products array
+  const itemList = Array.isArray(order.items) ? order.items : Array.isArray(order.products) ? order.products : null;
 
-  if (order.selected_offer_title && typeof order.selected_offer_title === 'string') {
-    parts.push(order.selected_offer_title.trim());
-  }
+  if (itemList && itemList.length > 0) {
+    const itemDescriptions = itemList.map((item: any) => {
+      const title = item.title || item.product_name || item.name || order.product_name || "Produit";
+      const size = item.size || item.selected_size || item.variant_title || safeFormatSizes(item.sizes);
+      return size ? `${title} (${size})` : title;
+    });
+    parts.push(itemDescriptions.join(' + '));
+  } else {
+    const rawName = typeof order.product_name === 'string' ? order.product_name.trim() : String(order.product_name || "Produit");
+    parts.push(rawName);
 
-  const formattedSizes = safeFormatSizes(order.sizes || order.selected_sizes) || safeFormatSizes(order.variant_title);
-  if (formattedSizes) {
-    parts.push(`المقاسات: ${formattedSizes}`);
+    if (order.selected_offer_title && typeof order.selected_offer_title === 'string') {
+      parts.push(order.selected_offer_title.trim());
+    }
+
+    const formattedSizes = safeFormatSizes(order.sizes || order.selected_sizes) || safeFormatSizes(order.variant_title);
+    if (formattedSizes) {
+      parts.push(`المقاسات: ${formattedSizes}`);
+    }
   }
 
   if (order.notes) {
@@ -276,13 +288,15 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
           if (existingParcel) {
              zrData = existingParcel;
           } else {
-            const deliveryTypeStr = (order.delivery_type || "").toLowerCase();
+            // ROOT-LEVEL METADATA EXTRACTION (CRITICAL)
+            const rawDeliveryType = order.delivery_type || order.shipping_type || order.deliveryType || 'home';
+            const deliveryTypeStr = String(rawDeliveryType).toLowerCase();
             const isStopDesk = /استلام|desk|pickup|office/i.test(deliveryTypeStr);
             const finalDeliveryType = isStopDesk ? "pickup-point" : "home";
 
             let deskNameFromType = "";
-            if (isStopDesk && order.delivery_type && order.delivery_type.includes(" - ")) {
-              deskNameFromType = order.delivery_type.split(" - ").slice(1).join(" - ").trim();
+            if (isStopDesk && typeof rawDeliveryType === 'string' && rawDeliveryType.includes(" - ")) {
+              deskNameFromType = rawDeliveryType.split(" - ").slice(1).join(" - ").trim();
             }
 
             const deskObj = order.selectedDesk || (order.selectedDeskName ? { 
@@ -293,16 +307,19 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
               id: order.selectedDeskId
             } : deskNameFromType ? { name: deskNameFromType } : null);
 
-            // Customer Name & Phone Normalization
-            const customerName = typeof order.fullname === 'string' && order.fullname.trim() ? order.fullname.trim() : "Client";
-            const cleanPhone = normalizePhoneLocal(order.phone || order.customer_phone || order.phone_number);
+            // Customer Name & Phone Normalization directly from root parent order
+            const customerName = order.fullname || order.customer_name || order.customer_info?.name || "Client";
+            const cleanPhone = normalizePhoneLocal(
+              order.phone || order.customer_phone || order.phone_number || order.customer_info?.phone
+            );
 
-            // Wilaya & Commune Extraction Guard with comprehensive fallback properties
+            // Multi-path fallback checking for shipping fields directly from root parent order
             const rawWilaya = (isStopDesk && (deskObj?.wilaya || deskObj?.wilaya_name))
               || order.wilaya
-              || order.wilaya_name
-              || order.customer_wilaya
               || order.shipping_wilaya
+              || order.customer_info?.wilaya
+              || order.customer_wilaya
+              || order.wilaya_name
               || order.selectedDeskWilaya
               || order.wilayaName
               || order.city
@@ -311,9 +328,10 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
 
             const rawCommune = (isStopDesk && (deskObj?.commune || deskObj?.commune_name))
               || order.commune
-              || order.commune_name
-              || order.customer_commune
               || order.shipping_commune
+              || order.customer_info?.commune
+              || order.customer_commune
+              || order.commune_name
               || order.selectedDeskCommune
               || order.communeName
               || order.district
@@ -334,7 +352,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
                 id: order.id,
                 stage: "PRE_FLIGHT_VALIDATION",
                 code: "MISSING_REQUIRED_FIELDS",
-                message: "الولاية، البلدية، ورقم الهاتف مطلوبة لمزامنة ZR Express.",
+                message: "عذراً، بيانات الولاية أو البلدية مفقودة لهذا الطلب في لوحة التحكم",
                 debugContext: {
                   targetWilaya,
                   targetCommune,
@@ -369,7 +387,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             
             const formattedProductName = safeFormatProductName(order.product_name, order.sizes || order.selected_sizes, order.variant_title);
             const productDescription = safeFormatDescription(order);
-            const itemQuantity = Math.max(1, Number(order.quantity || order.selected_offer_pieces) || 1);
+            const itemQuantity = Math.max(1, Number(order.quantity || order.selected_offer_pieces || (Array.isArray(order.items) ? order.items.length : 1)) || 1);
             
             // Multi-Item Price Calculation safely summed as number
             const totalAmount = Number(order.total_amount ?? order.total_price ?? order.finalTotal ?? 0) || 0;

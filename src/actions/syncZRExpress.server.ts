@@ -241,10 +241,18 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
       const results = [];
       let successCount = 0;
 
-      for (const order of orders) {
+      for (let order of orders) {
         try {
           console.log(`\n--- Processing Order ${order.id} ---`);
-          
+          console.log('=== RAW MULTI-ITEM ORDER FROM SUPABASE ===', JSON.stringify(order, null, 2));
+
+          // Inspect & Extract Safe Data: Unwrap if wrapped inside an array
+          if (Array.isArray(order) && order.length > 0) {
+            order = order[0];
+          } else if (order.orders && Array.isArray(order.orders) && order.orders.length > 0) {
+            order = order.orders[0];
+          }
+
           if (order.tracking_number && String(order.tracking_number).startsWith("ZRE")) {
              console.log(`[ORDER_SKIPPED] Order ${order.id} already synced.`);
              results.push({

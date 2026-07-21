@@ -521,12 +521,21 @@ function OrdersDashboard() {
       return;
     }
 
-    for (const o of ordersToSync) {
+    for (let o of ordersToSync) {
+      console.log('=== RAW MULTI-ITEM ORDER FROM SUPABASE ===', JSON.stringify(o, null, 2));
+
+      // Inspect & Extract Safe Data: Unwrap if wrapped inside an array
+      if (Array.isArray(o) && o.length > 0) {
+        o = o[0];
+      } else if (o.orders && Array.isArray(o.orders) && o.orders.length > 0) {
+        o = o.orders[0];
+      }
+
       const wilaya = o.wilaya || (o as any).shipping_wilaya || (o as any).customer_info?.wilaya || (o as any).customer_wilaya || '';
       const commune = o.commune || (o as any).shipping_commune || (o as any).customer_info?.commune || (o as any).customer_commune || '';
       if (!wilaya || !commune) {
         console.error('Missing location data in order:', o);
-        alert('عذراً، بيانات الولاية أو البلدية مفقودة لهذا الطلب في لوحة التحكم');
+        alert('Order keys: ' + Object.keys(o).join(', ') + '\nعذراً، بيانات الولاية أو البلدية مفقودة لهذا الطلب في لوحة التحكم');
         setIsSyncing(false);
         return;
       }

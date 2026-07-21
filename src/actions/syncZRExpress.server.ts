@@ -15,6 +15,14 @@ function cleanTerritoryName(name: string): string {
   return name.replace(/[0-9-]/g, '').trim();
 }
 
+// Safely extract territory string from string or object
+function extractTerritoryName(value: any): string {
+  if (!value) return "";
+  if (typeof value === 'string') return value.trim();
+  if (typeof value === 'object') return String(value.name || value.nameAr || value.nameFr || value.code || "").trim();
+  return String(value).trim();
+}
+
 async function searchTerritory(query: string, expectedLevel: string): Promise<string | null> {
   const cleanQuery = cleanTerritoryName(query);
   if (!cleanQuery) return null;
@@ -50,19 +58,38 @@ async function searchTerritory(query: string, expectedLevel: string): Promise<st
   return null; 
 }
 
-function normalizePhone(phone: string): string | null {
-  if (!phone) return null;
-  let clean = phone.replace(/[\s-]/g, '');
-  if (clean.startsWith('0')) {
-    clean = '+213' + clean.substring(1);
-  } else if (!clean.startsWith('+')) {
-    clean = '+213' + clean;
+// Phone Number Normalization to clean flat Algerian local format (e.g. 0724426898)
+function normalizePhoneLocal(phoneInput: any): string | null {
+  if (!phoneInput) return null;
+
+  let rawPhone = typeof phoneInput === 'object' 
+    ? (phoneInput.number1 || phoneInput.phone || phoneInput.number || String(phoneInput)) 
+    : String(phoneInput);
+
+  let clean = rawPhone.replace(/[^\d+]/g, '').trim();
+
+  if (clean.startsWith('+213')) {
+    clean = '0' + clean.substring(4);
+  } else if (clean.startsWith('213') && clean.length >= 11) {
+    clean = '0' + clean.substring(3);
+  } else if (!clean.startsWith('0') && /^[567]\d{8}$/.test(clean)) {
+    clean = '0' + clean;
   }
-  if (clean.length < 10) return null;
+
+  // Final check: must be a 10-digit number starting with 0
+  if (!/^0[567]\d{8}$/.test(clean)) {
+    if (/^0\d{9}$/.test(clean)) {
+      return clean;
+    }
+    clean = clean.replace(/^\+?213/, '');
+    if (!clean.startsWith('0')) clean = '0' + clean;
+    if (clean.length < 9) return null;
+  }
+
   return clean;
 }
 
-// Safely flattens size input (string, string[], object[], or JSON string) into a flat clean string
+// Safely flattens size input (string, string[], object[], or JSON string) into a flat clean string joined by ' + '
 function safeFormatSizes(sizesInput: any): string {
   if (!sizesInput) return "";
 
@@ -70,7 +97,7 @@ function safeFormatSizes(sizesInput: any): string {
     return sizesInput
       .map(item => (typeof item === 'object' && item !== null ? (item.title || item.name || JSON.stringify(item)) : String(item)))
       .filter(Boolean)
-      .join(', ');
+      .join(' + ');
   }
 
   if (typeof sizesInput === 'string') {
@@ -82,7 +109,7 @@ function safeFormatSizes(sizesInput: any): string {
           return parsed
             .map(item => (typeof item === 'object' && item !== null ? (item.title || item.name || JSON.stringify(item)) : String(item)))
             .filter(Boolean)
-            .join(', ');
+            .join(' + ');
         }
       } catch (e) {
         // Not a JSON array, return raw trimmed string
@@ -98,7 +125,7 @@ function safeFormatSizes(sizesInput: any): string {
   return String(sizesInput);
 }
 
-// Safely formats product name and sizes into a flat string
+// Safely formats product name and sizes into a flat string e.g. "Ensemble d'été (5-6 سنوات + 7-8 سنوات)"
 function safeFormatProductName(rawProductName: any, rawSizes: any, rawVariantTitle: any): string {
   const baseName = typeof rawProductName === 'string' 
     ? rawProductName.trim() 
@@ -168,7 +195,6 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
         };
       }
 
-      // Reuse the statically resolved URL and Key from the default client to avoid Vercel process.env undefined errors
       const supabaseUrl = defaultSupabase.supabaseUrl;
       const supabaseAnonKey = defaultSupabase.supabaseKey;
       
@@ -268,23 +294,24 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
               id: order.selectedDeskId
             } : deskNameFromType ? { name: deskNameFromType } : null);
 
-            // Validation
-            const customerName = order.fullname || "Client";
-            const phoneStr = normalizePhone(order.phone || "");
-            if (!phoneStr) {
-              console.warn(`[ORDER_VALIDATION_FAILED] Invalid phone for order ${order.id}`);
+            // Validation & Phone Normalization as flat local string (e.g. 0724426898)
+            const customerName = typeof order.fullname === 'string' ? order.fullname.trim() : "Client";
+            const cleanPhone = normalizePhoneLocal(order.phone);
+            if (!cleanPhone) {
+              console.warn(`[ORDER_VALIDATION_FAILED] Invalid phone for order ${order.id}:`, order.phone);
               results.push({ success: false, id: order.id, stage: "VALIDATION", code: "INVALID_PHONE", message: "رقم الهاتف غير صالح" });
               continue;
             }
 
-            const targetWilaya = isStopDesk && deskObj?.wilaya ? deskObj.wilaya : order.wilaya;
+            // Wilaya & Commune Extraction Guard
+            const targetWilaya = extractTerritoryName(isStopDesk && deskObj?.wilaya ? deskObj.wilaya : order.wilaya);
             if (!targetWilaya) {
               console.warn(`[ORDER_VALIDATION_FAILED] Missing wilaya for order ${order.id}`);
               results.push({ success: false, id: order.id, stage: "VALIDATION", code: "INVALID_WILAYA", message: "الولاية مفقودة" });
               continue;
             }
 
-            const targetCommune = isStopDesk && deskObj?.commune ? deskObj.commune : order.commune;
+            const targetCommune = extractTerritoryName(isStopDesk && deskObj?.commune ? deskObj.commune : order.commune);
             if (!targetCommune) {
               console.warn(`[ORDER_VALIDATION_FAILED] Missing commune for order ${order.id}`);
               results.push({ success: false, id: order.id, stage: "VALIDATION", code: "INVALID_COMMUNE", message: "البلدية مفقودة" });
@@ -316,13 +343,17 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             const formattedProductName = safeFormatProductName(order.product_name, order.sizes || order.selected_sizes, order.variant_title);
             const productDescription = safeFormatDescription(order);
             const itemQuantity = Math.max(1, Number(order.quantity || order.selected_offer_pieces) || 1);
+            
+            // Multi-Item Price Calculation safely summed as number
+            const totalAmount = Number(order.total_amount ?? order.total_price ?? order.finalTotal ?? 0) || 0;
 
-            const payload: any = {
+            const finalPayload: any = {
               customer: {
                 customerId: crypto.randomUUID(),
                 name: String(customerName || "Client"),
-                phone: { number1: String(phoneStr) }
+                phone: String(cleanPhone)
               },
+              phone: String(cleanPhone),
               deliveryAddress: {
                 cityTerritoryId: String(wilayaUuid),
                 districtTerritoryId: String(communeUuid),
@@ -331,12 +362,12 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
               orderedProducts: [
                 {
                   productName: String(formattedProductName),
-                  unitPrice: Number(order.total_amount) || 0,
+                  unitPrice: totalAmount,
                   quantity: itemQuantity,
                   stockType: "none"
                 }
               ],
-              amount: Number(order.total_amount) || 0,
+              amount: totalAmount,
               description: String(productDescription),
               deliveryType: String(finalDeliveryType),
               externalId: String(order.id)
@@ -359,11 +390,11 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             }
 
             if (isStopDesk && finalHubId) {
-              payload.hubId = String(finalHubId);
+              finalPayload.hubId = String(finalHubId);
             }
 
             console.log(`[ZR_PAYLOAD_BUILT] Prepared payload for order ${order.id}.`);
-            console.log(`[ZR_PAYLOAD_SANITIZED] Sanitized payload for order ${order.id}:`, JSON.stringify(payload, null, 2));
+            console.log('[FINAL_ZR_PAYLOAD]', JSON.stringify(finalPayload));
             
             console.log(`[ZR_REQUEST_SENT] Sending request to ${API_BASE}/api/v1/parcels`);
             const response = await fetch(`${API_BASE}/api/v1/parcels`, {
@@ -374,7 +405,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
                 'X-Tenant': TENANT_ID,
                 'Content-Type': 'application/json'
               },
-              body: JSON.stringify(payload)
+              body: JSON.stringify(finalPayload)
             });
             
             console.log(`[ZR_RESPONSE_RECEIVED] Status: ${response.status} ${response.statusText} for order ${order.id}`);
@@ -396,7 +427,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
                 code: `HTTP_${response.status}`, 
                 message: "رفض ZR Express الطلب",
                 details: errorMsg,
-                payload: payload,
+                payload: finalPayload,
                 responseBody: rawBody,
                 debugContext: {
                    status: response.status,
@@ -409,7 +440,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
   
             zrData = JSON.parse(rawBody);
             console.log(`[ZR_SUCCESS] Successfully synced order ${order.id}`);
-          } // End of else (create new shipment)
+          }
 
           // 3. Update Supabase with Tracking Info
           const trackingNumber = zrData.trackingNumber || zrData.code || zrData.id || `ZRE-${order.id.substring(0,6)}`;
@@ -423,90 +454,60 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
           console.log(`[ORDER_UPDATE_STARTED] Updating Supabase for ${order.id} with payload:`, updatePayload);
           const { error: updateError, count } = await authSupabase
             .from('orders')
-            .update(updatePayload, { count: 'exact' })
+            .update(updatePayload)
             .eq('id', order.id);
 
-          if (updateError || count === 0) {
-             console.error(`[SYNC_FAILED_AT: ORDER_UPDATE_DONE] DB update failed for ${order.id}:`, updateError, "Count:", count);
-             
-             let failReason = "";
-             const availableColumns = dbOrders && dbOrders.length > 0 ? Object.keys(dbOrders[0]).join(", ") : "unknown";
-             
-             if (updateError) {
-                failReason = `Supabase Error: Code=${updateError.code}, Message=${updateError.message}, Details=${updateError.details}, Hint=${updateError.hint}`;
-                if (updateError.code === '42703') {
-                   failReason += `\n[CRITICAL SCHEMA ERROR] The column does not exist! The ONLY columns that actually exist in your database table are: ${availableColumns}. You MUST run ALTER TABLE in Supabase to add tracking_number and zr_express_id!`;
-                }
-             } else if (count === 0) {
-                failReason = `Update returned count = 0. This means the WHERE clause (id = '${order.id}') matched no rows. This usually happens if the order ID is wrong, the row was deleted, or Row-Level Security (RLS) UPDATE policies blocked this user from modifying this row.`;
-             }
-             
-             results.push({ 
-               success: false, 
-               id: order.id, 
-               stage: "DB_UPDATE", 
-               code: updateError?.code || (count === 0 ? "ZERO_ROWS" : "DATABASE_UPDATE_FAILED"), 
-               message: failReason, 
-               details: `Table: orders | WHERE: id = ${order.id} | Payload: ${JSON.stringify(updatePayload)}`,
-               payload: updatePayload,
-               responseBody: updateError ? JSON.stringify(updateError, null, 2) : "count = 0",
-               debugContext: {
-                 tableName: 'orders',
-                 whereClause: `id = '${order.id}'`,
-                 orderId: order.id,
-                 updatePayload,
-                 supabaseError: updateError,
-                 rowCount: count
-               }
+          if (updateError) {
+             console.error(`[ORDER_UPDATE_FAILED] Failed to update tracking in Supabase for ${order.id}:`, updateError);
+             results.push({
+               success: false,
+               id: order.id,
+               stage: "DB_UPDATE",
+               code: updateError.code || "DB_UPDATE_ERROR",
+               message: "فشل تحديث رقم تتبع ZR Express في قاعدة البيانات",
+               details: updateError.message,
+               trackingNumber
              });
-             continue;
+          } else {
+             console.log(`[ORDER_UPDATE_SUCCESS] Successfully updated tracking ${trackingNumber} for ${order.id}. Rows affected: ${count}`);
+             successCount++;
+             results.push({
+               success: true,
+               id: order.id,
+               stage: "COMPLETE",
+               code: "SUCCESS",
+               message: "تمت مزامنة الطلب بنجاح وتوليد رقم التتبع",
+               trackingNumber,
+               zrExpressId
+             });
           }
 
-          console.log(`[ORDER_UPDATE_DONE] Successfully updated DB for ${order.id}`);
+        } catch (singleError: any) {
+          console.error(`[CRITICAL_UNHANDLED_ORDER_ERROR] Error on order ${order.id}:`, singleError);
           results.push({
-            success: true,
-            id: order.id,
-            stage: "SYNC_SUCCESS",
-            code: "SUCCESS",
-            message: "تمت المزامنة بنجاح",
-            trackingNumber: trackingNumber,
-            zrExpressId: zrExpressId
-          });
-          
-          successCount++;
-        } catch (err: any) {
-          console.error(`[SYNC_FAILED_AT: UNKNOWN_SYNC_ERROR] Order ${order.id}:`, err);
-          results.push({ 
-            success: false, 
-            id: order.id, 
-            stage: "UNKNOWN", 
-            code: "UNKNOWN_SYNC_ERROR", 
-            message: "حدث خطأ غير متوقع", 
-            details: err?.message,
-            debugContext: {
-              customerName: order.fullname,
-              phone: order.phone,
-              wilaya: order.wilaya,
-              commune: order.commune,
-              delivery_type: order.delivery_type
-            }
+             success: false,
+             id: order.id,
+             stage: "UNHANDLED_EXCEPTION",
+             code: singleError.name || "UNKNOWN_EXCEPTION",
+             message: singleError.message || "خطأ عام غير متوقع أثناء معالجة الطلب"
           });
         }
-      } 
-      
-      const failedCount = data.ordersToSync.length - successCount;
+      }
+
+      console.log(`[SYNC_COMPLETED] Processed ${orders.length} orders. Successes: ${successCount}`);
       return {
-        success: true, // Master success determines if the call itself succeeded, not if every order synced
-        message: "اكتملت عملية المزامنة",
+        success: successCount > 0,
+        message: `تمت مزامنة ${successCount} من أصل ${orders.length} طلبات بنجاح.`,
         successCount,
-        failedCount,
+        failedCount: orders.length - successCount,
         results
       };
-    } catch (globalError: any) {
-      console.error("[SYNC_FAILED_AT: GLOBAL_ERROR]", globalError);
+
+    } catch (err: any) {
+      console.error("[CRITICAL_SYNC_SYSTEM_FAILURE] Unhandled crash in syncConfirmedOrdersFn:", err);
       return {
         success: false,
-        message: `حدث خطأ عام: ${globalError?.message || 'غير معروف'}`,
+        message: `خطأ في النظام: ${err.message || "حدث خطأ أثناء الاتصال بمزود الخدمة"}`,
         results: []
       };
     }

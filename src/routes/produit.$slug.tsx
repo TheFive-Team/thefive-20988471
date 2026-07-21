@@ -190,19 +190,19 @@ function ProductPage() {
             <div className="flex flex-col items-start text-left bg-white rounded-[20px] p-[20px_16px] shadow-[0_4px_16px_rgba(16,42,67,0.04)] border border-[#E8E0D2] w-full max-w-full min-w-0 m-0 box-border overflow-hidden">
             
             {/* Collection Label */}
-            <div className="mb-[8px] w-full text-left" dir="ltr">
-              <span className="font-sans font-semibold text-[11px] tracking-[1.5px] uppercase text-[#C99A24]">
+            <div className="mb-[10px] w-full text-left" dir="ltr">
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#C99A24] text-white text-[10px] sm:text-[11px] font-semibold tracking-[1.5px] uppercase shadow-xs">
                 NOUVELLE COLLECTION
               </span>
             </div>
             
             {/* Product Name & Subtitle */}
             <div className="w-full text-left" dir="ltr">
-              <h1 className="font-serif font-medium text-[#102A4C] text-[21px] leading-[1.25] m-0">
+              <h1 className="font-serif font-semibold text-[#102A4C] text-[24px] sm:text-[26px] leading-[1.28] tracking-tight m-0">
                 {displayTitle}
               </h1>
               {displaySubtitle && (
-                <h2 className="font-sans font-normal text-[#737E91] text-[14px] mt-[5px]">
+                <h2 className="font-sans font-normal text-[#737E91] text-[14px] mt-[6px] leading-snug">
                   {displaySubtitle}
                 </h2>
               )}
@@ -232,7 +232,7 @@ function ProductPage() {
                       <span className="font-sans font-normal text-[14px] text-slate-400 line-through leading-none whitespace-nowrap">
                         {formatMoney({ amount: compPrice, currencyCode: "DZD" })}
                       </span>
-                      <span className="inline-flex items-center h-[22px] px-[8px] rounded-[6px] bg-[#102A4C] text-white text-[11px] font-semibold whitespace-nowrap">
+                      <span className="inline-flex items-center h-[22px] px-[9px] rounded-full bg-[#C99A24] text-white text-[11px] font-semibold leading-none whitespace-nowrap shadow-xs">
                         -{discount}%
                       </span>
                     </>
@@ -293,19 +293,19 @@ function ProductPage() {
           <div className="hidden md:block mb-4 bg-[#FCFCFC] rounded-[22px] p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100/80">
             
             {/* Collection Label */}
-            <div className="mb-2">
-              <span className="font-sans font-semibold text-[11px] tracking-[1.5px] uppercase text-[#C99A24]">
+            <div className="mb-2.5">
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#C99A24] text-white text-[11px] font-semibold tracking-[1.5px] uppercase shadow-xs">
                 NOUVELLE COLLECTION
               </span>
             </div>
             
             {/* Product Name & Subtitle */}
             <div className="mb-3 w-full text-left" dir="ltr">
-              <h1 className="font-serif font-medium text-[#102A4C] text-[21px] leading-[1.25] drop-shadow-sm">
+              <h1 className="font-serif font-semibold text-[#102A4C] text-[26px] lg:text-[30px] leading-[1.25] tracking-tight drop-shadow-xs">
                 {displayTitle}
               </h1>
               {displaySubtitle && (
-                <h2 className="font-sans font-normal text-[#737E91] text-[14px] mt-1.5">
+                <h2 className="font-sans font-normal text-[#737E91] text-[14px] mt-1.5 leading-snug">
                   {displaySubtitle}
                 </h2>
               )}
@@ -335,7 +335,7 @@ function ProductPage() {
                       <span className="font-sans font-normal text-[14px] text-slate-400 line-through leading-none">
                         {formatMoney({ amount: comparePrice, currencyCode: "DZD" })}
                       </span>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-[#102A4C] text-white text-[11px] font-semibold leading-none ml-2">
+                      <span className="inline-flex items-center h-[22px] px-[9px] rounded-full bg-[#C99A24] text-white text-[11px] font-semibold leading-none ml-1 shadow-xs">
                         -{discount}%
                       </span>
                     </div>

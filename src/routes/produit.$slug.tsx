@@ -371,9 +371,9 @@ function ProductPage() {
                                     onClick={() => setVariantBSizeForPiece(pieceIndex, v.node.id)}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                                       isSelected
-                                        ? "bg-[#C99A24] text-white shadow-sm ring-2 ring-[#C99A24]/40"
+                                        ? "bg-[#C9A227] text-white border border-[#C9A227] shadow-sm ring-2 ring-[#C9A227]/40"
                                         : isAvailable
-                                        ? "bg-white text-slate-700 border border-slate-200 hover:border-[#C99A24]"
+                                        ? "bg-white text-slate-700 border border-slate-200 hover:border-[#C9A227]"
                                         : "bg-slate-100 text-slate-400 border border-slate-100 cursor-not-allowed line-through"
                                     }`}
                                   >
@@ -550,9 +550,9 @@ function ProductPage() {
                                   onClick={() => setVariantBSizeForPiece(pieceIndex, v.node.id)}
                                   className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                                     isSelected
-                                      ? "bg-[#C99A24] text-[#ffffff] shadow-sm ring-2 ring-[#C99A24]/40"
+                                      ? "bg-[#C9A227] text-white border border-[#C9A227] shadow-sm ring-2 ring-[#C9A227]/40"
                                       : isAvailable
-                                      ? "bg-white text-slate-700 border border-slate-200 hover:border-[#C99A24]"
+                                      ? "bg-white text-slate-700 border border-slate-200 hover:border-[#C9A227]"
                                       : "bg-slate-100 text-slate-400 border border-slate-100 cursor-not-allowed line-through"
                                   }`}
                                 >

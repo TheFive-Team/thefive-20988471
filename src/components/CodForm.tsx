@@ -338,7 +338,7 @@ export function CodForm({
                                 !isAvailable && !isSelected
                                   ? "opacity-35 border border-[#F2F2F2] bg-[#F2F2F2] text-[#A6A6A6] cursor-not-allowed line-through" 
                                   : isSelected
-                                    ? "bg-[#0b1b3d] text-white border border-[#0b1b3d]"
+                                    ? "bg-[#C9A227] text-white border border-[#C9A227] shadow-sm ring-2 ring-[#C9A227]/40"
                                     : "border border-[#E2E8F0] text-[#1E293B] hover:bg-slate-50 bg-[#FFFFFF] active:scale-[0.98]"
                               }`}
                             >

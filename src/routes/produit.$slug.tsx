@@ -71,10 +71,10 @@ export const Route = createFileRoute("/produit/$slug")({
 });
 
 const ageMapVariantB: Record<string, string> = {
-  "6": "5-6 سنوات",
-  "8": "7-8 سنوات",
-  "10": "9-10 سنوات",
-  "12": "11-12 سنوات"
+  "6": "5-6",
+  "8": "7-8",
+  "10": "9-10",
+  "12": "11-12"
 };
 
 function ProductPage() {

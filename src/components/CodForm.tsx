@@ -10,10 +10,10 @@ import ZR_OFFICES from "@/lib/zr_offices.json";
 const normalizeStr = (str: string) => str ? str.toLowerCase().replace(/[^a-z0-9]/g, "") : "";
 
 const ageMap: Record<string, string> = {
-  "6": "5-6 سنوات",
-  "8": "7-8 سنوات",
-  "10": "9-10 سنوات",
-  "12": "11-12 سنوات"
+  "6": "5-6",
+  "8": "7-8",
+  "10": "9-10",
+  "12": "11-12"
 };
 
 export function CodForm({ 

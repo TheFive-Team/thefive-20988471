@@ -239,16 +239,12 @@ function ProductPage() {
   let displaySubtitle = (p as any)?.subtitle || "";
 
   if (slug === "Ensemble–d’Été–Fille" && !displaySubtitle) {
-    displaySubtitle = "طقم صيفي بناتي أنيق (قماش قطن 100% ناعم + سروال كتان بارد)";
+    displaySubtitle = "Coton pur & lin naturel • Douceur & confort";
   }
 
   if (isVariantB) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-10 sm:py-24 w-full box-border">
-        {/* A/B Test Variant B Banner Indicator */}
-        <div className="mb-4 p-2.5 bg-[#C99A24]/10 border border-[#C99A24]/30 rounded-xl text-center text-xs font-bold text-[#C99A24]" dir="rtl">
-          ✨ تجربة الشراء السريعة (Variant B — 2 Step Flow)
-        </div>
 
         <div className="grid gap-0 md:grid-cols-2 md:gap-10 lg:gap-12">
           
@@ -272,16 +268,30 @@ function ProductPage() {
                     {displayTitle}
                   </h1>
                   {displaySubtitle && (
-                    <h2 className="font-sans font-semibold text-[#2D3748] text-[15px] mt-[6px] leading-snug" dir="rtl">
+                    <h2 className="font-sans font-medium text-slate-500 text-sm mt-[6px] leading-snug" dir="ltr">
                       {displaySubtitle}
                     </h2>
                   )}
                 </div>
-                <div className="flex items-center gap-[6px] mt-[12px] w-full text-left" dir="ltr">
-                  <div className="flex text-[#D4AF37] text-[14px] tracking-widest leading-none">
-                    <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+
+                {/* Rating & Social Proof + Micro Trust Badges */}
+                <div className="mt-3 w-full flex flex-col gap-2">
+                  {/* Line 1: Rating & Social Proof */}
+                  <div className="flex items-center gap-2 text-sm text-slate-700 font-medium" dir="rtl">
+                    <span className="text-[#D4AF37] font-bold text-sm">★ 4.9/5</span>
+                    <span className="text-slate-300">•</span>
+                    <span className="text-slate-600 text-xs font-medium">(أكثر من 850 عائلة جزائرية)</span>
                   </div>
-                  <span className="text-[13px] font-medium text-slate-600 leading-none">4.9 • 127 avis</span>
+
+                  {/* Line 2: Micro Trust Badges */}
+                  <div className="flex flex-wrap items-center gap-2" dir="rtl">
+                    <span className="bg-slate-50 border border-slate-200 text-slate-600 text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1">
+                      💵 دفع عند الاستلام
+                    </span>
+                    <span className="bg-slate-50 border border-slate-200 text-slate-600 text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1">
+                      📞 نتصل بك للتأكيد قبل الشحن
+                    </span>
+                  </div>
                 </div>
                 
                 {/* Price */}
@@ -454,16 +464,30 @@ function ProductPage() {
                   {displayTitle}
                 </h1>
                 {displaySubtitle && (
-                  <h2 className="font-sans font-semibold text-[#2D3748] text-[16px] mt-2 leading-snug" dir="rtl">
+                  <h2 className="font-sans font-medium text-slate-500 text-sm mt-1.5 leading-snug" dir="ltr">
                     {displaySubtitle}
                   </h2>
                 )}
               </div>
-              <div className="flex items-center gap-2 mb-6">
-                <div className="flex text-[#D4AF37] text-[14px] tracking-widest">
-                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+
+              {/* Rating & Social Proof + Micro Trust Badges */}
+              <div className="mt-3 mb-5 w-full flex flex-col gap-2">
+                {/* Line 1: Rating & Social Proof */}
+                <div className="flex items-center gap-2 text-sm text-slate-700 font-medium" dir="rtl">
+                  <span className="text-[#D4AF37] font-bold text-sm">★ 4.9/5</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="text-slate-600 text-xs font-medium">(أكثر من 850 عائلة جزائرية)</span>
                 </div>
-                <span className="text-[13px] font-medium text-slate-600 mt-0.5">4.9 • 127 avis</span>
+
+                {/* Line 2: Micro Trust Badges */}
+                <div className="flex flex-wrap items-center gap-2" dir="rtl">
+                  <span className="bg-slate-50 border border-slate-200 text-slate-600 text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1">
+                    💵 دفع عند الاستلام
+                  </span>
+                  <span className="bg-slate-50 border border-slate-200 text-slate-600 text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1">
+                    📞 نتصل بك للتأكيد قبل الشحن
+                  </span>
+                </div>
               </div>
               <div className="flex items-center w-full mb-5">
                 {(() => {

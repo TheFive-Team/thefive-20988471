@@ -369,7 +369,7 @@ function ProductPage() {
                                     type="button"
                                     disabled={!isAvailable}
                                     onClick={() => setVariantBSizeForPiece(pieceIndex, v.node.id)}
-                                    className={`w-full h-10 px-1 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center ${
+                                    className={`w-full h-11 px-0.5 rounded-lg text-sm sm:text-base font-extrabold transition-all cursor-pointer flex items-center justify-center whitespace-nowrap ${
                                       isSelected
                                         ? "bg-[#C9A227] text-white border border-[#C9A227] shadow-sm ring-2 ring-[#C9A227]/40"
                                         : isAvailable
@@ -548,7 +548,7 @@ function ProductPage() {
                                   type="button"
                                   disabled={!isAvailable}
                                   onClick={() => setVariantBSizeForPiece(pieceIndex, v.node.id)}
-                                  className={`w-full h-10 px-1 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center ${
+                                  className={`w-full h-11 px-0.5 rounded-lg text-sm sm:text-base font-extrabold transition-all cursor-pointer flex items-center justify-center whitespace-nowrap ${
                                     isSelected
                                       ? "bg-[#C9A227] text-white border border-[#C9A227] shadow-sm ring-2 ring-[#C9A227]/40"
                                       : isAvailable

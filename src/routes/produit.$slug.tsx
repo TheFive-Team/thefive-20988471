@@ -355,7 +355,7 @@ function ProductPage() {
                                 القطعة {pieceIndex + 1}:
                               </span>
                             )}
-                            <div className="flex flex-wrap gap-2">
+                            <div className="grid grid-cols-4 gap-1.5 sm:gap-2 w-full">
                               {variants.map((v: any) => {
                                 const stock = v.node.quantityAvailable ?? 0;
                                 const isAvailable = v.node.availableForSale && stock > 0;
@@ -369,7 +369,7 @@ function ProductPage() {
                                     type="button"
                                     disabled={!isAvailable}
                                     onClick={() => setVariantBSizeForPiece(pieceIndex, v.node.id)}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                                    className={`w-full h-10 px-1 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center ${
                                       isSelected
                                         ? "bg-[#C9A227] text-white border border-[#C9A227] shadow-sm ring-2 ring-[#C9A227]/40"
                                         : isAvailable
@@ -534,7 +534,7 @@ function ProductPage() {
                               القطعة {pieceIndex + 1}:
                             </span>
                           )}
-                          <div className="flex flex-wrap gap-2">
+                          <div className="grid grid-cols-4 gap-1.5 sm:gap-2 w-full">
                             {variants.map((v: any) => {
                               const stock = v.node.quantityAvailable ?? 0;
                               const isAvailable = v.node.availableForSale && stock > 0;
@@ -548,7 +548,7 @@ function ProductPage() {
                                   type="button"
                                   disabled={!isAvailable}
                                   onClick={() => setVariantBSizeForPiece(pieceIndex, v.node.id)}
-                                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                                  className={`w-full h-10 px-1 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center ${
                                     isSelected
                                       ? "bg-[#C9A227] text-white border border-[#C9A227] shadow-sm ring-2 ring-[#C9A227]/40"
                                       : isAvailable

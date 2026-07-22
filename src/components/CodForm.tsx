@@ -321,7 +321,7 @@ export function CodForm({
                     {quantity > 1 && (
                       <p className="font-bold text-[11px] text-[#9A9A9A] pr-1">القطعة {pieceIndex + 1}</p>
                     )}
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-4 gap-1.5 sm:gap-2 w-full">
                       {variants.map((v: any) => {
                         const isAvailable = isVariantAvailable(v.node, pieceIndex);
                         const isSelected = selectedSizes[pieceIndex] === v.node.id;
@@ -329,12 +329,12 @@ export function CodForm({
                         const showScarcity = scarcityConfig?.enableSizeScarcity && isAvailable && qty <= (scarcityConfig.sizeLowStockThreshold || 3) && qty > 0;
                         
                         return (
-                          <div key={v.node.id} className="flex flex-col items-center gap-1">
+                          <div key={v.node.id} className="flex flex-col items-center gap-1 w-full">
                             <button
                               type="button"
                               onClick={() => setSizeForPiece(pieceIndex, v.node.id)}
                               disabled={!isAvailable && !isSelected}
-                              className={`rounded-[9px] min-w-[90px] h-[38px] px-4 text-[14px] font-sans font-semibold tracking-wide transition-all duration-300 ${
+                              className={`w-full rounded-[9px] h-[38px] px-1 text-xs sm:text-[14px] font-sans font-semibold tracking-wide transition-all duration-300 flex items-center justify-center ${
                                 !isAvailable && !isSelected
                                   ? "opacity-35 border border-[#F2F2F2] bg-[#F2F2F2] text-[#A6A6A6] cursor-not-allowed line-through" 
                                   : isSelected

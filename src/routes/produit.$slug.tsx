@@ -275,9 +275,10 @@ function ProductPage() {
                 </div>
 
                 {/* Rating & Social Proof */}
-                <div className="mt-3 w-full flex items-center gap-2 text-sm text-slate-700 font-medium" dir="ltr">
-                  <span className="text-[#D4AF37] font-bold text-sm">★ 4.9/5</span>
-                  <span className="text-slate-300">•</span>
+                <div className="mt-3 w-full flex items-center gap-1.5 text-sm text-slate-700 font-medium" dir="rtl">
+                  <span className="font-bold text-sm text-slate-800">4.9/5</span>
+                  <span className="text-[#D4AF37] font-bold text-sm">★</span>
+                  <span className="text-slate-300 mx-0.5">•</span>
                   <span className="text-slate-600 text-xs font-medium">(أكثر من 850 عائلة جزائرية)</span>
                 </div>
                 
@@ -458,9 +459,10 @@ function ProductPage() {
               </div>
 
               {/* Rating & Social Proof */}
-              <div className="mt-3 mb-4 w-full flex items-center gap-2 text-sm text-slate-700 font-medium" dir="ltr">
-                <span className="text-[#D4AF37] font-bold text-sm">★ 4.9/5</span>
-                <span className="text-slate-300">•</span>
+              <div className="mt-3 mb-4 w-full flex items-center gap-1.5 text-sm text-slate-700 font-medium" dir="rtl">
+                <span className="font-bold text-sm text-slate-800">4.9/5</span>
+                <span className="text-[#D4AF37] font-bold text-sm">★</span>
+                <span className="text-slate-300 mx-0.5">•</span>
                 <span className="text-slate-600 text-xs font-medium">(أكثر من 850 عائلة جزائرية)</span>
               </div>
               <div className="flex items-center w-full mb-5">
@@ -716,9 +718,10 @@ function ProductPage() {
             </div>
             
             {/* Rating & Social Proof */}
-            <div className="mt-3 w-full flex items-center gap-2 text-sm text-slate-700 font-medium" dir="ltr">
-              <span className="text-[#D4AF37] font-bold text-sm">★ 4.9/5</span>
-              <span className="text-slate-300">•</span>
+            <div className="mt-3 w-full flex items-center gap-1.5 text-sm text-slate-700 font-medium" dir="rtl">
+              <span className="font-bold text-sm text-slate-800">4.9/5</span>
+              <span className="text-[#D4AF37] font-bold text-sm">★</span>
+              <span className="text-slate-300 mx-0.5">•</span>
               <span className="text-slate-600 text-xs font-medium">(أكثر من 850 عائلة جزائرية)</span>
             </div>
             
@@ -818,9 +821,10 @@ function ProductPage() {
             </div>
             
             {/* Rating & Social Proof */}
-            <div className="mt-3 mb-4 w-full flex items-center gap-2 text-sm text-slate-700 font-medium" dir="ltr">
-              <span className="text-[#D4AF37] font-bold text-sm">★ 4.9/5</span>
-              <span className="text-slate-300">•</span>
+            <div className="mt-3 mb-4 w-full flex items-center gap-1.5 text-sm text-slate-700 font-medium" dir="rtl">
+              <span className="font-bold text-sm text-slate-800">4.9/5</span>
+              <span className="text-[#D4AF37] font-bold text-sm">★</span>
+              <span className="text-slate-300 mx-0.5">•</span>
               <span className="text-slate-600 text-xs font-medium">(أكثر من 850 عائلة جزائرية)</span>
             </div>
             

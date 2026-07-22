@@ -4,6 +4,7 @@ import { submitOrderFn } from "@/actions/submitOrder.server";
 import { wilayas } from "@/lib/wilayas";
 import { communesByWilaya } from "@/lib/communes";
 import { formatMoney } from "@/lib/shopify";
+import { supabase } from "@/lib/supabase";
 
 export interface NewLeadFormProps {
   productName?: string;
@@ -192,41 +193,40 @@ export function NewLeadForm({
 
     try {
       const wilayaName = selectedWilayaObj ? `${selectedWilayaObj.code} - ${selectedWilayaObj.nameAr}` : wilayaCode;
-      const finalDeliveryType = shippingMethod === "home" ? "توصيل للمنزل" : "استلام من المكتب (Stop Desk)";
+      const finalDeliveryType = shippingMethod === "home" ? "home" : "desk";
       const eventId = typeof crypto !== "undefined" && crypto.randomUUID 
         ? crypto.randomUUID() 
         : `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
       const formattedSizes = Array.isArray(selectedSizes) 
-        ? selectedSizes.map(id => variants?.find((v: any) => v?.node?.id === id)?.node?.title ?? "").filter(Boolean)
-        : [];
+        ? selectedSizes.map(id => variants?.find((v: any) => v?.node?.id === id)?.node?.title ?? "").filter(Boolean).join(" + ")
+        : "";
 
-      const response = await submitOrderFn({
-        data: {
-          fullname: (fullname || "").trim(),
-          phone: (phone || "").replace(/\s+/g, ""),
-          wilaya: wilayaName,
-          commune: communeName,
-          address: "",
-          deliveryType: finalDeliveryType,
-          deliveryFee: Number(deliveryFee) || 0,
-          productName: productName || "Product",
-          offerId: "new-lead-form",
-          offerTitle: `${quantity} ${quantity === 1 ? 'قطعة' : 'قطع'}`,
-          offerPieces: quantity,
-          offerPrice: Number(finalProductTotal) || 0,
-          quantity: quantity,
-          discountAmount: Number(discountAmount) || 0,
-          finalProductTotal: Number(finalProductTotal) || 0,
-          finalTotal: Number(grandTotal) || 0,
-          selectedSizes: formattedSizes,
-          eventId,
-          clientUserAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
-          eventSourceUrl: typeof window !== "undefined" ? window.location.href : ""
-        }
-      });
+      const supabasePayload = {
+        customer_name: (fullname || "").trim(),
+        phone: (phone || "").replace(/\s+/g, ""),
+        wilaya: wilayaName,
+        commune: communeName,
+        delivery_type: finalDeliveryType,
+        total_price: Number(grandTotal) || 0,
+        selected_size: formattedSizes,
+        product_name: productName || "Product",
+        status: 'pending',
+        items: [
+          {
+            title: productName || "Product",
+            size: formattedSizes,
+            quantity: quantity,
+            price: Number(basePriceNum) || 0
+          }
+        ]
+      };
 
-      if (response?.success) {
+      console.log('[SUPABASE_SUBMIT_VARIANT_B]', supabasePayload);
+
+      const { error: dbError } = await supabase.from('orders').insert([supabasePayload]);
+
+      if (!dbError) {
         localStorage.setItem("thefive_last_order", Date.now().toString());
         setSubmitted(true);
         onOrderSuccess?.();
@@ -250,6 +250,7 @@ export function NewLeadForm({
           w.fbq?.("track", "Purchase", finalPurchasePayload, { eventID: eventId });
         }
       } else {
+        console.error("Supabase insert error:", dbError);
         setFormError("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.");
       }
     } catch (err) {

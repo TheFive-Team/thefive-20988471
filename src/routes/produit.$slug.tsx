@@ -8,6 +8,7 @@ import { MobileImageGallery } from "@/components/MobileImageGallery";
 import { CodForm } from "@/components/CodForm";
 import { LazySection } from "@/components/LazySection";
 import { WhyChooseUs } from "@/components/WhyChooseUs";
+import { ShieldCheck, Truck, CheckCircle2, RefreshCw } from "lucide-react";
 
 const Reviews = lazy(() => import("@/components/Reviews").then(m => ({ default: m.Reviews })));
 const StickyCheckoutBar = lazy(() => import("@/components/StickyCheckoutBar").then(m => ({ default: m.StickyCheckoutBar })));
@@ -238,7 +239,7 @@ function ProductPage() {
   let displaySubtitle = (p as any)?.subtitle || "";
 
   if (slug === "Ensemble–d’Été–Fille" && !displaySubtitle) {
-    displaySubtitle = "Gaze de coton + pantalon en lin";
+    displaySubtitle = "طقم صيفي بناتي أنيق (قماش قطن 100% ناعم + سروال كتان بارد)";
   }
 
   if (isVariantB) {
@@ -267,11 +268,11 @@ function ProductPage() {
                   </span>
                 </div>
                 <div className="w-full text-left" dir="ltr">
-                  <h1 className="font-serif font-medium text-[#102A4C] text-[clamp(32px,8vw,40px)] leading-[1.12] tracking-tight m-0 break-words">
+                  <h1 className="font-serif font-bold text-[#102A4C] text-[clamp(32px,8vw,40px)] leading-[1.12] tracking-tight m-0 break-words">
                     {displayTitle}
                   </h1>
                   {displaySubtitle && (
-                    <h2 className="font-sans font-normal text-[#737E91] text-[14px] mt-[6px] leading-snug">
+                    <h2 className="font-sans font-semibold text-[#2D3748] text-[15px] mt-[6px] leading-snug" dir="rtl">
                       {displaySubtitle}
                     </h2>
                   )}
@@ -292,7 +293,7 @@ function ProductPage() {
                       const discount = Math.round(((parseFloat(compPrice) - parseFloat(currentPrice)) / parseFloat(compPrice)) * 100);
                       return (
                         <>
-                          <span className="font-sans font-bold text-[32px] text-[#102A4C] leading-none whitespace-nowrap">
+                          <span className="font-sans font-extrabold text-[36px] text-[#102A4C] leading-none whitespace-nowrap">
                             {formatMoney({ amount: currentPrice, currencyCode: "DZD" })}
                           </span>
                           <span className="font-sans font-normal text-[14px] text-slate-400 line-through leading-none whitespace-nowrap">
@@ -305,7 +306,7 @@ function ProductPage() {
                       );
                     }
                     return (
-                      <span className="font-sans font-bold text-[32px] text-[#102A4C] leading-none whitespace-nowrap">
+                      <span className="font-sans font-extrabold text-[36px] text-[#102A4C] leading-none whitespace-nowrap">
                         {formatMoney({ amount: currentPrice ?? 0, currencyCode: "DZD" })}
                       </span>
                     );
@@ -316,7 +317,7 @@ function ProductPage() {
                 <div className="w-full mt-5 pt-4 border-t border-slate-100" dir="rtl">
                   {/* Quantity Counter */}
                   <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200/80 mb-3">
-                    <span className="text-xs font-bold text-slate-700">الكمية:</span>
+                    <span className="text-sm font-extrabold text-[#102A4C]">الكمية:</span>
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
@@ -340,7 +341,7 @@ function ProductPage() {
                   {variants.length > 1 && (
                     <div id="variantB-size-selector" className="space-y-2 text-right">
                       <div className="flex items-center justify-between mb-1">
-                        <label className="text-xs font-bold text-slate-700">
+                        <label className="text-sm font-extrabold text-[#102A4C]">
                           اختاري المقاس {variantBQty > 1 ? "(لكل قطعة)" : ""}:
                         </label>
                         {variantBSizeError && (
@@ -449,11 +450,11 @@ function ProductPage() {
                 </span>
               </div>
               <div className="mb-3 w-full text-left" dir="ltr">
-                <h1 className="font-serif font-medium text-[#102A4C] text-[clamp(40px,4vw,54px)] leading-[1.1] tracking-tight drop-shadow-xs break-words">
+                <h1 className="font-serif font-bold text-[#102A4C] text-[clamp(40px,4vw,54px)] leading-[1.1] tracking-tight drop-shadow-xs break-words">
                   {displayTitle}
                 </h1>
                 {displaySubtitle && (
-                  <h2 className="font-sans font-normal text-[#737E91] text-[14px] mt-1.5 leading-snug">
+                  <h2 className="font-sans font-semibold text-[#2D3748] text-[16px] mt-2 leading-snug" dir="rtl">
                     {displaySubtitle}
                   </h2>
                 )}
@@ -472,7 +473,7 @@ function ProductPage() {
                     const discount = Math.round(((parseFloat(comparePrice) - parseFloat(currentPrice)) / parseFloat(comparePrice)) * 100);
                     return (
                       <div className="flex items-center gap-3">
-                        <span className="font-sans font-bold text-[32px] text-[#102A4C] leading-none">
+                        <span className="font-sans font-extrabold text-[38px] text-[#102A4C] leading-none">
                           {formatMoney({ amount: currentPrice, currencyCode: "DZD" })}
                         </span>
                         <span className="font-sans font-normal text-[14px] text-slate-400 line-through leading-none">
@@ -485,7 +486,7 @@ function ProductPage() {
                     );
                   }
                   return (
-                    <span className="font-sans font-bold text-[32px] text-[#102A4C] leading-none">
+                    <span className="font-sans font-extrabold text-[38px] text-[#102A4C] leading-none">
                       {formatMoney({ amount: currentPrice ?? 0, currencyCode: "DZD" })}
                     </span>
                   );
@@ -495,7 +496,7 @@ function ProductPage() {
               {/* Step 1: Desktop Controls */}
               <div className="pt-4 border-t border-slate-200/60" dir="rtl">
                 <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200/80 mb-3">
-                  <span className="text-xs font-bold text-slate-700">الكمية:</span>
+                  <span className="text-sm font-extrabold text-[#102A4C]">الكمية:</span>
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
@@ -518,7 +519,7 @@ function ProductPage() {
                 {variants.length > 1 && (
                   <div id="variantB-size-selector-desktop" className="space-y-2 text-right mb-4">
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-bold text-slate-700">
+                      <label className="text-sm font-extrabold text-[#102A4C]">
                         اختاري المقاس {variantBQty > 1 ? "(لكل قطعة)" : ""}:
                       </label>
                       {variantBSizeError && (
@@ -593,8 +594,37 @@ function ProductPage() {
                   selectedSizes={variantBSizes}
                 />
               ) : (
-                <div className="p-6 bg-white rounded-[22px] border border-dashed border-[#C99A24]/40 text-center text-xs text-slate-500 font-medium shadow-xs" dir="rtl">
-                  انقري على زر <strong className="text-[#102A4C]">"التالي: أكملي معلومات التوصيل 📦"</strong> أعلاه لملء استمارة التوصيل الشفافة وسريعة التنفيذ.
+                <div className="p-5 bg-[#F9FAFB] rounded-[16px] border border-[#E5E7EB] text-right shadow-sm mt-2" dir="rtl">
+                  <h4 className="text-[#102A4C] font-bold text-[14px] mb-3 flex items-center gap-2">
+                    <ShieldCheck size={18} className="text-[#C99A24]" />
+                    تسوقي بثقة وأمان
+                  </h4>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-2.5">
+                      <div className="mt-0.5 w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                        <Truck size={13} className="text-blue-600" />
+                      </div>
+                      <p className="text-[13px] text-[#2D3748] font-medium leading-tight">
+                        <span className="font-bold text-[#102A4C]">توصيل مع إمكانية المعاينة:</span> افتحي الطرد وتأكدي من الجودة قبل الدفع.
+                      </p>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <div className="mt-0.5 w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                        <CheckCircle2 size={13} className="text-emerald-600" />
+                      </div>
+                      <p className="text-[13px] text-[#2D3748] font-medium leading-tight">
+                        <span className="font-bold text-[#102A4C]">قماش ممتاز ورطب:</span> ناعم جداً على بشرة الأطفال ومناسب للحر.
+                      </p>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <div className="mt-0.5 w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
+                        <RefreshCw size={13} className="text-amber-600" />
+                      </div>
+                      <p className="text-[13px] text-[#2D3748] font-medium leading-tight">
+                        <span className="font-bold text-[#102A4C]">ضمان الاستبدال:</span> تبديل المقاس متوفر وسهل.
+                      </p>
+                    </li>
+                  </ul>
                 </div>
               )}
             </div>

@@ -368,7 +368,7 @@ export function CodForm({
                {variants.length > 1 ? '3' : '2'}
             </span>
             <div className="flex flex-col text-right w-full min-w-0">
-              <h3 className="text-[17px] font-bold text-[#102A43]">معلومات العميل</h3>
+              <h3 className="text-[17px] font-bold text-[#102A43]">معلومات الزبون</h3>
               <p className="text-[11px] sm:text-[12px] font-medium text-[#9A9A9A] mt-1">سنستخدمها فقط لتأكيد الطلب</p>
             </div>
           </div>

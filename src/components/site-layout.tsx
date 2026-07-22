@@ -6,9 +6,9 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md">
-      <div className="mx-auto flex justify-center items-center px-4 py-5 sm:px-8 sm:py-8">
+      <div className="mx-auto flex justify-center items-center px-4 py-3 sm:px-8 sm:py-6">
         {/* Center: logo */}
-        <div className="flex items-center justify-center py-2 select-none">
+        <div className="flex items-center justify-center py-1 select-none">
           <span className="font-serif text-3xl sm:text-4xl md:text-5xl font-medium tracking-[0.2em] text-secondary uppercase">
             The Five A
           </span>

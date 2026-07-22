@@ -361,14 +361,15 @@ export function NewLeadForm({
           />
         </div>
 
-        {/* Wilaya & Commune Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* Wilaya & Commune Section */}
+        <div className="space-y-3">
           {/* Wilaya Dropdown */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5">
               الولاية <span className="text-rose-500">*</span>
             </label>
             <select
+              id="field-wilaya"
               value={wilayaCode}
               onChange={(e) => handleWilayaChange(e.target.value)}
               className={`w-full h-12 px-3 rounded-xl border text-sm transition-all outline-none bg-slate-50/50 cursor-pointer ${
@@ -386,31 +387,31 @@ export function NewLeadForm({
             </select>
           </div>
 
-          {/* Commune Dropdown */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">
-              البلدية <span className="text-rose-500">*</span>
-            </label>
-            <select
-              value={communeName}
-              disabled={!wilayaCode}
-              onChange={(e) => handleCommuneChange(e.target.value)}
-              className={`w-full h-12 px-3 rounded-xl border text-sm transition-all outline-none bg-slate-50/50 cursor-pointer ${
-                !wilayaCode ? "opacity-50 cursor-not-allowed" : ""
-              } ${
-                errors.commune 
-                  ? "border-rose-400 bg-rose-50/50 focus:border-rose-500" 
-                  : "border-slate-200 focus:bg-white focus:border-[#C99A24] focus:ring-2 focus:ring-[#C99A24]/20"
-              }`}
-            >
-              <option value="">{wilayaCode ? "اختر البلدية..." : "اختر الولاية أولاً"}</option>
-              {availableCommunes.map((c, idx) => (
-                <option key={idx} value={c.ar}>
-                  {c.ar} ({c.fr})
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Commune Dropdown — Conditionally rendered ONLY after Wilaya is selected */}
+          {wilayaCode && (
+            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                البلدية <span className="text-rose-500">*</span>
+              </label>
+              <select
+                id="field-commune"
+                value={communeName}
+                onChange={(e) => handleCommuneChange(e.target.value)}
+                className={`w-full h-12 px-3 rounded-xl border text-sm transition-all outline-none bg-slate-50/50 cursor-pointer ${
+                  errors.commune 
+                    ? "border-rose-400 bg-rose-50/50 focus:border-rose-500" 
+                    : "border-slate-200 focus:bg-white focus:border-[#C99A24] focus:ring-2 focus:ring-[#C99A24]/20"
+                }`}
+              >
+                <option value="">اختاري بلديتك...</option>
+                {availableCommunes.map((c, idx) => (
+                  <option key={idx} value={c.ar}>
+                    {c.ar} ({c.fr})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Shipping Method Options — Conditionally revealed ONLY when both Wilaya and Commune are selected */}

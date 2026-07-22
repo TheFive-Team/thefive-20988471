@@ -408,21 +408,23 @@ export function CodForm({
               </div>
             </div>
 
-            <div>
-              <label htmlFor="commune" className={labelClasses}>البلدية</label>
-              <div className="relative">
-                 <select
-                   id="commune" required disabled={!form.wilaya}
-                   value={form.commune} onChange={(e) => setForm({ ...form, commune: e.target.value, shippingMethod: e.target.value ? form.shippingMethod : "" })}
-                   className={`${inputClasses} appearance-none pr-4 ${!form.wilaya ? 'bg-slate-50 opacity-70 cursor-not-allowed' : ''}`}
-                 >
-                   <option value="" disabled>اختر البلدية</option>
-                   {form.wilaya && (communesByWilaya[Number(form.wilaya)] ?? []).map((c, i) => (
-                     <option key={i} value={c.ar}>{c.ar}</option>
-                   ))}
-                 </select>
+            {form.wilaya && (
+              <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                <label htmlFor="commune" className={labelClasses}>البلدية</label>
+                <div className="relative">
+                   <select
+                     id="commune" required
+                     value={form.commune} onChange={(e) => setForm({ ...form, commune: e.target.value, shippingMethod: e.target.value ? form.shippingMethod : "" })}
+                     className={`${inputClasses} appearance-none pr-4`}
+                   >
+                     <option value="" disabled>اختاري بلديتك</option>
+                     {(communesByWilaya[Number(form.wilaya)] ?? []).map((c, i) => (
+                       <option key={i} value={c.ar}>{c.ar}</option>
+                     ))}
+                   </select>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </section>
 

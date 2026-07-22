@@ -731,22 +731,34 @@ function ProductPage() {
             
             {/* Product Name & Subtitle */}
             <div className="w-full text-left" dir="ltr">
-              <h1 className="font-serif font-medium text-[#102A4C] text-[clamp(32px,8vw,40px)] leading-[1.12] tracking-tight m-0 break-words">
+              <h1 className="font-serif font-bold text-[#102A4C] text-[clamp(32px,8vw,40px)] leading-[1.12] tracking-tight m-0 break-words">
                 {displayTitle}
               </h1>
               {displaySubtitle && (
-                <h2 className="font-sans font-normal text-[#737E91] text-[14px] mt-[6px] leading-snug">
+                <h2 className="font-sans font-medium text-slate-500 text-sm mt-[6px] leading-snug" dir="ltr">
                   {displaySubtitle}
                 </h2>
               )}
             </div>
             
-            {/* Rating */}
-            <div className="flex items-center gap-[6px] mt-[12px] w-full text-left" dir="ltr">
-              <div className="flex text-[#D4AF37] text-[14px] tracking-widest leading-none">
-                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            {/* Rating & Social Proof + Micro Trust Badges */}
+            <div className="mt-3 w-full flex flex-col gap-2">
+              {/* Line 1: Rating & Social Proof */}
+              <div className="flex items-center gap-2 text-sm text-slate-700 font-medium" dir="rtl">
+                <span className="text-[#D4AF37] font-bold text-sm">★ 4.9/5</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-600 text-xs font-medium">(أكثر من 850 عائلة جزائرية)</span>
               </div>
-              <span className="text-[13px] font-medium text-slate-600 leading-none">4.9 • 127 avis</span>
+
+              {/* Line 2: Micro Trust Badges */}
+              <div className="flex flex-wrap items-center gap-2" dir="rtl">
+                <span className="bg-slate-50 border border-slate-200 text-slate-600 text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1">
+                  💵 دفع عند الاستلام
+                </span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-600 text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1">
+                  📞 نتصل بك للتأكيد قبل الشحن
+                </span>
+              </div>
             </div>
             
             {/* Price Row */}
@@ -834,22 +846,34 @@ function ProductPage() {
             
             {/* Product Name & Subtitle */}
             <div className="mb-3 w-full text-left" dir="ltr">
-              <h1 className="font-serif font-medium text-[#102A4C] text-[clamp(40px,4vw,54px)] leading-[1.1] tracking-tight drop-shadow-xs break-words">
+              <h1 className="font-serif font-bold text-[#102A4C] text-[clamp(40px,4vw,54px)] leading-[1.1] tracking-tight drop-shadow-xs break-words">
                 {displayTitle}
               </h1>
               {displaySubtitle && (
-                <h2 className="font-sans font-normal text-[#737E91] text-[14px] mt-1.5 leading-snug">
+                <h2 className="font-sans font-medium text-slate-500 text-sm mt-1.5 leading-snug" dir="ltr">
                   {displaySubtitle}
                 </h2>
               )}
             </div>
             
-            {/* Rating */}
-            <div className="flex items-center gap-2 mb-6">
-              <div className="flex text-[#D4AF37] text-[14px] tracking-widest">
-                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            {/* Rating & Social Proof + Micro Trust Badges */}
+            <div className="mt-3 mb-5 w-full flex flex-col gap-2">
+              {/* Line 1: Rating & Social Proof */}
+              <div className="flex items-center gap-2 text-sm text-slate-700 font-medium" dir="rtl">
+                <span className="text-[#D4AF37] font-bold text-sm">★ 4.9/5</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-600 text-xs font-medium">(أكثر من 850 عائلة جزائرية)</span>
               </div>
-              <span className="text-[13px] font-medium text-slate-600 mt-0.5">4.9 • 127 avis</span>
+
+              {/* Line 2: Micro Trust Badges */}
+              <div className="flex flex-wrap items-center gap-2" dir="rtl">
+                <span className="bg-slate-50 border border-slate-200 text-slate-600 text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1">
+                  💵 دفع عند الاستلام
+                </span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-600 text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1">
+                  📞 نتصل بك للتأكيد قبل الشحن
+                </span>
+              </div>
             </div>
             
             {/* Price Row */}

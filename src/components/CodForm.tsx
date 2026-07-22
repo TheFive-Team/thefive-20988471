@@ -334,7 +334,7 @@ export function CodForm({
                               type="button"
                               onClick={() => setSizeForPiece(pieceIndex, v.node.id)}
                               disabled={!isAvailable && !isSelected}
-                              className={`w-full rounded-[9px] h-11 px-0.5 text-sm sm:text-base font-sans font-extrabold tracking-wide transition-all duration-300 flex items-center justify-center whitespace-nowrap ${
+                              className={`w-full rounded-[9px] h-11 px-0.5 text-[18px] sm:text-[20px] font-sans font-bold leading-none tracking-wide transition-all duration-300 flex items-center justify-center whitespace-nowrap ${
                                 !isAvailable && !isSelected
                                   ? "opacity-35 border border-[#F2F2F2] bg-[#F2F2F2] text-[#A6A6A6] cursor-not-allowed line-through" 
                                   : isSelected

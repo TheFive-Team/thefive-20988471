@@ -371,8 +371,20 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             // Customer Name & Phone Normalization
             const customerName = order.fullname || order.customer_name || order.customer_info?.name || "Client";
             const rawPhoneValue = order.phone || order.customer_phone || order.phone_number || order.customer_info?.phone;
+
+            console.log("RAW ORDER:", {
+              phone: order.phone,
+              customer_phone: order.customer_phone,
+              phone_number: order.phone_number,
+              customer_info: order.customer_info,
+              customer: order.customer
+            });
+
             const cleanPhoneLocal = normalizePhoneLocal(rawPhoneValue);
+            console.log("LOCAL PHONE:", cleanPhoneLocal);
+
             const cleanPhoneIntl = normalizePhoneInternational(rawPhoneValue);
+            console.log("INTL PHONE:", cleanPhoneIntl);
 
             console.log(`[PHONE_DEBUG] Order ${order.id}:`, {
               originalPhone: rawPhoneValue,
@@ -545,6 +557,11 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             
             const totalAmount = Number(order.total_amount ?? order.total_price ?? order.finalTotal ?? 0) || 0;
 
+            console.log("FINAL PHONE VALUES:", {
+              customerPhone: cleanPhoneIntl,
+              rootPhone: cleanPhoneIntl
+            });
+
             const finalPayload: any = {
               customer: {
                 customerId: crypto.randomUUID(),
@@ -583,6 +600,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
               normalizedPhone: cleanPhoneIntl
             });
             console.log('[FINAL_ZR_PAYLOAD]', JSON.stringify(finalPayload, null, 2));
+            console.log(JSON.stringify(finalPayload, null, 2));
             
             console.log(`[ZR_REQUEST_SENT] Sending request to ${API_BASE}/api/v1/parcels`);
             const response = await fetch(`${API_BASE}/api/v1/parcels`, {

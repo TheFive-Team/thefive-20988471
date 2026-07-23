@@ -4,6 +4,7 @@ import { z } from "zod";
 import { supabase as defaultSupabase } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
+import { wilayas } from "@/lib/wilayas";
 
 const API_KEY = process.env.ZR_API_KEY || process.env.ZR_EXPRESS_SECRET_KEY || '';
 const TENANT_ID = process.env.ZR_TENANT_ID || process.env.ZR_EXPRESS_TENANT_ID || '';
@@ -25,34 +26,53 @@ function extractTerritoryName(value: any): string {
 
 async function searchTerritory(query: string, expectedLevel: string): Promise<string | null> {
   const cleanQuery = cleanTerritoryName(query);
-  if (!cleanQuery) return null;
-  try {
-    const url = `${API_BASE}/api/v1/territories/search`;
-    console.log(`[ZR Express] Searching territory: ${cleanQuery} (original: ${query})`);
-    
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        'Authorization': `Bearer ${API_KEY}`,
-        'X-Api-Key': API_KEY,
-        'X-Tenant': TENANT_ID,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ keyword: cleanQuery })
-    });
-    
-    if (!res.ok) {
-      console.error(`[ZR Express] Territory search failed for ${cleanQuery}:`, res.status);
-      return null;
+  if (!cleanQuery && !query) return null;
+
+  // Try finding matching Wilaya from wilayas dataset for multi-language search (Fr & Ar)
+  const digits = query.replace(/\D/g, '');
+  const matchedWilaya = wilayas.find(w => 
+    (digits && w.code === Number(digits)) ||
+    w.name.toLowerCase() === cleanQuery.toLowerCase() ||
+    w.nameAr === cleanQuery ||
+    query.toLowerCase().includes(w.name.toLowerCase()) ||
+    query.includes(w.nameAr)
+  );
+
+  const candidateQueries: string[] = [];
+  if (matchedWilaya) {
+    candidateQueries.push(matchedWilaya.name);
+    candidateQueries.push(matchedWilaya.nameAr);
+  }
+  if (cleanQuery && !candidateQueries.includes(cleanQuery)) {
+    candidateQueries.push(cleanQuery);
+  }
+
+  for (const q of candidateQueries) {
+    try {
+      const url = `${API_BASE}/api/v1/territories/search`;
+      console.log(`[ZR Express] Searching territory (${expectedLevel}): ${q} (original: ${query})`);
+      
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          'Authorization': `Bearer ${API_KEY}`,
+          'X-Api-Key': API_KEY,
+          'X-Tenant': TENANT_ID,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ keyword: q })
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.items && data.items.length > 0) {
+          const match = data.items.find((item: any) => item.level === expectedLevel) || data.items[0];
+          if (match?.id) return match.id;
+        }
+      }
+    } catch (error) {
+      console.error(`[ZR Express] Territory search error for ${q}:`, error);
     }
-    
-    const data = await res.json();
-    if (data && data.items && data.items.length > 0) {
-      const match = data.items.find((item: any) => item.level === expectedLevel) || data.items[0];
-      return match.id;
-    }
-  } catch (error) {
-    console.error(`[ZR Express] Territory search error for ${query}:`, error);
   }
   
   return null; 
@@ -371,10 +391,90 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
               continue;
             }
 
-            if (isStopDesk && !deskObj?.name && !deskObj?.id) {
-               console.warn(`[ORDER_VALIDATION_FAILED] Missing desk info for Stop Desk order ${order.id}`);
-               results.push({ success: false, id: order.id, stage: "VALIDATION", code: "INVALID_DESK", message: "يرجى اختيار مكتب التوصيل" });
-               continue;
+            let finalHubId = deskObj?.id;
+            let finalDeskName = deskObj?.name || "";
+
+            if (isStopDesk) {
+              let offices: any[] = [];
+              try {
+                const fs = await import('fs');
+                const path = await import('path');
+                const officesPath = path.resolve(process.cwd(), 'src/lib/zr_offices.json');
+                if (fs.existsSync(officesPath)) {
+                  offices = JSON.parse(fs.readFileSync(officesPath, 'utf8'));
+                }
+              } catch (e) {
+                console.error('[ZR_MAPPING_ERROR] Failed to load offices JSON:', e);
+              }
+
+              // 1. Match deskObj.name if present
+              if (!finalHubId && deskObj?.name && offices.length > 0) {
+                const match = offices.find((o: any) => o.name === deskObj.name);
+                if (match?.id) {
+                  finalHubId = match.id;
+                  finalDeskName = match.name;
+                }
+              }
+
+              // 2. Auto-match Hub for targetWilaya / targetCommune in zr_offices.json
+              if (!finalHubId && offices.length > 0) {
+                const digits = targetWilaya.replace(/\D/g, '');
+                const matchedWilaya = wilayas.find(w => 
+                  (digits && w.code === Number(digits)) ||
+                  w.name.toLowerCase() === targetWilaya.toLowerCase() ||
+                  w.nameAr === targetWilaya ||
+                  targetWilaya.toLowerCase().includes(w.name.toLowerCase()) ||
+                  targetWilaya.includes(w.nameAr)
+                );
+
+                const wilayaCodeStr = matchedWilaya ? String(matchedWilaya.code).padStart(2, '0') : '';
+                const wilayaEnName = matchedWilaya?.name.toLowerCase() || targetWilaya.toLowerCase();
+
+                let foundOffice = offices.find((o: any) => 
+                  o.id && o.pickup === "Oui" && (
+                    (o.ville && o.ville.toLowerCase() === wilayaEnName) ||
+                    (o.commune && o.commune.toLowerCase() === targetCommune.toLowerCase()) ||
+                    (wilayaCodeStr && o.name && o.name.includes(wilayaCodeStr)) ||
+                    (matchedWilaya && o.name && o.name.toLowerCase().includes(matchedWilaya.name.toLowerCase()))
+                  )
+                );
+
+                if (!foundOffice) {
+                  foundOffice = offices.find((o: any) => 
+                    o.id && (
+                      (o.ville && o.ville.toLowerCase() === wilayaEnName) ||
+                      (wilayaCodeStr && o.name && o.name.includes(wilayaCodeStr))
+                    )
+                  );
+                }
+
+                if (foundOffice?.id) {
+                  finalHubId = foundOffice.id;
+                  finalDeskName = foundOffice.name;
+                  console.log(`[ZR_HUB_AUTOFIND] Auto-mapped Hub ID ${finalHubId} (${finalDeskName}) for Wilaya: ${targetWilaya}`);
+                }
+              }
+
+              // Validation Guard: If still no Hub ID for pickup-point, fail gracefully before ZR Express call
+              if (!finalHubId) {
+                 console.warn(`[ORDER_VALIDATION_FAILED] Missing hub ID for Stop Desk order ${order.id} in Wilaya ${targetWilaya}`);
+                 results.push({
+                   success: false,
+                   id: order.id,
+                   stage: "VALIDATION",
+                   code: "INVALID_DESK",
+                   message: `عذراً، تعذر تحديد مكتب التوصيل (Hub ID) لولاية ${targetWilaya}. يرجى التحقق من لوحة التحكم.`,
+                   debugContext: {
+                     targetWilaya,
+                     targetCommune,
+                     phoneStr: cleanPhone || "",
+                     customerName,
+                     deliveryType: finalDeliveryType,
+                     deskName: "Non trouvé"
+                   }
+                 });
+                 continue;
+              }
             }
 
             console.log("[ORDER_VALIDATED] Pre-flight payload validation passed.");
@@ -397,12 +497,11 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             const productDescription = safeFormatDescription(order);
             const itemQuantity = Math.max(1, Number(order.quantity || order.selected_offer_pieces || (Array.isArray(order.items) ? order.items.length : 1)) || 1);
             
-            // Multi-Item Price Calculation safely summed as number
             const totalAmount = Number(order.total_amount ?? order.total_price ?? order.finalTotal ?? 0) || 0;
 
             const finalPayload: any = {
               customer: {
-                customerId: crypto.randomUUID(), // strictly customerId with capital 'I'
+                customerId: crypto.randomUUID(),
                 name: String(customerName),
                 phone: String(cleanPhone)
               },
@@ -425,22 +524,6 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
               deliveryType: String(finalDeliveryType),
               externalId: String(order.id)
             };
-            
-            let finalHubId = deskObj?.id;
-            if (isStopDesk && !finalHubId && deskObj?.name) {
-              try {
-                const fs = await import('fs');
-                const path = await import('path');
-                const officesPath = path.resolve(process.cwd(), 'src/lib/zr_offices.json');
-                if (fs.existsSync(officesPath)) {
-                  const offices = JSON.parse(fs.readFileSync(officesPath, 'utf8'));
-                  const match = offices.find((o: any) => o.name === deskObj.name);
-                  if (match?.id) finalHubId = match.id;
-                }
-              } catch (e) {
-                console.error('[ZR_MAPPING_ERROR] Failed to map desk name to Hub ID:', e);
-              }
-            }
 
             if (isStopDesk && finalHubId) {
               finalPayload.hubId = String(finalHubId);
@@ -470,8 +553,10 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
               let errorMsg = "حدث خطأ غير معروف في واجهة ZR Express";
               try {
                 const errObj = JSON.parse(rawBody);
-                errorMsg = errObj.message || errObj.error || errorMsg;
-              } catch (e) {}
+                errorMsg = errObj.message || errObj.error || errObj.detail || (Array.isArray(errObj.errors) ? errObj.errors.map((e: any) => e.message || JSON.stringify(e)).join(', ') : '') || (typeof errObj === 'string' ? errObj : errorMsg);
+              } catch (e) {
+                if (rawBody && rawBody.trim()) errorMsg = rawBody;
+              }
               
               results.push({ 
                 success: false, 
@@ -490,7 +575,8 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
                    targetCommune,
                    phoneStr: cleanPhone,
                    customerName,
-                   deliveryType: finalDeliveryType
+                   deliveryType: finalDeliveryType,
+                   deskName: finalDeskName || deskObj?.name || (finalHubId ? String(finalHubId) : "N/A")
                 }
               });
               continue;

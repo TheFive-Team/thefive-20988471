@@ -108,6 +108,38 @@ function normalizePhoneLocal(phoneInput: any): string | null {
   return clean;
 }
 
+// Phone Number Normalization to clean flat Algerian international format (+213XXXXXXXXX)
+function normalizePhoneInternational(phoneInput: any): string | null {
+  if (!phoneInput) return null;
+
+  let rawPhone = typeof phoneInput === 'object' 
+    ? (phoneInput.number1 || phoneInput.phone || phoneInput.number || String(phoneInput)) 
+    : String(phoneInput);
+
+  let clean = rawPhone.replace(/[^\d+]/g, '').trim();
+
+  if (clean.startsWith('+213')) {
+    const numDigits = clean.substring(4);
+    if (/^[56723489]\d{8}$/.test(numDigits) || /^\d{9}$/.test(numDigits)) {
+      return clean;
+    }
+  }
+
+  if (clean.startsWith('213') && clean.length >= 11) {
+    clean = clean.substring(3);
+  }
+
+  if (clean.startsWith('0')) {
+    clean = clean.substring(1);
+  }
+
+  if (/^[56723489]\d{8}$/.test(clean)) {
+    return `+213${clean}`;
+  }
+
+  return null;
+}
+
 // Safely flattens size input (string, string[], object[], or JSON string) into a flat clean string joined by ' + '
 function safeFormatSizes(sizesInput: any): string {
   if (!sizesInput) return "";
@@ -335,11 +367,17 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
               id: order.selectedDeskId
             } : deskNameFromType ? { name: deskNameFromType } : null);
 
-            // Customer Name & Phone Normalization directly from root parent order
+            // Customer Name & Phone Normalization
             const customerName = order.fullname || order.customer_name || order.customer_info?.name || "Client";
-            const cleanPhone = normalizePhoneLocal(
-              order.phone || order.customer_phone || order.phone_number || order.customer_info?.phone
-            );
+            const rawPhoneValue = order.phone || order.customer_phone || order.phone_number || order.customer_info?.phone;
+            const cleanPhoneLocal = normalizePhoneLocal(rawPhoneValue);
+            const cleanPhoneIntl = normalizePhoneInternational(rawPhoneValue);
+
+            console.log(`[PHONE_DEBUG] Order ${order.id}:`, {
+              originalPhone: rawPhoneValue,
+              normalizedLocalPhone: cleanPhoneLocal,
+              normalizedIntlPhone: cleanPhoneIntl
+            });
 
             // Multi-path fallback checking for shipping fields directly from root parent order
             const rawWilaya = (isStopDesk && (deskObj?.wilaya || deskObj?.wilaya_name))
@@ -368,23 +406,29 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             const targetCommune = extractTerritoryName(rawCommune);
 
             // Pre-Flight Payload Validation Guard (CRITICAL)
-            if (!targetWilaya || !targetCommune || !cleanPhone) {
-              const missingMsg = "Wilaya, Commune, and Phone are required for ZR Express sync.";
+            if (!targetWilaya || !targetCommune || !cleanPhoneIntl) {
+              const missingMsg = !cleanPhoneIntl 
+                ? `عذراً، رقم الهاتف غير صالح (${rawPhoneValue || 'مفقود'}). يرجى إدخال رقم هاتف جزائري صحيح`
+                : "عذراً، بيانات الولاية أو البلدية مفقودة لهذا الطلب في لوحة التحكم";
+
               console.error(`[PRE_FLIGHT_VALIDATION_FAILED] Order ${order.id}: ${missingMsg}`, {
+                originalPhone: rawPhoneValue,
+                normalizedPhone: cleanPhoneIntl || "invalid",
                 targetWilaya,
-                targetCommune,
-                cleanPhone
+                targetCommune
               });
+
               results.push({
                 success: false,
                 id: order.id,
                 stage: "PRE_FLIGHT_VALIDATION",
-                code: "MISSING_REQUIRED_FIELDS",
-                message: "عذراً، بيانات الولاية أو البلدية مفقودة لهذا الطلب في لوحة التحكم",
+                code: !cleanPhoneIntl ? "INVALID_PHONE_NUMBER" : "MISSING_REQUIRED_FIELDS",
+                message: missingMsg,
                 debugContext: {
+                  originalPhone: rawPhoneValue || "",
+                  normalizedPhone: cleanPhoneIntl || "Non valide",
                   targetWilaya,
                   targetCommune,
-                  phoneStr: cleanPhone || "",
                   customerName
                 }
               });
@@ -465,9 +509,10 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
                    code: "INVALID_DESK",
                    message: `عذراً، تعذر تحديد مكتب التوصيل (Hub ID) لولاية ${targetWilaya}. يرجى التحقق من لوحة التحكم.`,
                    debugContext: {
+                     originalPhone: rawPhoneValue || "",
+                     normalizedPhone: cleanPhoneIntl || "",
                      targetWilaya,
                      targetCommune,
-                     phoneStr: cleanPhone || "",
                      customerName,
                      deliveryType: finalDeliveryType,
                      deskName: "Non trouvé"
@@ -503,9 +548,11 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
               customer: {
                 customerId: crypto.randomUUID(),
                 name: String(customerName),
-                phone: String(cleanPhone)
+                phone: {
+                  number1: String(cleanPhoneIntl)
+                }
               },
-              phone: String(cleanPhone),
+              phone: String(cleanPhoneIntl),
               deliveryAddress: {
                 cityTerritoryId: String(wilayaUuid),
                 districtTerritoryId: String(communeUuid),
@@ -530,7 +577,11 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             }
 
             console.log(`[ZR_PAYLOAD_BUILT] Prepared payload for order ${order.id}.`);
-            console.log('[FINAL_ZR_PAYLOAD]', JSON.stringify(finalPayload));
+            console.log('[PHONE_LOGS]', {
+              originalPhone: rawPhoneValue,
+              normalizedPhone: cleanPhoneIntl
+            });
+            console.log('[FINAL_ZR_PAYLOAD]', JSON.stringify(finalPayload, null, 2));
             
             console.log(`[ZR_REQUEST_SENT] Sending request to ${API_BASE}/api/v1/parcels`);
             const response = await fetch(`${API_BASE}/api/v1/parcels`, {
@@ -571,9 +622,10 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
                    status: response.status,
                    statusText: response.statusText,
                    body: rawBody,
+                   originalPhone: rawPhoneValue,
+                   normalizedPhone: cleanPhoneIntl,
                    targetWilaya,
                    targetCommune,
-                   phoneStr: cleanPhone,
                    customerName,
                    deliveryType: finalDeliveryType,
                    deskName: finalDeskName || deskObj?.name || (finalHubId ? String(finalHubId) : "N/A")

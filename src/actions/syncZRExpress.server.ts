@@ -78,7 +78,38 @@ async function searchTerritory(query: string, expectedLevel: string): Promise<st
   return null; 
 }
 
-// Phone Number Normalization to clean flat Algerian local format (e.g. 0724426898)
+// Robust Phone Extractor checking candidate fields and ignoring empty strings, null, and undefined
+function extractRawPhone(order: any): string | null {
+  if (!order || typeof order !== 'object') return null;
+
+  const candidates = [
+    order.phone,
+    order.phone_number,
+    order.customer_phone,
+    order.client_phone,
+    order.telephone,
+    order.customer?.phone,
+    order.customer_info?.phone,
+    order.shipping_address?.phone
+  ];
+
+  for (const c of candidates) {
+    if (c === null || c === undefined) continue;
+    let valStr = "";
+    if (typeof c === 'object') {
+      valStr = String(c.number1 || c.phone || c.number || "").trim();
+    } else {
+      valStr = String(c).trim();
+    }
+    if (valStr.length > 0) {
+      return valStr;
+    }
+  }
+
+  return null;
+}
+
+// Phone Number Normalization to clean flat Algerian local format (0XXXXXXXXX)
 function normalizePhoneLocal(phoneInput: any): string | null {
   if (!phoneInput) return null;
 
@@ -368,16 +399,17 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
               id: order.selectedDeskId
             } : deskNameFromType ? { name: deskNameFromType } : null);
 
-            // Customer Name & Phone Normalization
+            // Customer Name & Phone Normalization via extractRawPhone helper
             const customerName = order.fullname || order.customer_name || order.customer_info?.name || "Client";
-            const rawPhoneValue = order.phone || order.customer_phone || order.phone_number || order.customer_info?.phone;
+            const rawPhoneValue = extractRawPhone(order);
 
             console.log("RAW ORDER:", {
               phone: order.phone,
               customer_phone: order.customer_phone,
               phone_number: order.phone_number,
               customer_info: order.customer_info,
-              customer: order.customer
+              customer: order.customer,
+              extractedRawPhone: rawPhoneValue
             });
 
             const cleanPhoneLocal = normalizePhoneLocal(rawPhoneValue);
@@ -421,8 +453,8 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             // Pre-Flight Payload Validation Guard (CRITICAL)
             if (!targetWilaya || !targetCommune || !cleanPhoneIntl) {
               const missingMsg = !cleanPhoneIntl 
-                ? `عذراً، رقم الهاتف غير صالح (${rawPhoneValue || 'مفقود'}). يرجى إدخال رقم هاتف جزائري صحيح`
-                : "عذراً، بيانات الولاية أو البلدية مفقودة لهذا الطلب في لوحة التحكم";
+                ? `رقم الهاتف مفقود أو غير صالح للطلب (#${order.id})`
+                : `عذراً، بيانات الولاية أو البلدية مفقودة للطلب (#${order.id})`;
 
               console.error(`[PRE_FLIGHT_VALIDATION_FAILED] Order ${order.id}: ${missingMsg}`, {
                 originalPhone: rawPhoneValue,

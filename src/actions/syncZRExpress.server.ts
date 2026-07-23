@@ -594,14 +594,11 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
               finalPayload.hubId = String(finalHubId);
             }
 
-            console.log(`[ZR_PAYLOAD_BUILT] Prepared payload for order ${order.id}.`);
-            console.log('[PHONE_LOGS]', {
-              originalPhone: rawPhoneValue,
-              normalizedPhone: cleanPhoneIntl
-            });
-            console.log('[FINAL_ZR_PAYLOAD]', JSON.stringify(finalPayload, null, 2));
-            console.log(JSON.stringify(finalPayload, null, 2));
-            
+            console.log('[AUDIT DB RECORD]:', JSON.stringify(order));
+            console.log('[AUDIT RAW PHONE]:', rawPhoneValue);
+            console.log('[AUDIT NORMALIZED PHONE]:', cleanPhoneIntl);
+            console.log('[AUDIT FINAL PAYLOAD STRING]:', JSON.stringify(finalPayload));
+
             console.log(`[ZR_REQUEST_SENT] Sending request to ${API_BASE}/api/v1/parcels`);
             const response = await fetch(`${API_BASE}/api/v1/parcels`, {
               method: 'POST',

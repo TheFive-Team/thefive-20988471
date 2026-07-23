@@ -562,6 +562,14 @@ function OrdersDashboard() {
         // Build a detailed feedback string
         const lines = [`نجحت مزامنة ${response.successCount} من ${response.successCount! + response.failedCount!} طلب.`];
         
+        const successes = response.results.filter(r => r.success);
+        if (successes.length > 0) {
+           lines.push("\n--- الطلبات المزامنة بنجاح ---");
+           successes.forEach(s => {
+              lines.push(`• الطلب #${s.id.substring(0, 8)}: رقم التتبع (${s.trackingNumber || 'تمت المزامنة'}) | Parcel ID: ${s.zrExpressId || 'موجود'}`);
+           });
+        }
+
         const failures = response.results.filter(r => !r.success);
         if (failures.length > 0) {
            lines.push("\n--- الأخطاء ---");

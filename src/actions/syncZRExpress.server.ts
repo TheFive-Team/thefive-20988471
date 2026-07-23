@@ -305,21 +305,22 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             order = order.orders[0];
           }
 
-          if (order.tracking_number && String(order.tracking_number).startsWith("ZRE")) {
-             console.log(`[ORDER_SKIPPED] Order ${order.id} already synced.`);
+          if ((order.zr_express_id && String(order.zr_express_id).trim()) || (order.tracking_number && String(order.tracking_number).trim())) {
+             console.log(`[ORDER_SKIPPED] Order ${order.id} already synced (Parcel ID: ${order.zr_express_id || 'N/A'}, Tracking: ${order.tracking_number || 'N/A'}). Skipping.`);
              results.push({
                success: true,
                id: order.id,
                stage: "PRE_SYNC",
                code: "ALREADY_SYNCED",
                message: "تمت مزامنة الطلب مسبقاً",
-               trackingNumber: order.tracking_number
+               trackingNumber: order.tracking_number || order.zr_express_id,
+               zrExpressId: order.zr_express_id || ""
              });
              continue;
           }
 
-          // 1. Check if ZR Express parcel already exists to prevent duplicates
-          console.log(`[ZR_REQUEST_SENT] Checking if shipment already exists for order ${order.id}...`);
+          // 1. Check if ZR Express parcel already exists on API to prevent duplicates
+          console.log(`[ZR_DUPLICATE_CHECK] Searching if shipment already exists for order ${order.id}...`);
           const searchRes = await fetch(`${API_BASE}/api/v1/parcels/search`, {
             method: 'POST',
             headers: {
@@ -337,7 +338,7 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             if (searchData && searchData.items && searchData.items.length > 0) {
               existingParcel = searchData.items.find((i: any) => i.externalId === order.id || i.description?.includes(order.id));
               if (!existingParcel) {
-                existingParcel = searchData.items[0]; // fallback to first match
+                existingParcel = searchData.items[0];
               }
               console.log(`[ZR_DUPLICATE_PREVENTED] Found existing shipment for order ${order.id} (ZR ID: ${existingParcel.id}, Tracking: ${existingParcel.trackingNumber})`);
             }
@@ -602,11 +603,17 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             if (!response.ok) {
               console.error(`[SYNC_FAILED_AT: ZR_REQUEST] ZR API Error for ${order.id}:`, rawBody);
               let errorMsg = "حدث خطأ غير معروف في واجهة ZR Express";
-              try {
-                const errObj = JSON.parse(rawBody);
-                errorMsg = errObj.message || errObj.error || errObj.detail || (Array.isArray(errObj.errors) ? errObj.errors.map((e: any) => e.message || JSON.stringify(e)).join(', ') : '') || (typeof errObj === 'string' ? errObj : errorMsg);
-              } catch (e) {
-                if (rawBody && rawBody.trim()) errorMsg = rawBody;
+              if (rawBody && rawBody.trim()) {
+                try {
+                  const errObj = JSON.parse(rawBody);
+                  if (Array.isArray(errObj.errors) && errObj.errors.length > 0) {
+                    errorMsg = errObj.errors.map((e: any) => e.description || e.message || JSON.stringify(e)).join(' | ');
+                  } else {
+                    errorMsg = errObj.message || errObj.error || errObj.detail || errObj.title || JSON.stringify(errObj);
+                  }
+                } catch (e) {
+                  errorMsg = rawBody.trim();
+                }
               }
               
               results.push({ 
@@ -635,18 +642,44 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
             }
   
             zrData = JSON.parse(rawBody);
-            console.log(`[ZR_SUCCESS] Successfully synced order ${order.id}`);
+            console.log(`[ZR_SUCCESS] Successfully created parcel for order ${order.id}. Response data:`, zrData);
           }
 
-          // 3. Update Supabase with Tracking Info
-          const trackingNumber = zrData.trackingNumber || zrData.code || zrData.id || `ZRE-${order.id.substring(0,6)}`;
+          // If zrData has id but no trackingNumber, fetch full parcel info from ZR Express
+          if (zrData && zrData.id && !zrData.trackingNumber) {
+             try {
+               const fullRes = await fetch(`${API_BASE}/api/v1/parcels/${zrData.id}`, {
+                 headers: {
+                   'Authorization': `Bearer ${API_KEY}`,
+                   'X-Api-Key': API_KEY,
+                   'X-Tenant': TENANT_ID
+                 }
+               });
+               if (fullRes.ok) {
+                 const fullData = await fullRes.json();
+                 zrData = { ...zrData, ...fullData };
+               }
+             } catch (e) {
+               console.error(`[ZR_PARCEL_FETCH_ERROR] Failed to fetch full parcel details for ${zrData.id}:`, e);
+             }
+          }
+
+          // 3. Update Supabase with Parcel ID and Tracking Info
           const zrExpressId = zrData.id || zrData.parcelId || '';
+          const trackingNumber = zrData.trackingNumber || zrData.code || zrExpressId || `ZRE-${order.id.substring(0,6)}`;
 
           const updatePayload = {
              tracking_number: trackingNumber,
              zr_express_id: zrExpressId
           };
           
+          console.log('[ZR_SYNC_SUCCESS]', JSON.stringify({
+            orderId: order.id,
+            parcelId: zrExpressId,
+            trackingNumber: trackingNumber,
+            timestamp: new Date().toISOString()
+          }, null, 2));
+
           console.log(`[ORDER_UPDATE_STARTED] Updating Supabase for ${order.id} with payload:`, updatePayload);
           const { error: updateError, count } = await authSupabase
             .from('orders')
@@ -662,17 +695,18 @@ export const syncConfirmedOrdersFn = createServerFn({ method: "POST" })
                code: updateError.code || "DB_UPDATE_ERROR",
                message: "فشل تحديث رقم تتبع ZR Express في قاعدة البيانات",
                details: updateError.message,
-               trackingNumber
+               trackingNumber,
+               zrExpressId
              });
           } else {
-             console.log(`[ORDER_UPDATE_SUCCESS] Successfully updated tracking ${trackingNumber} for ${order.id}. Rows affected: ${count}`);
+             console.log(`[ORDER_UPDATE_SUCCESS] Successfully updated tracking ${trackingNumber} and parcel ID ${zrExpressId} for ${order.id}. Rows affected: ${count}`);
              successCount++;
              results.push({
                success: true,
                id: order.id,
                stage: "COMPLETE",
                code: "SUCCESS",
-               message: "تمت مزامنة الطلب بنجاح وتوليد رقم التتبع",
+               message: `تمت مزامنة الطلب بنجاح وتوليد رقم التتبع (${trackingNumber})`,
                trackingNumber,
                zrExpressId
              });

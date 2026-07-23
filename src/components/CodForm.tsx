@@ -526,7 +526,7 @@ export function CodForm({
                  {form.wilaya && form.shippingMethod ? (
                    `${(form.shippingMethod === 'home' ? selectedWilayaObj?.home : selectedWilayaObj?.stop)?.toLocaleString()} د.ج`
                   ) : (
-                    <span className="text-gray-400 italic text-sm font-normal">يحدد لاحقاً</span>
+                    <span className="text-gray-400 italic text-sm font-normal">بعد اختيار الولاية</span>
                   )}
                </span>
              </div>

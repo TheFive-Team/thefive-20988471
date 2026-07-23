@@ -125,7 +125,7 @@
         "edges": [
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17848373323540",
+              "id": "gid://shopify/ProductVariant/17848377723680",
               "title": "6",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -147,7 +147,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17848373323541",
+              "id": "gid://shopify/ProductVariant/17848377723681",
               "title": "8",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -169,7 +169,7 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17848373323542",
+              "id": "gid://shopify/ProductVariant/17848377723682",
               "title": "10",
               "availableForSale": true,
               "quantityAvailable": 100,
@@ -191,10 +191,10 @@
           },
           {
             "node": {
-              "id": "gid://shopify/ProductVariant/17848373323543",
+              "id": "gid://shopify/ProductVariant/17848377723683",
               "title": "12",
               "availableForSale": true,
-              "quantityAvailable": 0,
+              "quantityAvailable": 100,
               "price": {
                 "amount": "5800.0",
                 "currencyCode": "DZD"
